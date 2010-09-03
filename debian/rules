@@ -1,0 +1,45 @@
+#!/usr/bin/make -f
+# debian/rules for statcvs, based on the one from Batik (uses CDBS)
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/ant.mk
+
+VERSION = $(shell dpkg-parsechangelog | egrep '^Version' | \
+	sed -r 's/Version:\s*//' | sed -r 's/^[0-9]+://' | \
+	sed -r 's/(\.dfsg)?-[0-9.]+//')
+
+JAVA_HOME_DIRS       := /usr/lib/jvm/java-6-openjdk /usr/lib/jvm/default-java /usr/lib/jvm/java-6-sun .
+DEB_JARS             := ant-launcher.jar RXTXcomm.jar swing-layout.jar \
+			vecmath.jar j3dcore.jar j3dutils.jar j3d-org-java3d-all.jar
+DEB_ANT_BUILD_TARGET := jar
+DEB_ANT_CLEAN_TARGET := clean
+
+print-version:
+	echo $(VERSION)
+
+install/reprap-host::
+	# Install sundry files - most of these should go somewhere else, but where?
+	install -D -m644 reprap.properties.dist debian/reprap-host/usr/lib/reprap/reprap.properties.dist
+	install -D -m644 *.png debian/reprap-host/usr/lib/reprap
+	install -D -m644 reprap-wv.stl debian/reprap-host/usr/lib/reprap/reprap-wv.stl
+	
+	# Install Libraries - most of these should be in their own .deb files in the future
+	install -D -m644 *.jar debian/reprap-host/usr/lib/reprap
+	install -D -m644 *.so debian/reprap-host/usr/lib/reprap
+	
+	# Script to run RepRap Host program - currently needs to be in same place as the libraries, needs to be changed
+	install -D -m755 reprap debian/reprap-host/usr/lib/reprap/reprap
+
+	# man page
+	install -D -m644 reprap-host.1 debian/reprap-host/usr/share/man/man1/reprap-host.1
+
+	# Menu generation files
+	install -D -m644 debian/reprap-host.desktop \
+	    debian/reprap-host/usr/share/applications/reprap-host.desktop
+	install -D -m644 debian/reprap-host.menu debian/reprap-host/usr/share/menu/reprap-host.menu
+	install -D -m644 debian/reprap.xpm debian/reprap-host/usr/share/pixmaps/reprap.xpm
+
+	# Documentation
+	mkdir -p debian/reprap-host/usr/share/doc/reprap-host
+	sed -e "s/RELEASE/$(RELEASE)/g" -e "s/DATE/$(NOW)/g" README \
+	    > debian/reprap-host/usr/share/doc/reprap-host/README

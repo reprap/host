@@ -1,0 +1,32 @@
+
+This is the RepRap Research Foundation's prepackaged version of the
+RepRap host code, written in Java by Adrian Bowyer with contributions
+from Ed Sells, Simon McAuliffe, Vik Olliver, Zach Smith, and Jonathan
+Marsden.
+
+This package was built by Jonathan Marsden <jmarsden@fastmail.fm> .
+Current sources are found at http://sourceforge.net/projects/reprap/
+
+The only changes made are the addition of the Debian package maintenance 
+system.
+
+See http://www.reprap.org for further details about RepRap.
+
+Copyright: RepRap is Copyright (C) 2006 Adrian Bowyer & The University of Bath
+ 
+Principal author:
+ 
+Adrian Bowyer
+Department of Mechanical Engineering
+Faculty of Engineering and Design
+University of Bath
+Bath BA2 7AY
+U.K.
+ 
+e-mail: A.Bowyer@bath.ac.uk
+
+RepRap is licensed under the GNU Lesser General Public License (LGPL),
+version 2.1.
+
+The full text of the LGPL can be found in /usr/share/common-licenses/LGPL-2.1 .
+
