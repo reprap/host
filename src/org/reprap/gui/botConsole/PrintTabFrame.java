@@ -505,17 +505,26 @@ private void pcbButtonActionPerformed(java.awt.event.ActionEvent evt)
 		JOptionPane.showMessageDialog(null, "No Gerber file was loaded.");
 		return;
 	}
-	File inputDrill = org.reprap.Main.gui.onOpen("PCB drill file", new String[] {"hol"}, "");
-	if(inputDrill == null)
-	{
-		JOptionPane.showMessageDialog(null, "No Drill file was loaded; pcb centres will not be marked");
-	}
-	int sp = inputGerber.getName().toLowerCase().indexOf(".top");
+
+	int sp = inputGerber.getAbsolutePath().toLowerCase().indexOf(".top");
+	String drill;
 	if(sp < 0)
-		sp = inputGerber.getName().toLowerCase().indexOf(".bot");
+	{
+		sp = inputGerber.getAbsolutePath().toLowerCase().indexOf(".bot");
+		drill = ".bdr";
+	} else
+	{
+		drill = ".tdr";
+	}
 	String fileRoot = "";
 	if(sp > 0)
-		fileRoot = inputGerber.getName().substring(0, sp);
+		fileRoot = inputGerber.getAbsolutePath().substring(0, sp);
+	drill = fileRoot+drill;
+	File inputDrill = new File(drill);
+	if(inputDrill == null)
+	{
+		JOptionPane.showMessageDialog(null, "Drill file " + drill + " not found; drill centres will not be marked");
+	}
 	File outputGCode = org.reprap.Main.gui.onOpen("G-Code file for PCB printing", new String[] {"gcode"}, fileRoot);
 	if(outputGCode == null)
 	{
