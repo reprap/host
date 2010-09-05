@@ -91,7 +91,8 @@ public class Preferences {
 		URL mainUrl = mainFile.toURI().toURL();
 		
 		if (fallbackUrl == null && !mainFile.exists())
-			throw new IOException("Cannot load RepRap properties file or default "+propsFileDist);
+			//throw new IOException("Cannot load RepRap properties file or default "+propsFileDist);
+			Debug.e("Cannot load RepRap properties file or default "+propsFileDist);
 		
 		if (fallbackUrl != null)
 			fallbackPreferences.load(fallbackUrl.openStream());
@@ -106,7 +107,7 @@ public class Preferences {
 			// If we don't have a local preferences file copy the default
 			// file into it.
 			mainPreferences.load(fallbackUrl.openStream());
-			save();
+			save(true);
 		}
 
 	}
@@ -173,7 +174,7 @@ public class Preferences {
 			Debug.d("The distribution preferences file and yours match.  This is good.");
 	}
 
-	public void save() throws FileNotFoundException, IOException {
+	public void save(boolean startUp) throws FileNotFoundException, IOException {
 		String savePath = new String(System.getProperty("user.home") + File.separatorChar + 
 			propsFolder + File.separatorChar);
 		File f = new File(savePath + File.separatorChar + propsFile);
@@ -188,7 +189,9 @@ public class Preferences {
 		
 		OutputStream output = new FileOutputStream(f);
 		mainPreferences.store(output, "RepRap machine parameters. See http://objects.reprap.org/wiki/Java_Software_Preferences_File");
-		org.reprap.Main.gui.getPrinter().refreshPreferences();
+
+		if(!startUp)
+			org.reprap.Main.gui.getPrinter().refreshPreferences();
 	}
 		
 	public String loadString(String name) {
@@ -260,7 +263,7 @@ public class Preferences {
 	
 	public static void saveGlobal() throws IOException {		
 		initIfNeeded();
-		globalPrefs.save();
+		globalPrefs.save(false);
 	}
 
 	public static Preferences getGlobalPreferences() throws IOException {

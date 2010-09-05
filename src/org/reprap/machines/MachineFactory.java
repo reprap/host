@@ -24,7 +24,7 @@ public class MachineFactory {
 	 */
 	static public Printer create() throws Exception
 	{
-		String machine = Preferences.loadGlobalString("RepRap_Machine");
+		String machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
 
 //		if (machine.compareToIgnoreCase("SNAPRepRap") == 0)
 //		  	return new SNAPReprap();

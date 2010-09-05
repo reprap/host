@@ -96,13 +96,14 @@ public class Main {
         
         FileFilter filter = new ExtensionFileFilter("STL", new String[] { "STL" });
         chooser.setFileFilter(filter);
+        
         try
         {
         	printer = MachineFactory.create();
         } catch (Exception ex)
         {
-        	System.err.println("MachineFactory.create() failed.\n" +
-        			ex.toString());
+        	System.err.println("MachineFactory.create() failed.\n");
+        	ex.printStackTrace();
         }
 	}
 
@@ -728,15 +729,15 @@ public class Main {
 		Debug.d("Main dispose()");
 		ftd.killThem();
 		/// TODO This class should be fixed so it gets the dispose on window close
-		try {
-			// Attempt to save screen position if requested
-			org.reprap.Preferences prefs = org.reprap.Preferences.getGlobalPreferences();
-			if (prefs.loadBool("RememberWindowPosition")) {
-				//prefs.setGlobalBool("MainWindowTop", xxx)
-			}
-		} catch (Exception ex) {
-			
-		}
+//		try {
+//			// Attempt to save screen position if requested
+//			org.reprap.Preferences prefs = org.reprap.Preferences.getGlobalPreferences();
+//			if (prefs.loadBool("RememberWindowPosition")) {
+//				//prefs.setGlobalBool("MainWindowTop", xxx);
+//			}
+//		} catch (Exception ex) {
+//			
+//		}
 		
 		System.exit(0);
 	}
