@@ -657,7 +657,7 @@ public class GCodeRepRap extends GenericRepRap {
 		super.homeToZeroZ();
 	}
 	
-	public double round(double c, double d)
+	public static double round(double c, double d)
 	{
 		double power = Math.pow(10.0, d);
 		

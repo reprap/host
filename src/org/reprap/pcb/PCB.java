@@ -15,6 +15,7 @@ import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.geometry.polygons.*;
 import org.reprap.utilities.RrGraphics;
+import org.reprap.utilities.Debug;
 import org.reprap.comms.GCodeReaderAndWriter;
 
 //import java.io.IOException;
@@ -23,7 +24,6 @@ public class PCB {
 	
 	GerberGCode gerberGcode; 
 	String[] splitline;
-	boolean debug = false;
 	RrRectangle bigBox;
 	BufferedReader in;
 	String line;
@@ -54,14 +54,14 @@ public class PCB {
 		outputGCodes = og;
 		pcbPen = pp;
 		penWidth = pcbPen.getExtrusionSize();
-		System.out.println("Gerber RS274X to GCoder Converter for RepRap\n");
+		Debug.d("Gerber RS274X to GCoder Converter for RepRap\n");
 
 
-		System.out.println("Input: " + inputTracksAndPads.getName());
-		System.out.println("Output: " + outputGCodes.getName()+"\n");
-		System.out.println("Pen Width: " + penWidth + " mm");
-		System.out.println("Offset X: " + offsetX + " mm");
-		System.out.println("Offset Y: " + offsetY + " mm");
+		Debug.d("Input: " + inputTracksAndPads.getName());
+		Debug.d("Output: " + outputGCodes.getName()+"\n");
+		Debug.d("Pen Width: " + penWidth + " mm");
+		Debug.d("Offset X: " + offsetX + " mm");
+		Debug.d("Offset Y: " + offsetY + " mm");
 
 		createBitmap();
 
@@ -73,7 +73,7 @@ public class PCB {
 		{
 			if(Preferences.loadGlobalBool("DisplaySimulation"))
 			{
-				RrGraphics simulationPlot2 = new RrGraphics("PCB plotlines");
+				RrGraphics simulationPlot2 = new RrGraphics("PCB pen plotlines");
 //				if(currentPolygon != null)
 //					thePattern.add(new RrPolygon(currentPolygon));
 				simulationPlot2.init(penPaths.getBox(), false, 0);
@@ -86,15 +86,18 @@ public class PCB {
 		
 		writeGCodes();
 			
-		System.out.println("GCode file generated succesfully !");
+		Debug.d("GCode file generated succesfully !");
 	}
 	
 	private void raisePen()
 	{
+		double zf = org.reprap.machines.GCodeRepRap.round(zFeedRate, 1);
+		double zu = org.reprap.machines.GCodeRepRap.round(pcbPen.getLift(), 1);
+		double xyf = org.reprap.machines.GCodeRepRap.round(pcbPen.getSlowXYFeedrate(), 1);		
 		try {
-			gcode.queue("G1 F" + zFeedRate + "; Z feedrate");
-			gcode.queue("G1 Z" + pcbPen.getLift() + "; Z clearance height");
-			gcode.queue("G1 F" + pcbPen.getSlowXYFeedrate() + "; XY feedrate");
+			gcode.queue("G1 F" + zf + "; Z feedrate");
+			gcode.queue("G1 Z" + zu + "; Z clearance height");
+			gcode.queue("G1 F" + xyf + "; XY feedrate");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -103,10 +106,13 @@ public class PCB {
 	
 	private void lowerPen()
 	{
+		double zf = org.reprap.machines.GCodeRepRap.round(zFeedRate, 1);
+		double zd = org.reprap.machines.GCodeRepRap.round(zDown, 1);
+		double xyf = org.reprap.machines.GCodeRepRap.round(pcbPen.getSlowXYFeedrate(), 1);
 		try {
-			gcode.queue("G1 F" + zFeedRate + "; Z feedrate");
-			gcode.queue("G1 Z" + zDown + "; Z drawing height");
-			gcode.queue("G1 F" + pcbPen.getSlowXYFeedrate() + "; XY feedrate");
+			gcode.queue("G1 F" + zf + "; Z feedrate");
+			gcode.queue("G1 Z" + zd + "; Z drawing height");
+			gcode.queue("G1 F" + xyf + "; XY feedrate");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -158,12 +164,22 @@ public class PCB {
 	{
 		if(p.size() <= 0)
 			return;
-		try {
-		gcode.queue("G1 X" + p.point(0).x() + " Y" + p.point(0).y() + "; move to polygon start");
+		double x, y;
+		try 
+		{
+			x = org.reprap.machines.GCodeRepRap.round(p.point(0).x(), 1);
+			y = org.reprap.machines.GCodeRepRap.round(p.point(0).y(), 1);
+		gcode.queue("G1 X" + x + " Y" + y + "; move to polygon start");
 		lowerPen();
 		for(int i = 1; i < p.size(); i++)
-			gcode.queue("G1 X" + p.point(i).x() + " Y" + p.point(i).y() + "; draw line");
-		gcode.queue("G1 X" + p.point(0).x() + " Y" + p.point(0).y() + "; draw back to polygon start");
+		{
+			x = org.reprap.machines.GCodeRepRap.round(p.point(i).x(), 1);
+			y = org.reprap.machines.GCodeRepRap.round(p.point(i).y(), 1);
+			gcode.queue("G1 X" + x + " Y" + y + "; draw line");
+		}
+		x = org.reprap.machines.GCodeRepRap.round(p.point(0).x(), 1);
+		y = org.reprap.machines.GCodeRepRap.round(p.point(0).y(), 1);
+		gcode.queue("G1 X" + x + " Y" + y + "; draw back to polygon start");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;
@@ -187,7 +203,7 @@ public class PCB {
 	
 	private void createBitmap()
 	{
-		gerberGcode = new GerberGCode(pcbPen, null, true); //, drawingHeight, freemoveHeight, XYFeedrate, ZFeedrate);
+		gerberGcode = new GerberGCode(pcbPen, null, true); 
 		
 		bigBox = new RrRectangle();
 
@@ -201,8 +217,8 @@ public class PCB {
 				if(r != null)
 					bigBox = RrRectangle.union(bigBox, r);
 			}
-			if(debug)
-				System.out.println("Surrounding reactangle: " + bigBox);
+			
+			Debug.d("Surrounding reactangle: " + bigBox);
 			in.close();
 			
 			in = new BufferedReader(new FileReader(inputTracksAndPads));
@@ -234,7 +250,7 @@ public class PCB {
 	
 	private RrRectangle processLine(String line, boolean drill)
 	{
-		if(debug) System.out.println(line);
+		Debug.d(line);
 		
 		boolean drillDef = false;
 		
@@ -250,7 +266,7 @@ public class PCB {
 
 			formatX = line.substring(6, 8);
 			formatY = line.substring(9, 11);
-			if(debug) System.out.println("Format X: " + formatX + " Format Y: " + formatY);
+			Debug.d("Format X: " + formatX + " Format Y: " + formatY);
 		}
 		else
 			if(line.startsWith("%ADD"))
@@ -266,18 +282,16 @@ public class PCB {
 				apertureType = splitline[0];
 				apertureSize = splitline[1]; 
 
-				if(debug) 
-				{
-					System.out.println("\n\nAparture: " + apertureNum);
-					System.out.println("Type: " + apertureType);
-				}
+
+				Debug.d("\n\nAparture: " + apertureNum);
+				Debug.d("Type: " + apertureType);
+				
 
 				if(apertureType.equals("C"))
 				{
 					double s = scale*Double.parseDouble(apertureSize);
-					gerberGcode.addCircleAperture(Integer.parseInt(apertureNum), s);
-					if(debug) 
-						System.out.println("Size: " + s + " mm");
+					gerberGcode.addCircleAperture(Integer.parseInt(apertureNum), s); 
+					Debug.d("Size: " + s + " mm");
 				}
 				else
 					if(apertureType.equals("R"))
@@ -288,8 +302,7 @@ public class PCB {
 						double y = scale*Double.parseDouble(rectSides[1]);
 
 						gerberGcode.addRectangleAperture(Integer.parseInt(apertureNum), x, y);
-						if(debug) 
-							System.out.println("Size: " + x + "x" + y + "mm x mm");
+						Debug.d("Size: " + x + "x" + y + "mm x mm");
 					}
 					else
 						if(apertureType.equals("OC8"))
@@ -298,7 +311,7 @@ public class PCB {
 						}
 						else
 						{
-							System.out.println(" [-] aparture type: " + apertureType + " not supported [" + line+"]\n");
+							Debug.e(" [-] aparture type: " + apertureType + " not supported [" + line+"]\n");
 							//System.exit(-1);
 						}
 
@@ -316,44 +329,38 @@ public class PCB {
 						apertureNum = splitline[0];
 						apertureSize = splitline[1]; 
 
-						if(debug) 
-							System.out.println("\n\nDrill: " + apertureNum);
+						Debug.d("\n\nDrill: " + apertureNum);
 
 						drillDef = true;
 
 						double s = scale*Double.parseDouble(apertureSize);
 						gerberGcode.addCircleAperture(Integer.parseInt(apertureNum), s);
-						if(debug) 
-							System.out.println("Size: " + s + " mm");
+						Debug.d("Size: " + s + " mm");
 					}
 				}
 				else
 					if(line.startsWith("G90"))
 					{
 						gerberGcode.enableAbsolute();
-						if(debug)
-							System.out.println("Absolute coordinates");
+						Debug.d("Absolute coordinates");
 					}
 					else
 						if(line.startsWith("G91"))
 						{
 							gerberGcode.enableRelative();
-							if(debug)
-								System.out.println("Relative coordinates");
+							Debug.d("Relative coordinates");
 						}
 						else
 							if(line.startsWith("G70") || (drill && line.startsWith("M72")))
 							{
 								scale = 25.4;
-								if(debug)
-									System.out.println("Inches");
+								Debug.d("Inches");
 							}
 							else
 								if(line.startsWith("G71")|| (drill && line.startsWith("M71")))
 								{
 									scale = 1;
-									if(debug)
-										System.out.println("Metric");
+									Debug.d("Metric");
 								}
 								else
 									if(line.startsWith("G54"))
@@ -361,16 +368,14 @@ public class PCB {
 										if(drill)
 										{
 											gerberGcode.selectAperture(-1);
-											if(debug)
-												System.out.println("Drill centre selected.");
+											Debug.d("Drill centre selected.");
 										} else
 										{
 											int aperture;
 
 											aperture = Integer.valueOf(line.substring(4, line.length()-1).trim());
 											gerberGcode.selectAperture(aperture);
-											if(debug)
-												System.out.println("Apature: " + aperture + " selected.");
+											Debug.d("Apature: " + aperture + " selected.");
 										}
 
 									}
@@ -404,8 +409,7 @@ public class PCB {
 											x += offsetX;
 											y += offsetY;
 
-											if(debug)
-												System.out.println(" X: "+x+" Y:"+y+" D:"+d);
+											Debug.d(" X: "+x+" Y:"+y+" D:"+d);
 
 											if(d==1)
 											{
@@ -428,8 +432,7 @@ public class PCB {
 												if(drill)
 												{
 													gerberGcode.selectAperture(-1);
-													if(debug)
-														System.out.println("Drill centre selected.");
+													Debug.d("Drill centre selected.");
 												} else
 												{
 													int aperture;
@@ -437,8 +440,7 @@ public class PCB {
 													aperture = Integer.valueOf(line.substring(1, 3));
 													gerberGcode.selectAperture(aperture);
 
-													if(debug)
-														System.out.print("Apature: " + aperture + " selected.");
+													Debug.d("Apature: " + aperture + " selected.");
 												}
 											}
 		return result;

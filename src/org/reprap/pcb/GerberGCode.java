@@ -128,6 +128,7 @@ public class GerberGCode {
 		if(pcb == null)
 			return result;
 		pcb.homogeneous(result.sw(), result.ne(), colour);
+		lastCoords = new Rr2Point(fixCoords(c));
 		return result;
 	}
 	
@@ -137,6 +138,7 @@ public class GerberGCode {
 		if(pcb == null)
 			return result;
 		pcb.disc(c, curAperture.width*0.5, colour);
+		lastCoords = new Rr2Point(fixCoords(c));
 		//octagon(fixCoords(c), curAperture.width);
 		return result;
 	}
@@ -230,7 +232,7 @@ public class GerberGCode {
 		{
 			if(Preferences.loadGlobalBool("DisplaySimulation"))
 			{
-				RrGraphics simulationPlot1 = new RrGraphics("PCB pattern");
+				RrGraphics simulationPlot1 = new RrGraphics("PCB from gerber");
 //				if(currentPolygon != null)
 //					thePattern.add(new RrPolygon(currentPolygon));
 				simulationPlot1.init(pcb.box(), false, 0);
