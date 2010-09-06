@@ -549,23 +549,8 @@ public class LayerProducer {
 //		else if(p.isClosed() && att.getExtruder().randomStart())
 //			p = p.randomStart();
 		
-		int stopExtruding = p.size() + 10;
-		int stopValve = stopExtruding;
-		double extrudeBackLength = att.getExtruder().getExtrusionOverRun();
-		double valveBackLength = att.getExtruder().getValveOverRun();
-		if(extrudeBackLength >= valveBackLength)
-		{
-			if(extrudeBackLength > 0)
-				stopExtruding = p.backStep(extrudeBackLength);
-			if(valveBackLength > 0)
-				stopValve = p.backStep(valveBackLength);
-		} else
-		{
-			if(valveBackLength > 0)
-				stopValve = p.backStep(valveBackLength);
-			if(extrudeBackLength > 0)
-				stopExtruding = p.backStep(extrudeBackLength);			
-		}
+		//int stopExtruding = p.size() + 10;
+		//int stopValve = stopExtruding;
 		
 		if (printer.isCancelled()) return;
 		
@@ -577,16 +562,21 @@ public class LayerProducer {
 			p.setSpeeds(att.getExtruder().getSlowXYFeedrate(), p.isClosed()?outlineFeedrate:infillFeedrate, 
 					att.getExtruder().getMaxAcceleration());
 		
-		
-		if(extrudeBackLength <= 0)
-			stopExtruding = Integer.MAX_VALUE;
-		else if(acc)
-			stopExtruding = p.findBackPoint(extrudeBackLength);
-		
-		if(valveBackLength <= 0)
-			stopValve = Integer.MAX_VALUE;
-		else if(acc)
-			stopValve = p.findBackPoint(valveBackLength);
+		double extrudeBackLength = att.getExtruder().getExtrusionOverRun();
+		double valveBackLength = att.getExtruder().getValveOverRun();
+		if(extrudeBackLength > 0 && valveBackLength > 0)
+			Debug.e("LayerProducer.plot(): extruder has both valve backoff and extrude backoff specified.");
+
+		p.backStep(extrudeBackLength);
+		p.backStep(valveBackLength);
+//
+//		if(extrudeBackLength > 0 && acc)
+//			stopExtruding = p.findBackPoint(extrudeBackLength);
+//		
+//		if(valveBackLength <= 0)
+//			stopValve = Integer.MAX_VALUE;
+//		else if(acc)
+//			stopValve = p.findBackPoint(valveBackLength);
 
 		currentFeedrate = att.getExtruder().getFastXYFeedrate();
 		singleMove(p.point(0));
@@ -657,10 +647,8 @@ public class LayerProducer {
 					currentFeedrate = p.speed(i);
 				
 				oldexoff = extrudeOff;
-				extrudeOff = i > stopExtruding || i == p.size()-1;
-				valveOff = i > stopValve || i == p.size()-1;
-//				if(oldexoff ^ extrudeOff)
-//					printer.printEndReverse();				
+				extrudeOff = (i > p.drawEnd() && extrudeBackLength > 0) || i == p.size()-1;
+				valveOff = (i > p.drawEnd() && valveBackLength > 0) || i == p.size()-1;			
 				plot(p.point(i), next, extrudeOff, valveOff);
 				if(oldexoff ^ extrudeOff)
 					printer.printEndReverse();

@@ -120,6 +120,11 @@ public class RrPolygon
 	private boolean beingDestroyed = false;
 	
 	/**
+	 * The index of the last point to draw to, if there are more that should just be moved over
+	 */
+	private int drawEnd;
+	
+	/**
 	 * Destroy me and all that I point to
 	 */
 	public void destroy() 
@@ -182,6 +187,7 @@ public class RrPolygon
 		att = a;
 		box = new RrRectangle();
 		closed = c;
+		drawEnd = -1;
 	}
 	
 	/**
@@ -241,6 +247,18 @@ public class RrPolygon
 	{
 		return closed;
 	}
+	
+	/**
+	 * What's the last point to plot to?
+	 * @return
+	 */
+	public int drawEnd()
+	{
+		if(drawEnd < 0)
+			return size() - 1;
+		else
+			return drawEnd;
+	}
 		
 	/**
 	 * Length
@@ -267,6 +285,7 @@ public class RrPolygon
 				speeds.add(new Double(p.speed(i)));
 		}
 		closed = p.closed;
+		drawEnd = p.drawEnd;
 	}
 	
 	/**
@@ -293,6 +312,8 @@ public class RrPolygon
 			Debug.e("Rr2Point.add(): adding a point to a polygon with its speeds set.");
 		points.add(i, new Rr2Point(p));
 		box.expand(p);
+		if(i <= drawEnd)
+			drawEnd++;
 	}
 	
 	/**
@@ -305,7 +326,7 @@ public class RrPolygon
 		if(speeds != null)
 			Debug.e("Rr2Point.set(): adding a point to a polygon with its speeds set.");
 		points.set(i, new Rr2Point(p));
-		box.expand(p);
+		box.expand(p);  // Note if the old point was on the convex hull, and the new one is within, box will be too big after this
 	}
 
 	/**
@@ -321,6 +342,8 @@ public class RrPolygon
 		points.add(i, new Rr2Point(p));
 		speeds.add(i, s);
 		box.expand(p);
+		if(i <= drawEnd)
+			drawEnd++;
 	}
 	
 	/**
@@ -335,7 +358,7 @@ public class RrPolygon
 			Debug.e("Rr2Point.set(): adding a point and a speed to a polygon without its speeds set.");
 		points.set(i, new Rr2Point(p));
 		speeds.set(i, s);
-		box.expand(p);
+		box.expand(p); // Note if the old point was on the convex hull, and the new one is within, box will be too big after this
 	}
 	
 	/**
@@ -353,6 +376,15 @@ public class RrPolygon
 				speeds.add(new Double(0));
 		}
 		speeds.set(i, new Double(s));
+	}
+	
+	/**
+	 * Eet the last point to plot to
+	 * @param d
+	 */
+	public void setDrawEnd(int d)
+	{
+		drawEnd = d;
 	}
 	
 	/**
@@ -374,8 +406,12 @@ public class RrPolygon
 	{
 		if(p.size() == 0)
 			return;
+		if(drawEnd >= 0)
+			Debug.e("Rr2Point.add(): adding a polygon to another polygon with its draw ending set.");
 		for(int i = 0; i < p.size(); i++)
 		{
+			if(i == p.drawEnd)
+				drawEnd = size();
 			points.add(new Rr2Point(p.point(i)));
 		}
 		box.expand(p.box);
@@ -411,15 +447,23 @@ public class RrPolygon
 		{
 			Debug.e("Rr2Point.add(): attempt to add a polygon to another polygon when one has speeds and the other doesn't.");
 			return;
-		}			
+		}
+		if(k <= drawEnd)
+			Debug.e("Rr2Point.add(): adding a polygon to another polygon with its draw ending set.");
+		int de = -1;
+		if (drawEnd >= 0)
+			de = drawEnd + p.size();
 		for(int i = 0; i < p.size(); i++)
 		{
+			if(i == p.drawEnd)
+				drawEnd = size();
 			if(speeds != null)
 				add(k, new Rr2Point(p.point(i)), p.speed(i));
 			else
 				points.add(k, new Rr2Point(p.point(i)));
 			k++;
 		}
+		drawEnd = Math.max(drawEnd, de);
 		box.expand(p.box);
 	}
 	
@@ -471,6 +515,8 @@ public class RrPolygon
 	 */
 	public RrPolygon negate()
 	{
+		if(drawEnd >= 0)
+			Debug.e("Rr2Point.negate(): negating a polygon with its draw ending set.");
 		RrPolygon result = new RrPolygon(att, closed);
 		for(int i = size() - 1; i >= 0; i--)
 		{
@@ -490,19 +536,9 @@ public class RrPolygon
 	 */
 	public RrPolygon randomStart()
 	{
+		if(drawEnd >= 0)
+			Debug.e("Rr2Point.randomStart(: randomizing a polygon with its draw ending set.");
 		return newStart(rangen.nextInt(size()));
-//		if(!isClosed())
-//			Debug.e("RrPolygon.randomStart(): random-starting an open polygon!");
-//		RrPolygon result = new RrPolygon(att, closed);
-//		int i = rangen.nextInt(size());
-//		for(int j = 0; j < size(); j++)
-//		{
-//			result.add(new Rr2Point(point(i))); 
-//			i++;
-//			if(i >= size())
-//				i = 0;
-//		}
-//		return result;
 	}
 	
 	/**
@@ -512,6 +548,8 @@ public class RrPolygon
 	{
 		if(!isClosed())
 			Debug.e("RrPolygon.newStart(i): reordering an open polygon!");
+		if(drawEnd >= 0)
+			Debug.e("Rr2Point.newStart(i): reordering a polygon with its draw ending set.");		
 		if(i < 0 || i >= size())
 		{
 			Debug.e("RrPolygon.newStart(i): dud index: " + i);
@@ -538,6 +576,8 @@ public class RrPolygon
 	{
 		if(size() == 0 || lc.getModelLayer() < 0)
 			return this;
+		if(drawEnd >= 0)
+			Debug.e("Rr2Point.incrementedStart(): incrementing a polygon with its draw ending set.");	
 		int i = lc.getModelLayer() % size();
 		return newStart(i);
 	}
@@ -580,6 +620,10 @@ public class RrPolygon
 	{
 		if(!p.isClosed())
 			Debug.e("RrPolygon.nearestVertexReorder(): called for non-closed polygon.");
+		if(drawEnd >= 0 || p.drawEnd >= 0)
+			Debug.e("Rr2Point.nearestVertexReorderMerge(): merging polygons with a draw ending set.");
+		if(drawEnd >= 0)
+			Debug.e("Rr2Point.add(): incrementing a polygon with its draw ending set.");
 		double d = Double.POSITIVE_INFINITY;
 		int myPoint = -1;
 		int itsPoint = -1;
@@ -648,49 +692,65 @@ public class RrPolygon
 	}
 	
 	/**
-	 * Backtrack a given distance, inserting a new point there and returning its index
+	 * Backtrack a given distance, inserting a new point there and set drawEnd to it.
+	 * If drawEnd is already set, backtrack from that.
 	 * @param distance to backtrack
 	 * @return index of the inserted point
 	 */
-	public int backStep(double d)
+	public void backStep(double d)
 	{
-		Rr2Point last, p;
-		int start = size() - 1;
-		if(isClosed())
-			last = point(0);
+		if(d <= 0)
+			return;
+		
+		Rr2Point p, q;
+		int start, last;
+		
+		if(drawEnd >= 0)
+			start = drawEnd;
 		else
-		{
-			last = point(start);
-			start--;
-		}
+			start = size() - 1;					
+
+		if(!isClosed() && drawEnd < 0)
+				start--;
+		
+		if (start >= size() - 1)
+			last = 0;
+		else
+			last = start + 1;
+		
 		double sum = 0;
 		for(int i = start; i >= 0; i--)
 		{
-			p = point(i);
-			sum += Rr2Point.d(p, last);
+			sum += Rr2Point.d(point(i), point(last));
 			if(sum > d)
 			{
 				sum = sum - d;
-				p = Rr2Point.sub(last, p);
-				sum = sum/p.mod();
-				p = Rr2Point.add(point(i), Rr2Point.mul(sum, p));
+				q = Rr2Point.sub(point(last), point(i));
+				p = Rr2Point.add(point(i), Rr2Point.mul(sum/q.mod(), q));
+				double s = 0;
+				if(speeds != null)
+				{
+					s = speeds.get(last) - speeds.get(i);
+					s = speeds.get(i) + s*sum/q.mod();
+				}
 				int j = i + 1;
 				if(j < size())
 				{
 					points.add(j, p);
 					if(speeds != null)
-						speeds.add(j, new Double(0)); // It's up to the user to set something sensible here afterwards
+						speeds.add(j, new Double(s)); 
 				} else
 				{
 					points.add(p);
-					if(speeds != null)
-						speeds.add(new Double(0));    // ditto
+					if(speeds != null)						
+						speeds.add(new Double(s)); 
 				}
-				return(j);
+				drawEnd = j;
+				return;
 			}
-			last = p;
+			last = i;
 		}
-		return 0;
+		drawEnd = 0;
 	}
 	
 	/**
