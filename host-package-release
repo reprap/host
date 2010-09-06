@@ -19,7 +19,7 @@ SRCFILELIST="src/* build.xml build-user.xml .classpath .project \
 
 LIBFILES="lib/*"
 
-DESIGNFILES="../$MACHINE"
+DESIGNFILES="../$MACHINE ../electronics ../firmware"
 
 CLASSPATH=$CLASSPATH:./lib/j3dcore.jar
 CLASSPATH=$CLASSPATH:./lib/j3d-org-java3d-all.jar
@@ -83,8 +83,8 @@ done
 
 #Remove local configuration files
 
-rm -f "$BASENAME"/"$MACHINE"/firmware/FiveD_GCode/Extruder/configuration.h
-rm -f "$BASENAME"/"$MACHINE"/firmware/FiveD_GCode/FiveD_GCode_Interpreter/configuration.h
+rm -f "$BASENAME"/firmware/FiveD_GCode/Extruder/configuration.h
+rm -f "$BASENAME"/firmware/FiveD_GCode/FiveD_GCode_Interpreter/configuration.h
 
 echo "Design files copied."
 
