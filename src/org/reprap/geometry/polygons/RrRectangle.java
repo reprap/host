@@ -220,6 +220,17 @@ public class RrRectangle
 	}
 	
 	/**
+	 * Move somewhere else
+	 * @param p
+	 * @return
+	 */
+	public RrRectangle translate(Rr2Point p)
+	{
+		return new RrRectangle(new RrInterval(x.low() + p.x(), x.high() + p.x()), 
+				new RrInterval(y.low() + p.y(), y.high() + p.y()));
+	}
+	
+	/**
 	 * @param a
 	 */
 	public void expand(Rr2Point a)

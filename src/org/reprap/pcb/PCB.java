@@ -1,15 +1,28 @@
 package org.reprap.pcb;
 
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.File;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
 import org.reprap.Extruder;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
@@ -19,6 +32,101 @@ import org.reprap.utilities.Debug;
 import org.reprap.comms.GCodeReaderAndWriter;
 
 //import java.io.IOException;
+
+
+class PCBOffsets extends JPanel {
+	private static final long serialVersionUID = 1L;
+	private static JDialog dialog;
+	private static JTextField xo;
+	private static JTextField yo;
+	private static double xoff = 10;
+	private static double yoff = 10;
+	
+	private PCBOffsets(RrRectangle rec)
+	{
+		super(new BorderLayout());
+		JPanel radioPanel;
+		radioPanel = new JPanel(new GridLayout(0, 1));
+		radioPanel.setSize(300,200);
+		
+	    JLabel jLabel2 = new JLabel();
+	    radioPanel.add(jLabel2);
+	    jLabel2.setText(" PCB dimensions: " + org.reprap.machines.GCodeRepRap.round(rec.ne().x() - rec.sw().x(), 1) + 
+	    		"(X) x " + org.reprap.machines.GCodeRepRap.round(rec.ne().y() - rec.sw().y(), 1) + "(Y) mm");
+		jLabel2.setHorizontalAlignment(SwingConstants.CENTER);
+	    JLabel jLabel3 = new JLabel();
+	    radioPanel.add(jLabel3);
+	    jLabel3.setText(" Offsets (X and Y) in mm:");
+		jLabel3.setHorizontalAlignment(SwingConstants.CENTER);			
+		xo = new JTextField("10");
+		radioPanel.add(xo);
+		xo.setHorizontalAlignment(SwingConstants.CENTER);
+		yo = new JTextField("10");
+		radioPanel.add(yo);
+		yo.setHorizontalAlignment(SwingConstants.CENTER);			
+
+		
+		try
+		{
+			
+			JButton okButton = new JButton();
+			radioPanel.add(okButton);
+			okButton.setText("OK");
+			okButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					OKHandler();
+				}
+			});
+			
+			add(radioPanel, BorderLayout.LINE_START);
+			setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+			
+		} catch (Exception ex)
+		{
+			System.err.println(ex.toString());
+			ex.printStackTrace();
+		}	
+	}
+	
+	public static void OKHandler()
+	{
+		xoff = Double.parseDouble(xo.getText().trim());
+		yoff = Double.parseDouble(yo.getText().trim());
+		dialog.dispose();
+	}
+    
+    public static void pcbo(RrRectangle rec) 
+    {
+        //Create and set up the window.
+    	JFrame f = new JFrame();
+    	dialog = new JDialog(f, "PCB Offsets");
+        dialog.setLocation(500, 400);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+        //Create and set up the content pane.
+        JComponent newContentPane = new PCBOffsets(rec);
+        newContentPane.setOpaque(true); //content panes must be opaque
+        dialog.setContentPane(newContentPane);
+
+        //Display the window.
+        dialog.pack();
+        dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+        dialog.setVisible(true);
+    }
+    
+    
+    
+    public static double getXoff()
+    {
+    	return xoff;
+    }
+    
+    public static double getYoff()
+    {
+    	return yoff;
+    }
+	
+}
 
 public class PCB {
 	
@@ -35,8 +143,8 @@ public class PCB {
 	double zFeedRate = 50;
 	double zDown = 0;
 	static final double centreWidth = 0.9;
-	static final double offsetX=10;
-	static final double offsetY=10;
+	static double offsetX=0;
+	static double offsetY=0;
 	File inputTracksAndPads;
 	File inputDrill;
 	File outputGCodes;
@@ -60,8 +168,6 @@ public class PCB {
 		Debug.d("Input: " + inputTracksAndPads.getName());
 		Debug.d("Output: " + outputGCodes.getName()+"\n");
 		Debug.d("Pen Width: " + penWidth + " mm");
-		Debug.d("Offset X: " + offsetX + " mm");
-		Debug.d("Offset Y: " + offsetY + " mm");
 
 		createBitmap();
 
@@ -71,7 +177,7 @@ public class PCB {
 		
 		try 
 		{
-			if(Preferences.loadGlobalBool("DisplaySimulation"))
+			if(Preferences.loadGlobalBool("DisplaySimulation") && penPaths.size() > 0)
 			{
 				RrGraphics simulationPlot2 = new RrGraphics("PCB pen plotlines");
 //				if(currentPolygon != null)
@@ -218,8 +324,14 @@ public class PCB {
 					bigBox = RrRectangle.union(bigBox, r);
 			}
 			
-			Debug.d("Surrounding reactangle: " + bigBox);
 			in.close();
+			
+			PCBOffsets.pcbo(bigBox);
+
+			offsetX = PCBOffsets.getXoff() - bigBox.sw().x();
+			offsetY = PCBOffsets.getYoff() - bigBox.sw().y();
+			
+			bigBox = bigBox.translate(new Rr2Point(PCBOffsets.getXoff(), PCBOffsets.getYoff()));
 			
 			in = new BufferedReader(new FileReader(inputTracksAndPads));
 			

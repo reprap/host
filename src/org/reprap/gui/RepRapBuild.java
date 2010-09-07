@@ -109,6 +109,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -138,7 +139,7 @@ import org.reprap.geometry.polygons.AllSTLsToBuild;
 class MaterialRadioButtons extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static Attributes att;
-	private static JFrame frame;
+	private static JDialog dialog;
 	private static JTextField copies;
 	private static RepRapBuild rrb;
 	private static int stlIndex; 
@@ -209,7 +210,7 @@ class MaterialRadioButtons extends JPanel {
 		int number = Integer.parseInt(copies.getText().trim()) - 1;
 		STLObject stl = rrb.getSTLs().get(stlIndex);
 		rrb.moreCopies(stl, att, number);
-		frame.dispose();
+		dialog.dispose();
 	}
     
     public static void createAndShowGUI(Attributes a, RepRapBuild r, int index) 
@@ -218,18 +219,20 @@ class MaterialRadioButtons extends JPanel {
     	rrb = r;
     	stlIndex = index;
         //Create and set up the window.
-    	frame = new JFrame("Material selector");
-        frame.setLocation(500, 400);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    	JFrame f = new JFrame();
+    	dialog = new JDialog(f, "Material selector");
+        dialog.setLocation(500, 400);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         //Create and set up the content pane.
         JComponent newContentPane = new MaterialRadioButtons();
         newContentPane.setOpaque(true); //content panes must be opaque
-        frame.setContentPane(newContentPane);
+        dialog.setContentPane(newContentPane);
 
         //Display the window.
-        frame.pack();
-        frame.setVisible(true);
+        dialog.pack();
+        dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+        dialog.setVisible(true);
     }	   
 	
 }
