@@ -8,6 +8,7 @@ package org.reprap.gui.botConsole;
 
 import java.io.IOException;
 import org.reprap.Printer;
+import org.reprap.utilities.Debug;
 /**
  *
  * @author  ensab
@@ -17,6 +18,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
 
     private double XYfastSpeed;
     private double ZfastSpeed;
+    private boolean firstZero = true;
     private Printer printer;
     private static double nudgeSize = 0;
 	private BotConsoleFrame parentBotConsoleFrame = null;
@@ -71,6 +73,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
     
     /** Creates new form XYZTabPanel */
     public XYZTabPanel() {
+    	firstZero = true;
         printer = org.reprap.Main.gui.getPrinter();
         initComponents();
         try
@@ -468,18 +471,24 @@ private void nudgeSizeRB3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 public void homeAll()
 {
+	double ze[] = new double[4];
 	parentBotConsoleFrame.suspendPolling();
 	try {
 		printer.home();
+		if(!firstZero)
+			ze = printer.getZeroError();
 	} catch (Exception e) {
 		parentBotConsoleFrame.handleException(e);
 	}
+	if(!firstZero)
+		Debug.d("Zero errors (steps).  X:" + ze[0] + " Y:" + ze[1] + " Z:" + ze[2]);
 	xStepperPositionJPanel.zeroBox();
 	yStepperPositionJPanel.zeroBox();
 	zStepperPositionJPanel.zeroBox();
 //    xStepperPositionJPanel.homeAxis();
 //    yStepperPositionJPanel.homeAxis();
 //    zStepperPositionJPanel.homeAxis();
+	firstZero = false;
     parentBotConsoleFrame.resumePolling();
 }
 

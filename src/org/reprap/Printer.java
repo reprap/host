@@ -257,6 +257,13 @@ public interface Printer {
 	public double[] getCoordinates() throws Exception;
 	
 	/**
+	 * Get the zero errors
+	 * @return
+	 * @throws Exception
+	 */
+	public double[] getZeroError() throws Exception;
+	
+	/**
 	 * Tell the printer class it's Z position.  Only to be used if
 	 * you know what you're doing...
 	 * @param z

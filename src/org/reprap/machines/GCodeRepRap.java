@@ -42,7 +42,7 @@ public class GCodeRepRap extends GenericRepRap {
 		super();
 
 		gcode = new GCodeReaderAndWriter();
-		
+		gcode.queue("M110 ; Reset the line numbers");
 		loadExtruders();
 		
 		forceSelection = true;
@@ -454,9 +454,9 @@ public class GCodeRepRap extends GenericRepRap {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd:HH-mm-ss");
 		String myDateString = sdf.format(myDate);
 		gcode.queue("; Created: " + myDateString);
-		
 		gcode.queue(";#!RECTANGLE: " + lc.getBox());
-
+		
+		gcode.queue("M110 ; Reset the line numbers");
 		//take us to fun, safe metric land.
 		gcode.queue("G21 ;metric is good!");
 		
@@ -578,6 +578,22 @@ public class GCodeRepRap extends GenericRepRap {
 	public double[] getCoordinates() throws Exception
 	{
 		gcode.queue("M114; get coordinates");
+		double [] result = new double[4];
+		result[0] = gcode.getX();
+		result[1] = gcode.getY();
+		result[2] = gcode.getZ();
+		result[3] = gcode.getE();
+		return result;
+	}
+	
+	/**
+	 * Get X, Y, Z and E (if supported) coordinates in an array
+	 * @return
+	 * @throws Exception 
+	 */
+	public double[] getZeroError() throws Exception
+	{
+		gcode.queue("M117; get error coordinates");
 		double [] result = new double[4];
 		result[0] = gcode.getX();
 		result[1] = gcode.getY();

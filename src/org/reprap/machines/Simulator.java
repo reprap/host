@@ -95,6 +95,17 @@ public class Simulator extends GenericRepRap {
 		return result;
 	}
 	
+	public double[] getZeroError() throws Exception
+	{
+		double [] result = new double[4];
+		result[0] = 0;
+		result[1] = 0;
+		result[2] = 0;
+		result[3] = 0;
+		
+		return result;
+	}
+	
 	public void delay(long millis) {}
 	
 	//TODO: make this work normally.
