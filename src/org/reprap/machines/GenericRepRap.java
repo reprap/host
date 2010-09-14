@@ -892,7 +892,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		// Don't home the first layer
 		// The startup procedure has already done that
 		
-		if(lc.getMachineLayer() > 0)
+		if(lc.getMachineLayer() > 0 && Preferences.loadGlobalBool("InterLayerCooling"))
 			homeToZeroXYE();
 		
 		double datumX = getExtruder().getNozzleWipeDatumX();
@@ -931,15 +931,16 @@ public abstract class GenericRepRap implements CartesianPrinter
 		}
 		// Fan off
 		
-		getExtruder().setCooler(false);
+		if(coolTime > 0)
+			getExtruder().setCooler(false);
 		
 		// If we were cooling, wait for warm-up
 		
-		if(startCooling >= 0)
-		{
-			machineWait(200 * coolTime, false);			
-			Debug.d("End of cooling period");			
-		}
+//		if(startCooling >= 0)
+//		{
+//			machineWait(200 * coolTime, false);			
+//			Debug.d("End of cooling period");			
+//		}
 		
 		// Do the clearing extrude then
 		// Wipe the nozzle on the doctor blade
