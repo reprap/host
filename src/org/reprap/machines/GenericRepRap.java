@@ -894,6 +894,19 @@ public abstract class GenericRepRap implements CartesianPrinter
 		
 		if(lc.getMachineLayer() > 0 && Preferences.loadGlobalBool("InterLayerCooling"))
 			homeToZeroXYE();
+		else
+		{
+			int extruderNow = extruder;
+			for(int i = 0; i < extruders.length; i++)
+			{
+				if(extruders[i].getExtruderState().length() > 0)
+				{
+					selectExtruder(i);
+					extruders[i].zeroExtrudedLength();
+				}
+			}
+			selectExtruder(extruderNow);
+		}
 		
 		double datumX = getExtruder().getNozzleWipeDatumX();
 		double datumY = getExtruder().getNozzleWipeDatumY();

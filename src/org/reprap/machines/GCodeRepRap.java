@@ -545,21 +545,21 @@ public class GCodeRepRap extends GenericRepRap {
 		gcode.queue("G4 P" + millis + " ;delay");
 	}
 	
-	/**
-	 * Pick out a coordinate from the returned string
-	 * @param s
-	 * @param coord
-	 * @return
-	 */
-	private double getReturnedCoordinate(String s, String coord)
-	{
-		int i = s.indexOf(coord);
-		if(i < 0)
-			return 0;
-		String ss = s.substring(i + 1);
-		int j = ss.indexOf(" ");
-		return Double.parseDouble(ss.substring(0, j - 1));
-	}
+//	/**
+//	 * Pick out a coordinate from the returned string
+//	 * @param s
+//	 * @param coord
+//	 * @return
+//	 */
+//	private double getReturnedCoordinate(String s, String coord)
+//	{
+//		int i = s.indexOf(coord);
+//		if(i < 0)
+//			return 0;
+//		String ss = s.substring(i + 1);
+//		int j = ss.indexOf(" ");
+//		return Double.parseDouble(ss.substring(0, j - 1));
+//	}
 	
 	/**
 	 * Are we paused?
