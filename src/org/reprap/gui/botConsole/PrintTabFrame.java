@@ -12,6 +12,7 @@ import java.util.GregorianCalendar;
 import java.io.File;
 import javax.swing.JOptionPane;
 
+import org.reprap.Extruder;
 import org.reprap.Main;
 import org.reprap.Printer;
 import org.reprap.pcb.PCB;
@@ -498,6 +499,12 @@ private void pcbButtonActionPerformed(java.awt.event.ActionEvent evt)
 {
 	if(!SLoadOK)
 		return;
+	Extruder pcbp = printer.getExtruder("PCB-pen");
+	if(pcbp == null)
+	{
+		JOptionPane.showMessageDialog(null, "You have no PCB-pen among your extruders; see http://reprap.org/wiki/Plotting#Using_the_RepRap_Host_Software.");
+		return;
+	}	
 	parentBotConsoleFrame.suspendPolling();
 	File inputGerber = org.reprap.Main.gui.onOpen("PCB Gerber file", new String[] {"top", "bot"}, "");
 	if(inputGerber == null)
@@ -532,7 +539,8 @@ private void pcbButtonActionPerformed(java.awt.event.ActionEvent evt)
 		return;
 	}
 	PCB p = new PCB();
-	p.pcb(inputGerber, inputDrill, outputGCode, printer.getExtruder("PCB-pen"));
+	
+	p.pcb(inputGerber, inputDrill, outputGCode, pcbp);
 	parentBotConsoleFrame.resumePolling();
 }
 
