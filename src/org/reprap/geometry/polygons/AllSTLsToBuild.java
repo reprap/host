@@ -302,7 +302,7 @@ public class AllSTLsToBuild
 	{
 		if(size() <= 0)
 		{
-			Debug.e("AllSTLsToBuild.getNextOne(): no objects to pick from!");
+			Debug.e("AllSTLsToBuild.findSTL(): no objects to pick from!");
 			return -1;			
 		}
 		int index = -1;
@@ -314,7 +314,7 @@ public class AllSTLsToBuild
 			}
 		if(index < 0)
 		{
-			Debug.e("AllSTLsToBuild.getNextOne(): dud object submitted.");
+			Debug.e("AllSTLsToBuild.findSTL(): dud object submitted.");
 			return -1;
 		}
 		return index;
@@ -803,7 +803,7 @@ public class AllSTLsToBuild
 		}
 
 
-		// If we've got polygons to plot, ammend them so they start in the middle 
+		// If we've got polygons to plot, amend them so they start in the middle 
 		// of a hatch (this gives cleaner boundaries).  Also add the nose-wipe shield
 		// if it's been asked for.
 		
