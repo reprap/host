@@ -526,9 +526,10 @@ public class GCodeReaderAndWriter
 			{
 				long gotTo = lineNumber;
 				lineNumber = resp;
-				while(lineNumber <= gotTo)
+				String rCmd = " ";
+				while(lineNumber <= gotTo && !rCmd.contentEquals(""))
 				{
-					String rCmd = ringGet(lineNumber);
+					rCmd = ringGet(lineNumber);
 					bufferQueue(rCmd, retries+1);  // Is recursion clever; or stupid?
 				}
 			}
