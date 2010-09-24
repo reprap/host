@@ -22,6 +22,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
     private Printer printer;
     private static double nudgeSize = 0;
 	private BotConsoleFrame parentBotConsoleFrame = null;
+	private Thread agitateThread = null;
 	
     private void setPrefs() throws IOException {
         
@@ -85,6 +86,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
         } catch (Exception ex) {System.err.println(ex.toString());}
         setMotorSpeeds();
         setNudgeSize(Double.parseDouble(nudgeSizeRB1.getText()));
+        agitate = false;
     }
 
     /** This method is called from within the constructor to
@@ -122,11 +124,38 @@ public class XYZTabPanel extends javax.swing.JPanel {
                 heatButtonActionPerformed(evt);
             }
         });
-        
         bedTempPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Bed temp. (Celcius)"));
         
         
+        agitateAmplitude = new javax.swing.JTextField();
+        agitatePeriod = new javax.swing.JTextField();
+        agitateButton = new javax.swing.JToggleButton();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        agitatePanel = new javax.swing.JPanel();
+        agitate = false;
+        agitateAmplitude.setColumns(3);
+        agitateAmplitude.setFont(agitateAmplitude.getFont().deriveFont(agitateAmplitude.getFont().getSize()+1f));
+        agitateAmplitude.setText("10");
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12));
+        jLabel8.setText("Amplitude (mm):");
         
+        agitatePeriod.setColumns(3);
+        agitatePeriod.setFont(agitatePeriod.getFont().deriveFont(agitatePeriod.getFont().getSize()+1f));
+        agitatePeriod.setText("30");
+
+        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 12));
+        jLabel9.setText("Period (s):");
+        
+        agitateButton.setText("Agitate Y");
+        agitateButton.setFocusCycleRoot(true);
+        agitateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	agitateButtonActionPerformed(evt);
+            }
+        });        
+        agitatePanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Agitate Y axis"));
         
 
         buttonGroup1 = new javax.swing.ButtonGroup();
@@ -340,7 +369,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
                 //    .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
                 //.addContainerGap()
                 )
-                .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE) 
+                .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE) 
         );
         bedTempPanelLayout.setVerticalGroup(
             bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -357,7 +386,52 @@ public class XYZTabPanel extends javax.swing.JPanel {
                             .add(jLabel7)))
                     )
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
+                .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                .addContainerGap()
+                )
+        );
+            
+        
+        org.jdesktop.layout.GroupLayout agitatePanelLayout = new org.jdesktop.layout.GroupLayout(agitatePanel);
+        agitatePanel.setLayout(agitatePanelLayout);
+        agitatePanelLayout.setHorizontalGroup(
+        		agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.LEADING, agitatePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, agitatePanelLayout.createSequentialGroup()
+                        .add(jLabel8)
+                        .add(18, 18, 18)
+                        .add(agitateAmplitude, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 
+                        		org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, agitatePanelLayout.createSequentialGroup()
+                        .add(6, 6, 6)
+                        .add(jLabel9)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(agitatePeriod, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 
+                        		org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                //.add(agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                //    .add(agitateButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
+                //.addContainerGap()
+                )
+                .add(agitateButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE) 
+        );
+        agitatePanelLayout.setVerticalGroup(
+        		agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, agitatePanelLayout.createSequentialGroup()
+                .add(agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    //.add(agitateButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, agitatePanelLayout.createSequentialGroup()
+                        .add(agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(jLabel8)
+                            .add(agitateAmplitude))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(agitatePeriod, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jLabel9)))
+                    )
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(agitateButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
                 .addContainerGap()
                 )
         );
@@ -386,8 +460,15 @@ public class XYZTabPanel extends javax.swing.JPanel {
              
                     .add(motorsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
                     		org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(bedTempPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+.add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(bedTempPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                    		Short.MAX_VALUE)
+                    .add(agitatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                    		Short.MAX_VALUE) 
+                    		)
                     )
+                    //.add(agitatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                    //		Short.MAX_VALUE)   
                     //.addContainerGap()
                 )
         ));
@@ -395,9 +476,14 @@ public class XYZTabPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
+                   
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                   .add(bedTempPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-               
+                		.add(layout.createSequentialGroup()	
+                   .add(bedTempPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                		   org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                   .add(agitatePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                     		   org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                     		   )
                    .add(motorsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 226, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 )
                  .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -454,6 +540,71 @@ private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     	}
     	parentBotConsoleFrame.resumePolling();
     	
+}//GEN-LAST:event_heatButtonActionPerformed
+
+//private javax.swing.JTextField agitateAmplitude;
+//private javax.swing.JTextField agitatePeriod;
+//private javax.swing.JLabel jLabel8;
+//private javax.swing.JLabel jLabel9;
+//private javax.swing.JPanel agitatePanel;
+//private javax.swing.JToggleButton agitateButton;
+//private boolean agitate; 
+
+private void agitate(double a, double p)
+{
+	
+}
+
+private void agitateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heatButtonActionPerformed
+	parentBotConsoleFrame.suspendPolling();
+	if (agitate) 
+	{
+		agitate = false;
+		agitateButton.setText("Agitate");
+		parentBotConsoleFrame.resumePolling();
+	} else 
+	{
+		agitate = true;
+		agitateButton.setText("Stop Agitating");
+		try {
+			agitateThread = new Thread() 
+			{
+				public void run() 
+				{
+					double amp = 0.5*Double.parseDouble(agitateAmplitude.getText());
+					double per = 0.5*Double.parseDouble(agitatePeriod.getText());
+					double y0 = printer.getY() + amp;
+					double inc = 0.05*Math.PI/per;
+					double t = 1.5*Math.PI;
+					Thread.currentThread().setName("Agitate");
+					while(agitate)
+					{
+						double y = y0 + amp*Math.cos(t);
+						double speed = -amp*Math.sin(t)*60;
+						if(speed < 60)
+							speed = 60;
+						try
+						{
+							printer.moveTo(printer.getX(), y, printer.getZ(), speed, false, false);
+						} catch (Exception e)
+						{
+							e.printStackTrace();
+						}
+						t += inc;
+						if(t >= 2*Math.PI)
+							t = 0;
+					}
+				}
+			};
+
+			agitateThread.start();
+		} catch (NumberFormatException e) {
+			parentBotConsoleFrame.handleException(e);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}	
 }//GEN-LAST:event_heatButtonActionPerformed
     
     
@@ -628,5 +779,12 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JPanel bedTempPanel;
     private javax.swing.JToggleButton heatButton;
     private boolean heatPushed;
-
+    
+    private javax.swing.JTextField agitateAmplitude;
+    private javax.swing.JTextField agitatePeriod;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel agitatePanel;
+    private javax.swing.JToggleButton agitateButton;
+	private boolean agitate;
 }
