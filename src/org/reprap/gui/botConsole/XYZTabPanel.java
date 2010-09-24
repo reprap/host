@@ -575,7 +575,7 @@ private void agitateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN
 					double amp = 0.5*Double.parseDouble(agitateAmplitude.getText());
 					double per = Double.parseDouble(agitatePeriod.getText());
 					double y0 = printer.getY() + amp;
-					double inc = 0.04/per;
+					double inc = 0.1/per;
 					double t = 0.75*per;
 					double y;
 					Thread.currentThread().setName("Agitate");
