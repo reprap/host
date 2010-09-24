@@ -8,6 +8,7 @@ package org.reprap.gui.botConsole;
 
 import java.io.IOException;
 import org.reprap.Printer;
+import org.reprap.ReprapException;
 import org.reprap.utilities.Debug;
 /**
  *
@@ -136,14 +137,14 @@ public class XYZTabPanel extends javax.swing.JPanel {
         agitate = false;
         agitateAmplitude.setColumns(3);
         agitateAmplitude.setFont(agitateAmplitude.getFont().deriveFont(agitateAmplitude.getFont().getSize()+1f));
-        agitateAmplitude.setText("10");
+        agitateAmplitude.setText("50");
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel8.setText("Amplitude (mm):");
         
         agitatePeriod.setColumns(3);
         agitatePeriod.setFont(agitatePeriod.getFont().deriveFont(agitatePeriod.getFont().getSize()+1f));
-        agitatePeriod.setText("30");
+        agitatePeriod.setText("3");
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel9.setText("Period (s):");
@@ -572,27 +573,31 @@ private void agitateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN
 				public void run() 
 				{
 					double amp = 0.5*Double.parseDouble(agitateAmplitude.getText());
-					double per = 0.5*Double.parseDouble(agitatePeriod.getText());
+					double per = Double.parseDouble(agitatePeriod.getText());
 					double y0 = printer.getY() + amp;
-					double inc = 0.05*Math.PI/per;
-					double t = 1.5*Math.PI;
+					double inc = 0.04/per;
+					double t = 0.75*per;
+					double y;
 					Thread.currentThread().setName("Agitate");
-					while(agitate)
-					{
-						double y = y0 + amp*Math.cos(t);
-						double speed = -amp*Math.sin(t)*60;
-						if(speed < 60)
-							speed = 60;
-						try
+					try {
+						printer.moveTo(printer.getX(), printer.getY(), printer.getZ(), 1, false, false);
+						while(agitate)
 						{
+							y = y0 + amp*Math.cos(2*Math.PI*t/per);
+							double speed = Math.abs(-amp*2*Math.PI*Math.sin(2*Math.PI*t/per)*60/per);
+							if(speed < 1)
+								speed = 1;
+							//System.out.println("" + t + "," + y + "," + speed/60);
+
 							printer.moveTo(printer.getX(), y, printer.getZ(), speed, false, false);
-						} catch (Exception e)
-						{
-							e.printStackTrace();
+
+							t += inc;
+							if(t >= per)
+								t = 0;
 						}
-						t += inc;
-						if(t >= 2*Math.PI)
-							t = 0;
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 			};
