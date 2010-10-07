@@ -91,7 +91,7 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		if(xyFeedrate < feedrate)
 		{
-			System.err.println("GCodeRepRap().qXYMove: feedrate (" + feedrate + ") exceeds maximum (" + xyFeedrate + ").");
+			Debug.e("GCodeRepRap().qXYMove: feedrate (" + feedrate + ") exceeds maximum (" + xyFeedrate + ").");
 			feedrate = xyFeedrate;
 		}
 		
@@ -146,7 +146,7 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		if(zFeedrate < feedrate)
 		{
-			System.err.println("GCodeRepRap().qZMove: feedrate (" + feedrate + ") exceeds maximum (" + zFeedrate + ").");
+			Debug.e("GCodeRepRap().qZMove: feedrate (" + feedrate + ") exceeds maximum (" + zFeedrate + ").");
 			feedrate = zFeedrate;
 		}
 		
@@ -214,7 +214,7 @@ public class GCodeRepRap extends GenericRepRap {
 		boolean xyMove = dx!= 0 || dy != 0;
 		
 		if(zMove && xyMove)
-			System.err.println("GcodeRepRap.moveTo(): attempt to move in X|Y and Z simultaneously: (x, y, z) = (" + x + ", " + y + ", " + z + ")");
+			Debug.e("GcodeRepRap.moveTo(): attempt to move in X|Y and Z simultaneously: (x, y, z) = (" + x + ", " + y + ", " + z + ")");
 
 		double zFeedrate = round(getMaxFeedrateZ(), 1);
 		
@@ -269,7 +269,7 @@ public class GCodeRepRap extends GenericRepRap {
 		boolean xyMove = dx != 0 || dy != 0;
 		
 		if(zMove && xyMove)
-			System.err.println("GcodeRepRap.singleMove(): attempt to move in X|Y and Z simultaneously: (x, y, z) = (" + x + ", " + y + ", " + z + ")");
+			Debug.e("GcodeRepRap.singleMove(): attempt to move in X|Y and Z simultaneously: (x, y, z) = (" + x + ", " + y + ", " + z + ")");
 		
 		try
 		{
@@ -306,7 +306,7 @@ public class GCodeRepRap extends GenericRepRap {
 					break;
 					
 				default:
-					System.err.println("GCodeRepRap.singleMove(): dud VelocityProfile XY flat value.");	
+					Debug.e("GCodeRepRap.singleMove(): dud VelocityProfile XY flat value.");	
 				}
 			}
 
@@ -338,12 +338,12 @@ public class GCodeRepRap extends GenericRepRap {
 					break;
 					
 				default:
-					System.err.println("GCodeRepRap.singleMove(): dud VelocityProfile Z flat value.");	
+					Debug.e("GCodeRepRap.singleMove(): dud VelocityProfile Z flat value.");	
 				}				
 			}
 		} catch (Exception e)
 		{
-			System.err.println(e.toString());
+			Debug.e(e.toString());
 		}
 	}
 

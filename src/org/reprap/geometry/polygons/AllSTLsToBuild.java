@@ -98,7 +98,7 @@ public class AllSTLsToBuild
 		public LineSegment(Rr2Point p, Rr2Point q, Attributes at)
 		{
 			if(at == null)
-				System.err.println("LineSegment(): null attributes!");
+				Debug.e("LineSegment(): null attributes!");
 			a = p;
 			b = q;
 			att = at;
@@ -1008,7 +1008,7 @@ public class AllSTLsToBuild
 			break;
 			
 		default:
-			System.err.println("addEdge(): the | function doesn't seem to work...");
+			Debug.e("addEdge(): the | function doesn't seem to work...");
 		}
 		
 		// Work out the intersection line segment (e1 -> e2) between the z plane and the triangle
@@ -1052,7 +1052,7 @@ public class AllSTLsToBuild
         
         if(g.getVertexCount()%3 != 0)
         {
-        	System.err.println("addAllEdges(): shape3D with vertices not a multiple of 3!");
+        	Debug.e("addAllEdges(): shape3D with vertices not a multiple of 3!");
         }
         if(g != null)
         {

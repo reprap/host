@@ -302,7 +302,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		}
 		catch (Exception ex)
 		{
-			System.err.println("Refresh Reprap preferences: " + ex.toString());
+			Debug.e("Refresh Reprap preferences: " + ex.toString());
 		}
 		
 		for(int i = 0; i < extruders.length; i++)
@@ -365,7 +365,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 
 		if(materialIndex < 0 || materialIndex >= extruders.length)
 		{
-			System.err.println("Selected material (" + materialIndex + ") is out of range.");
+			Debug.e("Selected material (" + materialIndex + ") is out of range.");
 			extruder = 0;
 		} else
 			extruder = materialIndex;
@@ -396,7 +396,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 				return;
 			}
 		}
-		System.err.println("selectExtruder() - extruder not found for: " + att.getMaterial());
+		Debug.e("selectExtruder() - extruder not found for: " + att.getMaterial());
 	}
 	
 	/**
@@ -655,7 +655,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			moveTo(x, y, z, feedrate, false, false);
 		} catch (Exception e)
 		{
-			System.err.println(e.toString());
+			Debug.e(e.toString());
 		}
 	}
 	
@@ -665,11 +665,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 //	public void printTo(double x, double y, double z, boolean turnOff) throws ReprapException, IOException
 //	{		
-//		System.err.println("printing");
+//		Debug.e("printing");
 //		if (previewer != null)
 //			previewer.addSegment(currentX, currentY, currentZ, x, y, z);
 //		else
-//			System.err.println("previewer null!");
+//			Debug.e("previewer null!");
 //		
 //		if (isCancelled())
 //			return;

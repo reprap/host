@@ -446,7 +446,7 @@ public class RrGraphics
 			return;
 	    if(p.getAttributes().getAppearance() == null)
 	    {
-	    	System.err.println("RrGraphics: polygon with size > 0 has null appearance.");
+	    	Debug.e("RrGraphics: polygon with size > 0 has null appearance.");
 	    	return;
 	    }
 	    
@@ -470,7 +470,7 @@ public class RrGraphics
 	{
 	    if(b.attribute().getAppearance() == null)
 	    {
-	    	System.err.println("RrGraphics: booleanGrid has null appearance.");
+	    	Debug.e("RrGraphics: booleanGrid has null appearance.");
 	    	return;
 	    }
 	    

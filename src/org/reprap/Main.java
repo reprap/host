@@ -100,7 +100,7 @@ public class Main {
         	printer = MachineFactory.create();
         } catch (Exception ex)
         {
-        	System.err.println("MachineFactory.create() failed.\n");
+        	Debug.e("MachineFactory.create() failed.\n");
         	ex.printStackTrace();
         }
 	}
@@ -319,7 +319,7 @@ public class Main {
 
 					
 					if(printer == null)
-						System.err.println("Production attempted with null printer.");
+						Debug.e("Production attempted with null printer.");
 					producer = new Producer(printer, builder);
 					producer.setSegmentPause(segmentPause);
 					producer.setLayerPause(layerPause);

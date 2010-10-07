@@ -13,6 +13,7 @@
 package org.reprap.gui.botConsole;
 
 import org.reprap.Preferences;
+import org.reprap.utilities.Debug;
 
 import javax.swing.JOptionPane;
 
@@ -42,7 +43,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
             checkPrefs();
         }
         catch (Exception e) {
-            System.err.println("Failure trying to initialise comms in botConsole: " + e);
+            Debug.e("Failure trying to initialise comms in botConsole: " + e);
             JOptionPane.showMessageDialog(null, e.getMessage());
             return;
         }
@@ -273,7 +274,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     {
     	if(i >= 0 && i < bcf.extruderPanels.length)
     		return bcf.extruderPanels[i];
-    	System.err.println("getGenericExtruderTabPanel - extruder out of range: " + i);
+    	Debug.e("getGenericExtruderTabPanel - extruder out of range: " + i);
     	return bcf.extruderPanels[0];
     }
     

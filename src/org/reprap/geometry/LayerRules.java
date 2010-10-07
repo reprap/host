@@ -7,6 +7,7 @@ import org.reprap.geometry.polygons.RrHalfPlane;
 import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.Preferences;
+import org.reprap.utilities.Debug;
 
 /**
  * This stores a set of facts about the layer currently being made, and the
@@ -154,7 +155,7 @@ public class LayerRules
 				if(es[i].getLowerFineLayers() > fineLayers)
 					fineLayers = es[i].getLowerFineLayers();
 				if(Math.abs(es[i].getExtrusionHeight() - zStep) > Preferences.tiny())
-					System.err.println("Not all extruders extrude the same height of filament: " + 
+					Debug.e("Not all extruders extrude the same height of filament: " + 
 							zStep + " and " + es[i].getExtrusionHeight());
 			}
 		}

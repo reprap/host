@@ -24,6 +24,8 @@ import java.awt.Button;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import org.reprap.utilities.Debug;
+
 /**
  * This reads in the preferences file and constructs a set of menus from it to allow entries
  * to be edited.
@@ -125,7 +127,7 @@ public class Preferences extends JFrame {
 			{
 				String s = globalValues[i].getText();
 				if(category(s) != globalCats[i])
-					System.err.println("Dud format for " + globals[i].getText() + ": " + s);
+					Debug.e("Preferences window: Dud format for " + globals[i].getText() + ": " + s);
 				else
 					saveString(globals[i].getText(), s);
 			}
@@ -139,7 +141,7 @@ public class Preferences extends JFrame {
 				{
 					String s = evals[i].getText();
 					if(category(s) != cats[i])
-						System.err.println("Dud format for " + enames[i].getText() + ": " + s);
+						Debug.e("Preferences window: Dud format for " + enames[i].getText() + ": " + s);
 					else
 						saveString(enames[i].getText(), s);
 				}
@@ -172,7 +174,7 @@ public class Preferences extends JFrame {
 			globalCats = categorise(globalValues);
 		}catch (Exception ex)
 		{
-			System.err.println("Preferences window: Can't load the globals!");
+			Debug.e("Preferences window: Can't load the globals!");
 			ex.printStackTrace();
 		}
 		
@@ -182,7 +184,7 @@ public class Preferences extends JFrame {
 			extruderCount = Integer.parseInt(loadString("NumberOfExtruders"));
 		} catch (Exception ex)
 		{
-			System.err.println("Preferences window: Can't load the extruder count!");
+			Debug.e("Preferences window: Can't load the extruder count!");
 			ex.printStackTrace();
 		}
 		
@@ -202,7 +204,7 @@ public class Preferences extends JFrame {
 			}
 		}catch (Exception ex)
 		{
-			System.err.println("Preferences window: Can't load extruder(s)!");
+			Debug.e("Preferences window: Can't load extruder(s)!");
 			ex.printStackTrace();
 		}
 		
@@ -312,7 +314,7 @@ public class Preferences extends JFrame {
 		            	String configPath = org.reprap.Preferences.getProbsFolderPath() + configName;
 		            	if((new File(configPath)).exists())
 		            	{
-		            		System.out.println("loading config " + configName);
+		            		Debug.a("loading config " + configName);
 		            		org.reprap.Preferences.loadConfig(configName);		
 		            		updatePreferencesValues();
 		            		
@@ -339,7 +341,7 @@ public class Preferences extends JFrame {
 					if(!configFileObj.exists())
 	            	{
 						configfileList.addItem(configfileList.getSelectedItem());
-						System.out.println("loading config " + configName);
+						Debug.a("loading config " + configName);
 						org.reprap.Preferences.loadConfig(configName);	
 						updatePreferencesValues();
 		         

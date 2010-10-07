@@ -248,7 +248,7 @@ public class RFO
 		 */
 		public void startDocument ()
 		{
-			//System.out.println("Start document");
+			//Debug.a("Start document");
 		}
 
 
@@ -257,7 +257,7 @@ public class RFO
 		 */
 		public void endDocument ()
 		{
-			//System.out.println("End document");
+			//Debug.a("End document");
 		}
 
 
@@ -355,7 +355,7 @@ public class RFO
 		{
 //			for (int i = start; i < start + length; i++) 
 //				System.out.print(ch[i]);
-//			System.out.println();
+//			Debug.a();
 		}
 
 	}
@@ -610,11 +610,11 @@ public class RFO
 				File f = new File(dirToZip, fileList[i]); 
 				FileInputStream fis = new FileInputStream(f); 
 				String zEntry = f.getPath();
-				//System.out.println("\n" + zEntry);
+				//Debug.a("\n" + zEntry);
 				int start = zEntry.indexOf(uniqueName);
 				zEntry = zEntry.substring(start + uniqueName.length() + 1, zEntry.length());
-				//System.out.println(tempDir);
-				//System.out.println(zEntry + "\n");
+				//Debug.a(tempDir);
+				//Debug.a(zEntry + "\n");
 				ZipEntry entry = new ZipEntry(zEntry); 
 				rfoFile.putNextEntry(entry); 
 				while((bytesIn = fis.read(buffer)) != -1) 

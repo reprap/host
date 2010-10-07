@@ -61,7 +61,7 @@ class Variable implements Comparator<Variable>
 	String n;
 	
 	public Variable(String s) { init = false; n = s;}
-	public boolean value() { if(!init) System.err.println("Variable undefined!"); return bv; }
+	public boolean value() { if(!init) Debug.e("Variable undefined!"); return bv; }
 	public boolean isSet() { return init; }
 	public void set(boolean b) { bv = b; init = true;}
 	public String name() { return n; }
@@ -70,7 +70,7 @@ class Variable implements Comparator<Variable>
 	public Variable(Variable v)
 	{
 		if(!v.init) 
-			System.err.println("Variable(Variable v): input Variable undefined!");
+			Debug.e("Variable(Variable v): input Variable undefined!");
 		bv = v.bv;
 		init = v.init;
 		n = new String(v.n);
@@ -194,7 +194,7 @@ class BooleanExpression
 			break;			
 			
 		default:
-			System.err.println("BooleanExpression(...): variable number not 3 or 4!");	
+			Debug.e("BooleanExpression(...): variable number not 3 or 4!");	
 		}		
 	}
 	
@@ -233,7 +233,7 @@ class BooleanExpression
 	{
 		leafCount = -1;		
 		if(!op.diadic())
-			System.err.println("BooleanExpression(a, b): leaf operator or NOT!");
+			Debug.e("BooleanExpression(a, b): leaf operator or NOT!");
 		
 		leafOp = op;
 		leaf = null;
@@ -251,7 +251,7 @@ class BooleanExpression
 	{
 		leafCount = -1;		
 		if(op != Bop.NOT)
-			System.err.println("BooleanExpression(..., NOT): op not NOT!");
+			Debug.e("BooleanExpression(..., NOT): op not NOT!");
 		
 		leafOp = op;
 		leaf = null;
@@ -333,7 +333,7 @@ class BooleanExpression
 			if(v == variables[i])
 				return i;
 		}
-		System.err.println("getIndex(): variable not found!");
+		Debug.e("getIndex(): variable not found!");
 		return -1;
 	}
 		
@@ -379,7 +379,7 @@ class BooleanExpression
 			return r ^ c2.value();
 			
 		default:
-			System.err.println("generateValue_r: dud operator!");
+			Debug.e("generateValue_r: dud operator!");
 		}
 		return false;
 	}
@@ -420,11 +420,11 @@ class BooleanExpression
 			return r;
 			
 		case XOR:
-			System.err.println("toJava(): got to an XOR...");
+			Debug.e("toJava(): got to an XOR...");
 			break;
 			
 		default:
-			System.err.println("toJava(): dud operator");
+			Debug.e("toJava(): dud operator");
 		}
 		
 		return r;
@@ -632,7 +632,7 @@ class FunctionTable
 		if(rows.size() > 0)
 		{
 			if(!TableRow.sameOrder(newOne.all(), rows.get(0).all()))
-				System.err.println("FunctionTable.addRow() - variable lists different!");
+				Debug.e("FunctionTable.addRow() - variable lists different!");
 		}
 		
 		rows.add(newOne);
@@ -648,12 +648,12 @@ class FunctionTable
 			leng *= 2;
 		
 		if(leng != rows.size())
-			System.err.println("FunctionTable.tableCheck() - incorrect entry count: " + rows.size() +
+			Debug.e("FunctionTable.tableCheck() - incorrect entry count: " + rows.size() +
 					"(should be " + leng + ")");
 		Collections.sort(rows, new TableRow());
 		for(int i = 1; i < rows.size(); i++)
 			if(rows.get(i-1).number() == rows.get(i).number())
-				System.err.println("FunctionTable.tableDone() - identical rows: " + rows.get(i-1).toString() +
+				Debug.e("FunctionTable.tableDone() - identical rows: " + rows.get(i-1).toString() +
 						rows.get(i).toString());
 	}
 		
@@ -784,7 +784,7 @@ public class CodeGenerator
 	static List<BooleanExpression> generateAllPairs(BooleanExpression[] b2)
 	{
 		if(b2.length != 2)
-			System.err.println("generateAllPairs: array not of length 2: " + b2.length);
+			Debug.e("generateAllPairs: array not of length 2: " + b2.length);
 		
 		List<BooleanExpression> bel2 = new ArrayList<BooleanExpression>();
 		
@@ -858,7 +858,7 @@ public class CodeGenerator
 	static BooleanExpression findEqualTwo(FunctionTable f, Variable[] v)
 	{
 		if(v.length != 2)
-			System.err.println("findEqualTwo: array not of length 2: " + v.length);
+			Debug.e("findEqualTwo: array not of length 2: " + v.length);
 		BooleanExpression[] b2 = new BooleanExpression[2];
 		b2[0] = new BooleanExpression(v[0]);
 		b2[1] = new BooleanExpression(v[1]);
@@ -879,7 +879,7 @@ public class CodeGenerator
 	static BooleanExpression findEqualThree(FunctionTable f, Variable[] v)
 	{
 		if(v.length != 3)
-			System.err.println("findEqualThree: array not of length 3: " + v.length);
+			Debug.e("findEqualThree: array not of length 3: " + v.length);
 		BooleanExpression[] b3 = new BooleanExpression[3];
 		b3[0] = new BooleanExpression(v[0]);
 		b3[1] = new BooleanExpression(v[1]);

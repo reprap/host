@@ -83,7 +83,7 @@ class PCBOffsets extends JPanel {
 			
 		} catch (Exception ex)
 		{
-			System.err.println(ex.toString());
+			Debug.e(ex.toString());
 			ex.printStackTrace();
 		}	
 	}

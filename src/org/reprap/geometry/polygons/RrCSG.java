@@ -51,6 +51,7 @@
 package org.reprap.geometry.polygons;
 
 import java.util.ArrayList;
+import org.reprap.utilities.Debug;
 
 /**
  * RepRap Constructive Solid Geometry class
@@ -192,7 +193,7 @@ public class RrCSG
 	public RrCSG(RrCSG c)
 	{
 		if(c == u || c == n)
-			System.err.println("RrCSG deep copy: copying null or universal set.");
+			Debug.e("RrCSG deep copy: copying null or universal set.");
 		
 		if(c.hp != null)
 			hp = new RrHalfPlane(c.hp);
@@ -262,7 +263,7 @@ public class RrCSG
 			break;
 			
 		default:
-			System.err.println("toString_r(): invalid operator.");
+			Debug.e("toString_r(): invalid operator.");
 		}
 		return result;
 	}
@@ -383,7 +384,7 @@ public class RrCSG
 			break;
 			
 		default:
-			System.err.println("complement(): invalid operator.");
+			Debug.e("complement(): invalid operator.");
 			return nothing();
 		}
 		
@@ -488,7 +489,7 @@ public class RrCSG
 			case 4:
 				return intersection(leafA.complement(), leafB.complement());
 			case 5:
-				System.err.println("RrCSG crossCategorise: non-manifold shape (case 0101)!");
+				Debug.e("RrCSG crossCategorise: non-manifold shape (case 0101)!");
 				return union(intersection(leafA, leafB), intersection(leafA.complement(), leafB.complement()));
 			case 6:
 				return leafB.complement();
@@ -499,7 +500,7 @@ public class RrCSG
 			case 9:
 				return leafB;
 			case 10:
-				System.err.println("RrCSG crossCategorise: non-manifold shape (case 1010)!");
+				Debug.e("RrCSG crossCategorise: non-manifold shape (case 1010)!");
 				return union(RrCSG.intersection(leafA.complement(), leafB), intersection(leafA, leafB.complement()));
 			case 11:
 				return union(leafA, leafB);
@@ -512,7 +513,7 @@ public class RrCSG
 			case 15:
 				return universe();
 			default:
-				System.err.println("RrCSG crossCategorise: bitwise | doesn't seem to work...");
+				Debug.e("RrCSG crossCategorise: bitwise | doesn't seem to work...");
 				return this;
 			}
 		} catch (Exception e)
@@ -555,7 +556,7 @@ public class RrCSG
 			case 7:
 				return universe();
 			default:
-				System.err.println("RrCSG crossCategorise: bitwise | doesn't seem to work...");
+				Debug.e("RrCSG crossCategorise: bitwise | doesn't seem to work...");
 				return this;	
 			}
 		}
@@ -588,7 +589,7 @@ public class RrCSG
 
 		case NULL:			
 		case UNIVERSE:
-			System.err.println("uniqueList_r: null or universe at a leaf.");
+			Debug.e("uniqueList_r: null or universe at a leaf.");
 			break;
 			
 		case UNION:
@@ -598,7 +599,7 @@ public class RrCSG
 			break;
 			
 		default:
-			System.err.println("uniqueList_r: invalid operator.");
+			Debug.e("uniqueList_r: invalid operator.");
 		}		
 		
 		return;
@@ -971,7 +972,7 @@ public class RrCSG
 //				r = RrCSG.nothing();
 //				break;
 //		default:
-//			System.err.println("RrCSG.reg_3(): dud case value: " + caseVal);
+//			Debug.e("RrCSG.reg_3(): dud case value: " + caseVal);
 //		}
 //		
 //		return r;
@@ -1041,7 +1042,7 @@ public class RrCSG
 //						result.c2 = c2.c1;
 //						break;
 //					default:
-//						System.err.println("reg_4() 1: addition doesn't work...");
+//						Debug.e("reg_4() 1: addition doesn't work...");
 //					}  
 //				}
 //			}
@@ -1105,7 +1106,7 @@ public class RrCSG
 //					result = union(c1, c2.c2);
 //					break;
 //				default:
-//					System.err.println("reg_4() 2: addition doesn't work...");
+//					Debug.e("reg_4() 2: addition doesn't work...");
 //				}
 //				break;
 //				
@@ -1117,7 +1118,7 @@ public class RrCSG
 //				break;
 //				
 //			default:
-//				System.err.println("reg_4() 4: addition doesn't work...");
+//				Debug.e("reg_4() 4: addition doesn't work...");
 //			}
 //		}
 //		
@@ -1189,7 +1190,7 @@ public class RrCSG
 //			break;
 //			
 //		default:
-//			System.err.println("regularise(): set too complicated.");
+//			Debug.e("regularise(): set too complicated.");
 //		}
 //		
 //		return result;
@@ -1237,7 +1238,7 @@ public class RrCSG
 			break;
 			
 		default:
-			System.err.println("replace_all_same(): invalid operator.");		
+			Debug.e("replace_all_same(): invalid operator.");		
 		}
 	}
 	
@@ -1268,7 +1269,7 @@ public class RrCSG
 			break;
 			
 		default:
-			System.err.println("simplify_r(): invalid operator.");
+			Debug.e("simplify_r(): invalid operator.");
 		
 		}
 	}
@@ -1351,7 +1352,7 @@ public class RrCSG
 			break;
 			
 		default:
-			System.err.println("offset(): invalid operator.");
+			Debug.e("offset(): invalid operator.");
 			result = nothing();
 		}
 		return result;
@@ -1398,7 +1399,7 @@ public class RrCSG
 				return r2;
 			
 		default:
-			System.err.println("leaf(Rr2Point): invalid operator.");
+			Debug.e("leaf(Rr2Point): invalid operator.");
 			result = nothing();
 		}
 		return result;
@@ -1438,7 +1439,7 @@ public class RrCSG
 			break;
 			
 		default:
-			System.err.println("RrCSG.value(): dud operator.");
+			Debug.e("RrCSG.value(): dud operator.");
 		}
 		return result;
 	}
@@ -1472,7 +1473,7 @@ public class RrCSG
 //		case INTERSECTION:
 //			
 //		default:
-//			System.err.println("value(Rr2Point): non-leaf operator.");
+//			Debug.e("value(Rr2Point): non-leaf operator.");
 //		}
 //		return result;
 //	}
@@ -1509,7 +1510,7 @@ public class RrCSG
 			break;
 			
 		default:
-			System.err.println("value(RrBox): invalid operator.");
+			Debug.e("value(RrBox): invalid operator.");
 			result = new RrInterval();
 		}
 		
@@ -1530,7 +1531,7 @@ public class RrCSG
 		case LEAF:            
 			RrInterval i = hp.value(b);
 			if (i.empty())
-				System.err.println("RrCSG.prune(RrBox): empty interval!");
+				Debug.e("RrCSG.prune(RrBox): empty interval!");
 			else if(i.neg())
 				result = universe();
 			else if (i.pos())
@@ -1550,7 +1551,7 @@ public class RrCSG
 			break;
 			
 		default:
-			System.err.println("RrCSG.prune(RrBox): dud op value!");
+			Debug.e("RrCSG.prune(RrBox): dud op value!");
 		}
 		
 		return result;

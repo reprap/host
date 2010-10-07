@@ -128,6 +128,7 @@ import org.reprap.Attributes;
 import org.reprap.RFO;
 import org.reprap.Preferences;
 import org.reprap.geometry.polygons.AllSTLsToBuild;
+import org.reprap.utilities.Debug;
 
 /**
  * Little class to put up a radiobutton menu so you can set
@@ -199,7 +200,7 @@ class MaterialRadioButtons extends JPanel {
 			
 		} catch (Exception ex)
 		{
-			System.err.println(ex.toString());
+			Debug.e(ex.toString());
 			ex.printStackTrace();
 		}	
 	}

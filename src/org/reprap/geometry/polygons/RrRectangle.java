@@ -46,7 +46,7 @@
  
  =====================================================================
  
- RrBox: 2D rectangles
+ RrRectangle: 2D rectangles
  
  First version 20 May 2005
  This version: 1 May 2006 (Now in CVS - no more comments here)
@@ -54,6 +54,8 @@
  */
 
 package org.reprap.geometry.polygons;
+
+import org.reprap.utilities.Debug;
 
 /**
  * A 2D box is an X and a Y interval
@@ -127,7 +129,7 @@ public class RrRectangle
 //	 * For when we need one that has just something in
 //	 * @param a
 //	 */
-//	public RrBox(double a)
+//	public RrRectangle(double a)
 //	{
 //		x = new RrInterval(0, a);
 //		y = new RrInterval(0, a);
@@ -374,7 +376,7 @@ public class RrRectangle
 			return Rr2Point.dSquared(p, sw());
 			
 		default:
-			System.err.println("RrBox.dSquared(): dud value from point_relative()!");	
+			Debug.e("RrRectangle.dSquared(): dud value from point_relative()!");	
 		}
 		
 		return Math.min(d1, d2);

@@ -83,6 +83,7 @@ import com.sun.j3d.utils.picking.PickTool;
 import org.j3d.renderer.java3d.loaders.STLLoader;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
+import org.reprap.utilities.Debug;
 
 /**
  * Class for holding a group (maybe just 1) of 3D objects for RepRap to make.
@@ -295,7 +296,7 @@ public class STLObject
 
         } catch ( Exception e ) 
         {
-            System.err.println("loadSingelSTL(): Exception loading STL file from: " 
+            Debug.e("loadSingelSTL(): Exception loading STL file from: " 
                     + location);
             e.printStackTrace();
         }
@@ -445,7 +446,7 @@ public class STLObject
             //restoreAppearance();
             
         } else
-            System.err.println("applyOffset(): no bounding box or child.");
+            Debug.e("applyOffset(): no bounding box or child.");
     	
     	return result;
     }
@@ -711,7 +712,7 @@ public class STLObject
         		if(att != null)
         			setAppearance_r(b, att.getAppearance());
         		else
-        			System.err.println("restoreAppearance(): no Attributes!");
+        			Debug.e("restoreAppearance(): no Attributes!");
         	}
         }
     }

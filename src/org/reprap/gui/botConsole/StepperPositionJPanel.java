@@ -5,10 +5,13 @@
  */
 
 package org.reprap.gui.botConsole;
+
 import java.io.IOException;
 import javax.swing.JOptionPane;
 import org.reprap.Preferences;
 import org.reprap.Printer;
+import org.reprap.utilities.Debug;
+
 //import org.reprap.AxisMotor;
 //import org.reprap.comms.Communicator;
 //import org.reprap.comms.snap.SNAPAddress;
@@ -64,7 +67,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
         default:
                 axis = "X";
         		//motor = printer.getXMotor();
-                System.err.println("StepperPanel - dud axis id:" + motorID);
+                Debug.e("StepperPanel - dud axis id:" + motorID);
         }
         
 //        if(!motor.isAvailable())
@@ -138,7 +141,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
 				printer.homeToZeroZ();
 				break;
 			default:
-				System.err.println("StepperPositionPanel - homeReset.  Dud motor id: " + motorID);
+				Debug.e("StepperPositionPanel - homeReset.  Dud motor id: " + motorID);
 			}
             //motor.homeReset(getSpeedFromFeed(currentSpeed));
             zeroBox();
@@ -205,7 +208,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     				z = p;
     				break;
     			default:
-    				System.err.println("moveToTarget()  Dud motor id: " + motorID);
+    				Debug.e("moveToTarget()  Dud motor id: " + motorID);
     			}
     			printer.singleMove(x, y, z, currentSpeed);
     			//printer.moveTo(x, y, z, currentSpeed, false, false);
@@ -421,7 +424,7 @@ public void store()
 //			pos = printer.getZ();
 //			break;
 //		default:
-//			System.err.println("store()  Dud motor id: " + motorID);
+//			Debug.e("store()  Dud motor id: " + motorID);
 //		}
 //    try
 //    {   

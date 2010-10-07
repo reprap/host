@@ -200,7 +200,7 @@ public class GCodeReaderAndWriter
 			portName = Preferences.loadGlobalString("Port(name)");
 		} catch (Exception ex)
 		{
-			System.err.println("Cannot load preference Port(name).");
+			Debug.e("Cannot load preference Port(name).");
 			portName = "stdout";
 		}
 
@@ -231,7 +231,7 @@ public class GCodeReaderAndWriter
 		paused = true;
 //		while(!bufferEmpty())
 //		{
-//			//System.err.println("Waiting for buffer to empty.");
+//			//Debug.e("Waiting for buffer to empty.");
 //			sleep (131);
 //		}
 	}
@@ -294,7 +294,7 @@ public class GCodeReaderAndWriter
 
 //		if(bufferThread == null)
 //		{
-//			System.err.println("GCodeWriter: attempt to write to non-existent buffer.");
+//			Debug.e("GCodeWriter: attempt to write to non-existent buffer.");
 //			return true;
 //		}			
 		
@@ -320,7 +320,7 @@ public class GCodeReaderAndWriter
 						while(paused)
 						{
 							iAmPaused = true;
-							//System.err.println("Waiting for pause to end.");
+							//Debug.e("Waiting for pause to end.");
 							sleep(239);
 						}
 						iAmPaused = false;
@@ -790,11 +790,11 @@ public class GCodeReaderAndWriter
 			CommPortIdentifier commId = CommPortIdentifier.getPortIdentifier(portName);
 			port = (SerialPort)commId.open(portName, 30000);
 		} catch (NoSuchPortException e) {
-			System.err.println("Error opening port: " + portName);
+			Debug.e("Error opening port: " + portName);
 			return;
 		}
 		catch (PortInUseException e){
-			System.err.println("Port '" + portName + "' is already in use.");
+			Debug.e("Port '" + portName + "' is already in use.");
 			return;			
 		}
 		Main.setRepRapPresent(true);		
@@ -844,7 +844,7 @@ public class GCodeReaderAndWriter
 			serialInStream = port.getInputStream();
 			serialOutStream = new PrintStream(writeStream);
 		} catch (IOException e) {
-			System.err.println("GCodeWriter: Error opening serial port stream.");
+			Debug.e("GCodeWriter: Error opening serial port stream.");
 			serialInStream = null;
 			serialOutStream = null;
 			return;		
@@ -883,13 +883,13 @@ public class GCodeReaderAndWriter
 				return chooser.getSelectedFile().getName();
 			} catch (FileNotFoundException e) 
 			{
-				System.err.println("Can't read file " + name);
+				Debug.e("Can't read file " + name);
 				fileInStream = null;
 				return null;
 			}
 		} else
 		{
-			System.err.println("Can't read file.");
+			Debug.e("Can't read file.");
 			fileInStream = null;
 		}
 
@@ -943,7 +943,7 @@ public class GCodeReaderAndWriter
 			{
 				opFileArray = null;
 				opFileIndex = -1;
-				System.err.println("Can't write to file '" + opFileName);
+				Debug.e("Can't write to file '" + opFileName);
 				opFileName = null;
 				fileOutStream = null;
 			}
@@ -981,7 +981,7 @@ public class GCodeReaderAndWriter
 			fileOutStream = new PrintStream(fileStream);
 		} catch (Exception e)
 		{
-			System.err.println("Can't write to file " + opFileArray[opFileIndex]);
+			Debug.e("Can't write to file " + opFileArray[opFileIndex]);
 		}
 	}
 	
@@ -998,7 +998,7 @@ public class GCodeReaderAndWriter
 			fileOutStream = new PrintStream(fileStream);
 		} catch (Exception e)
 		{
-			System.err.println("Can't write to file " + opFileArray[opFileIndex]);
+			Debug.e("Can't write to file " + opFileArray[opFileIndex]);
 		}
 	}
 	
@@ -1025,7 +1025,7 @@ public class GCodeReaderAndWriter
 			fr.close();
 		} catch (Exception e) 
 		{  
-			System.err.println("Error copying file: " + e.toString());
+			Debug.e("Error copying file: " + e.toString());
 		}
 	}
 	
@@ -1044,7 +1044,7 @@ public class GCodeReaderAndWriter
 			fileOutStream = new PrintStream(fileStream);
 		} catch (Exception e)
 		{
-			System.err.println("Can't write to file " + opFileName + gcodeExtension);
+			Debug.e("Can't write to file " + opFileName + gcodeExtension);
 		}
 		
 		copyFile(fileOutStream, opFileArray[0]);

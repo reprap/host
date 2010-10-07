@@ -102,7 +102,7 @@ public class Preferences {
 		fallbackPreferences = new Properties();
 		mainPreferences = new Properties();
 		URL fallbackUrl = ClassLoader.getSystemResource(propsFileDist);
-		//System.out.println("++++ " + fallbackUrl.toString());
+		//Debug.a("++++ " + fallbackUrl.toString());
 
 		// Construct URL of user properties file
 		String path = new String(System.getProperty("user.home") + File.separatorChar + 
@@ -219,7 +219,7 @@ public class Preferences {
 			return mainPreferences.getProperty(name);
 		if (fallbackPreferences.containsKey(name))
 			return fallbackPreferences.getProperty(name);
-		System.err.println("RepRap preference: " + name + " not found in either preference file.");
+		Debug.e("RepRap preference: " + name + " not found in either preference file.");
 		return null;
 	}
 	
@@ -311,7 +311,7 @@ public class Preferences {
 	public static void setGlobalString(String name, String value) throws IOException {
 		initIfNeeded();
 
-		//System.err.println("Setting global " + name + ":" + value);
+		//Debug.e("Setting global " + name + ":" + value);
 		
 		globalPrefs.setString(name, value);
 	}
@@ -327,7 +327,7 @@ public class Preferences {
 	 */
 	private void setString(String name, String value) {
 		
-		//System.err.println("Setting " + name + ":" + value);
+		//Debug.e("Setting " + name + ":" + value);
 		
 		mainPreferences.setProperty(name, value);
 	}

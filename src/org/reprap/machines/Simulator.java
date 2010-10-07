@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.reprap.Extruder;
 //import org.reprap.devices.NullStepperMotor;
 import org.reprap.devices.NullExtruder;
+import org.reprap.utilities.Debug;
 
 /**
  *
@@ -149,7 +150,7 @@ public class Simulator extends GenericRepRap {
 	 */
 	public String loadGCodeFileForMaking()
 	{
-		System.err.println("Simulator: attempt to load GCode file.");
+		Debug.e("Simulator: attempt to load GCode file.");
 		//super.loadGCodeFileForMaking();
 		return null;
 	}
@@ -160,7 +161,7 @@ public class Simulator extends GenericRepRap {
 	 */
 	public String setGCodeFileForOutput(String fileRoot)
 	{
-		System.err.println("Simulator: cannot generate GCode file.");
+		Debug.e("Simulator: cannot generate GCode file.");
 		return null;		
 	}
 	

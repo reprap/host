@@ -475,12 +475,12 @@ public abstract class GenericExtruder implements Extruder
 			materialColour.setMaterial(new Material(col, black, col, black, 101f));
 		} catch (Exception ex)
 		{
-			System.err.println("Refresh extruder preferences: " + ex.toString());
+			Debug.e("Refresh extruder preferences: " + ex.toString());
 		}
 		
 		if(printer == null)
 		{
-			System.err.println("GenericExtruder(): printer is null!");
+			Debug.e("GenericExtruder(): printer is null!");
 		} else
 		{
 			fastXYFeedrate = Math.min(printer.getFastXYFeedrate(), fastXYFeedrate);
@@ -731,7 +731,7 @@ public abstract class GenericExtruder implements Extruder
     		return Preferences.loadGlobalDouble(prefName + "ExtrusionSpeed(mm/minute)");
     	} catch (Exception e)
     	{
-    		System.err.println(e.toString());
+    		Debug.e(e.toString());
     		return 200;  //Hack
     	}
     }
@@ -743,7 +743,7 @@ public abstract class GenericExtruder implements Extruder
     		return 3000; //Preferences.loadGlobalDouble(prefName + "SeparationSpeed(mm/minute)");
     	} catch (Exception e)
     	{
-    		System.err.println(e.toString());
+    		Debug.e(e.toString());
     		return 200;  //Hack
     	}
     }
@@ -1157,7 +1157,7 @@ public abstract class GenericExtruder implements Extruder
 				(float)Preferences.loadGlobalDouble(prefName + "ColourB(0..1)"));
 		} catch (Exception ex)
 		{
-			System.err.println(ex.toString());
+			Debug.e(ex.toString());
 		}
 		Appearance a = new Appearance();
 		a.setMaterial(new Material(col, black, col, black, 101f));

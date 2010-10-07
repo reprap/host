@@ -55,6 +55,8 @@
 
 package org.reprap.geometry.polygons;
 
+import org.reprap.utilities.Debug;
+
 /**
  * Real 1D intervals
  */
@@ -190,7 +192,7 @@ public class RrInterval
 	public static RrInterval add(RrInterval a, RrInterval b)
 	{
 		if(a.empty || b.empty)
-			System.err.println("add(...): adding empty interval(s).");	    
+			Debug.e("RrInterval.add(...): adding empty interval(s).");	    
 		return new RrInterval(a.low + b.low, a.high + b.high);
 	}
 	
@@ -202,7 +204,7 @@ public class RrInterval
 	public static RrInterval add(RrInterval a, double b)
 	{
 		if(a.empty)
-			System.err.println("add(...): adding an empty interval.");	    
+			Debug.e("RrInterval.add(...): adding an empty interval.");	    
 		return new RrInterval(a.low + b, a.high + b);
 	}
 	
@@ -226,7 +228,7 @@ public class RrInterval
 	public static RrInterval sub(RrInterval a, RrInterval b)
 	{
 		if(a.empty || b.empty)
-			System.err.println("difference(...): subtracting empty interval(s).");
+			Debug.e("RrInterval.sub(...): subtracting empty interval(s).");
 		return new RrInterval(a.low - b.high, a.high - b.low);
 	}
 	
@@ -238,7 +240,7 @@ public class RrInterval
 	public static RrInterval sub(RrInterval a, double b)
 	{
 		if(a.empty)
-			System.err.println("difference(...): subtracting an empty interval.");
+			Debug.e("RrInterval.sub(...): subtracting an empty interval.");
 		return new RrInterval(a.low - b, a.high - b);
 	}
 	
@@ -250,7 +252,7 @@ public class RrInterval
 	public static RrInterval sub(double b, RrInterval a)
 	{
 		if(a.empty)
-			System.err.println("difference(...): subtracting an empty interval.");
+			Debug.e("RrInterval.sub(...): subtracting an empty interval.");
 		return new RrInterval(b - a.high, b - a.low);
 	}   
 	
@@ -263,7 +265,7 @@ public class RrInterval
 	public static RrInterval mul(RrInterval a, RrInterval b)
 	{
 		if(a.empty || b.empty)
-			System.err.println("multiply(...): multiplying empty intervals.");
+			Debug.e("RrInterval.mul(...): multiplying empty intervals.");
 		double d = a.low*b.low;
 		RrInterval r = new RrInterval(d, d);
 		r.expand(a.low*b.high);
@@ -280,7 +282,7 @@ public class RrInterval
 	public static RrInterval mul(RrInterval a, double f)
 	{
 		if(a.empty)
-			System.err.println("multiply(...): multiplying an empty interval.");
+			Debug.e("RrInterval.mul(...): multiplying an empty interval.");
 		if(f > 0)
 			return new RrInterval(a.low*f, a.high*f);
 		else

@@ -5,6 +5,7 @@ import javax.media.j3d.BranchGroup;
 
 import org.reprap.devices.GenericExtruder;
 import org.reprap.gui.STLObject;
+import org.reprap.utilities.Debug;
 
 /**
  * Small class to hold RepRap attributes that are attached to
@@ -102,13 +103,13 @@ public class Attributes {
 			Printer p = org.reprap.Main.gui.getPrinter();
 			if(p == null)
 			{
-				System.err.println("Attributes.getExtruder(): null printer!");
+				Debug.e("Attributes.getExtruder(): null printer!");
 				return null;
 			}
 			e = p.getExtruder(material); 
 			if(e == null)
 			{
-				System.err.println("Attributes.getExtruder(): null extruder for " + material);
+				Debug.e("Attributes.getExtruder(): null extruder for " + material);
 				return null;
 			}
 		}

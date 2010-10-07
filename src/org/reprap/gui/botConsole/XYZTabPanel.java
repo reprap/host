@@ -81,7 +81,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
             xStepperPositionJPanel.postSetUp(1);
             yStepperPositionJPanel.postSetUp(2);
             zStepperPositionJPanel.postSetUp(3);
-        } catch (Exception ex) {System.err.println(ex.toString());}
+        } catch (Exception ex) {Debug.e(ex.toString());}
         setMotorSpeeds();
         setNudgeSize(Double.parseDouble(nudgeSizeRB1.getText()));
         agitate = false;

@@ -33,6 +33,8 @@ import org.reprap.Preferences;
 
 import com.sun.j3d.audioengines.javasound.JavaSoundMixer;
 
+import org.reprap.utilities.Debug;
+
 abstract public class Panel3D extends JPanel {
 	private static final long serialVersionUID = 1L;
 	//-------------------------------------------------------------
@@ -152,7 +154,7 @@ abstract public class Panel3D extends JPanel {
 				(float)Preferences.loadGlobalDouble("UnselectedColourB(0..1)"));
 		} catch (Exception ex)
 		{
-			System.err.println("Refresh Panel3D preferences: " + ex.toString());
+			Debug.e("Refresh Panel3D preferences: " + ex.toString());
 		}
 				
 		// End of stuff from the preferences file
@@ -218,7 +220,7 @@ abstract public class Panel3D extends JPanel {
 			File file = new File(System.getProperty("user.dir"));
 			return file.toURI().toURL();
 		} catch (Exception e) {
-			System.err.println("getWorkingDirectory( ): can't get user dir.");
+			Debug.e("getWorkingDirectory( ): can't get user dir.");
 		}
 
 		//return getCodeBase( );
@@ -323,7 +325,7 @@ abstract public class Panel3D extends JPanel {
 		JavaSoundMixer javaSoundMixer = new JavaSoundMixer(pe);
 
 		if (javaSoundMixer == null)
-			System.err.println("create of audiodevice failed");
+			Debug.e("create of audiodevice failed");
 
 		return javaSoundMixer;
 	}
@@ -533,8 +535,7 @@ abstract public class Panel3D extends JPanel {
 //			stlURL = u.toExternalForm();//u.getFile();
 ////			System.out.println(stlPath + " : " + stlURL);
 //		} catch (Exception e) {
-//			System.err
-//					.println("createSceneBranchGroup(): Exception finding working directory: "
+//			Debug.e("createSceneBranchGroup(): Exception finding working directory: "
 //							+ codebase.toExternalForm());
 //			e.printStackTrace();
 //		}
