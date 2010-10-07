@@ -266,7 +266,7 @@ public class Preferences extends JFrame {
 	
 	private void initGUI() 
 	{
-		setSize(600, 700);
+		setSize(400, 500);
 		
 		//Dimension box = new Dimension(30, 10);
 

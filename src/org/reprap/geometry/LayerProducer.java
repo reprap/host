@@ -11,7 +11,7 @@ import org.reprap.Printer;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
-import org.reprap.devices.pseudo.LinePrinter;
+//import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.geometry.polygons.Rr2Point;
 //import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.geometry.polygons.RrPolygon;
@@ -75,11 +75,11 @@ class segmentSpeeds
 		p3 = Rr2Point.add(p2, Rr2Point.mul(a, fastLength));
 	}
 	
-	int speed(int currentSpeed, double angFac)
-	{
-		double fac = (1 - 0.5*(1 + ca)*angFac);
-		return LinePrinter.speedFix(currentSpeed, fac);
-	}
+//	int speed(int currentSpeed, double angFac)
+//	{
+//		double fac = (1 - 0.5*(1 + ca)*angFac);
+//		return LinePrinter.speedFix(currentSpeed, fac);
+//	}
 }
 
 /**

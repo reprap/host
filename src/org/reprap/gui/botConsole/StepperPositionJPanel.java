@@ -28,7 +28,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
 
     private double currentSpeed;
     @SuppressWarnings("unused")
-	private double motorStepsPerMM;
+	//private double motorStepsPerMM;
     private double axisLength;
     private double nudgeSize;
     private double newTargetAfterNudge;
@@ -84,7 +84,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
         
         //motor = new GenericStepperMotor(communicator, new SNAPAddress(address), Preferences.getGlobalPreferences(), motorID);
 
-        motorStepsPerMM = Preferences.loadGlobalDouble(axis + "AxisScale(steps/mm)");
+        //motorStepsPerMM = Preferences.loadGlobalDouble(axis + "AxisScale(steps/mm)");
 	
 //      TODO: Activate this code when the Java3D parameters allow a small enough working volume. Currently I get a black screen.
 //      axisLength = Preferences.loadGlobalDouble("Working" + axis + "(mm)");

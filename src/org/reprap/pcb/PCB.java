@@ -175,20 +175,16 @@ public class PCB {
 		
 		penPaths = penPaths.nearEnds(new Rr2Point(0, 0), true, 1.5*penWidth);
 		
-		try 
+
+		if(Preferences.simulate() && penPaths.size() > 0)
 		{
-			if(Preferences.loadGlobalBool("DisplaySimulation") && penPaths.size() > 0)
-			{
-				RrGraphics simulationPlot2 = new RrGraphics("PCB pen plotlines");
-//				if(currentPolygon != null)
-//					thePattern.add(new RrPolygon(currentPolygon));
-				simulationPlot2.init(penPaths.getBox(), false, 0);
-				simulationPlot2.add(penPaths);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			RrGraphics simulationPlot2 = new RrGraphics("PCB pen plotlines");
+			//				if(currentPolygon != null)
+			//					thePattern.add(new RrPolygon(currentPolygon));
+			simulationPlot2.init(penPaths.getBox(), false, 0);
+			simulationPlot2.add(penPaths);
 		}
+
 		
 		writeGCodes();
 			

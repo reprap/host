@@ -404,7 +404,7 @@ public abstract class GenericExtruder implements Extruder
 		try
 		{
 			result = Preferences.loadGlobalInt(prefName + "Address");
-			maxExtruderSpeed = Preferences.loadGlobalInt(prefName + "MaxSpeed(0..255)");
+			maxExtruderSpeed = 255; //Preferences.loadGlobalInt(prefName + "MaxSpeed(0..255)");
 //			extrusionSpeed = Preferences.loadGlobalDouble(prefName + "ExtrusionSpeed(mm/minute)");
 			purgeTime = Preferences.loadGlobalDouble(prefName + "Purge(ms)");
 			extrusionPWM = Preferences.loadGlobalDouble(prefName + "ExtrusionPWM(0..1)");
@@ -412,38 +412,38 @@ public abstract class GenericExtruder implements Extruder
 			extrusionSize = Preferences.loadGlobalDouble(prefName + "ExtrusionSize(mm)");
 			extrusionHeight = Preferences.loadGlobalDouble(prefName + "ExtrusionHeight(mm)");
 			extrusionInfillWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionInfillWidth(mm)");
-			lowerFineLayers = Preferences.loadGlobalInt(prefName + "LowerFineLayers(0...)");
-			upperFineLayers = Preferences.loadGlobalInt(prefName + "UpperFineLayers(0...)");
+			lowerFineLayers = 2; //Preferences.loadGlobalInt(prefName + "LowerFineLayers(0...)");
+			upperFineLayers = 2; //Preferences.loadGlobalInt(prefName + "UpperFineLayers(0...)");
 			extrusionBroadWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionBroadWidth(mm)");		
 			coolingPeriod = Preferences.loadGlobalDouble(prefName + "CoolingPeriod(s)");
 			fastXYFeedrate = Preferences.loadGlobalDouble(prefName + "FastXYFeedrate(mm/minute)");
 			fastEFeedrate = Preferences.loadGlobalDouble(prefName + "FastEFeedrate(mm/minute)");
 			slowXYFeedrate = Preferences.loadGlobalDouble(prefName + "SlowXYFeedrate(mm/minute)");
 			maxAcceleration = Preferences.loadGlobalDouble(prefName + "MaxAcceleration(mm/minute/minute)");
-			middleStart = Preferences.loadGlobalBool(prefName + "MiddleStart");
-			t0 = Preferences.loadGlobalInt(prefName + "t0(0..255)");
+			middleStart = true; //Preferences.loadGlobalBool(prefName + "MiddleStart");
+			t0 = 0; //Preferences.loadGlobalInt(prefName + "t0(0..255)");
 			iSpeed = Preferences.loadGlobalDouble(prefName + "InfillSpeed(0..1)");
 			oSpeed = Preferences.loadGlobalDouble(prefName + "OutlineSpeed(0..1)");
-			asLength = Preferences.loadGlobalDouble(prefName + "AngleSpeedLength(mm)");
-			asFactor = Preferences.loadGlobalDouble(prefName + "AngleSpeedFactor(0..1)");
+			asLength = -1; //Preferences.loadGlobalDouble(prefName + "AngleSpeedLength(mm)");
+			asFactor = 0.5; //Preferences.loadGlobalDouble(prefName + "AngleSpeedFactor(0..1)");
 			material = Preferences.loadGlobalString(prefName + "MaterialType(name)");
 			supportMaterial = Preferences.loadGlobalString(prefName + "SupportMaterialType(name)");
 			inFillMaterial = Preferences.loadGlobalString(prefName + "InFillMaterialType(name)");			
 			offsetX = Preferences.loadGlobalDouble(prefName + "OffsetX(mm)");
 			offsetY = Preferences.loadGlobalDouble(prefName + "OffsetY(mm)");
 			offsetZ = Preferences.loadGlobalDouble(prefName + "OffsetZ(mm)");
-			nozzleWipeEnabled = Preferences.loadGlobalBool(prefName + "NozzleWipeEnabled");
-			nozzleWipeDatumX = Preferences.loadGlobalDouble(prefName + "NozzleWipeDatumX(mm)");
-			nozzleWipeDatumY = Preferences.loadGlobalDouble(prefName + "NozzleWipeDatumY(mm)");
-			nozzleWipeStrokeX = Preferences.loadGlobalDouble(prefName + "NozzleWipeStrokeX(mm)");
-			nozzleWipeStrokeY = Preferences.loadGlobalDouble(prefName + "NozzleWipeStrokeY(mm)");
-			nozzleWipeFreq = Preferences.loadGlobalInt(prefName + "NozzleWipeFreq");
-			nozzleClearTime = Preferences.loadGlobalDouble(prefName + "NozzleClearTime(s)");
-			nozzleWaitTime = Preferences.loadGlobalDouble(prefName + "NozzleWaitTime(s)");
-			randSt = Preferences.loadGlobalBool(prefName + "RandomStart");
-			incrementedSt = Preferences.loadGlobalBool(prefName + "IncrementedStart");
-			shortLength = Preferences.loadGlobalDouble(prefName + "ShortLength(mm)");
-			shortSpeed = Preferences.loadGlobalDouble(prefName + "ShortSpeed(0..1)");
+			nozzleWipeEnabled = false; //Preferences.loadGlobalBool(prefName + "NozzleWipeEnabled");
+			nozzleWipeDatumX = 22.4; //Preferences.loadGlobalDouble(prefName + "NozzleWipeDatumX(mm)");
+			nozzleWipeDatumY = 4; //Preferences.loadGlobalDouble(prefName + "NozzleWipeDatumY(mm)");
+			nozzleWipeStrokeX = 0; //Preferences.loadGlobalDouble(prefName + "NozzleWipeStrokeX(mm)");
+			nozzleWipeStrokeY = 10; //Preferences.loadGlobalDouble(prefName + "NozzleWipeStrokeY(mm)");
+			nozzleWipeFreq = 1; //Preferences.loadGlobalInt(prefName + "NozzleWipeFreq");
+			nozzleClearTime = 10; //Preferences.loadGlobalDouble(prefName + "NozzleClearTime(s)");
+			nozzleWaitTime = 0; //Preferences.loadGlobalDouble(prefName + "NozzleWaitTime(s)");
+			randSt = false; //Preferences.loadGlobalBool(prefName + "RandomStart");
+			incrementedSt = false; //Preferences.loadGlobalBool(prefName + "IncrementedStart");
+			shortLength = -1; //Preferences.loadGlobalDouble(prefName + "ShortLength(mm)");
+			shortSpeed = 1; //Preferences.loadGlobalDouble(prefName + "ShortSpeed(0..1)");
 			infillOverlap = Preferences.loadGlobalDouble(prefName + "InfillOverlap(mm)");
 			extrusionDelayForLayer = Preferences.loadGlobalDouble(prefName + "ExtrusionDelayForLayer(ms)");
 			extrusionDelayForPolygon = Preferences.loadGlobalDouble(prefName + "ExtrusionDelayForPolygon(ms)");
@@ -452,14 +452,14 @@ public abstract class GenericExtruder implements Extruder
 			valveDelayForPolygon = Preferences.loadGlobalDouble(prefName + "ValveDelayForPolygon(ms)");
 			extrusionReverseDelay = Preferences.loadGlobalDouble(prefName + "Reverse(ms)");
 			valveOverRun = Preferences.loadGlobalDouble(prefName + "ValveOverRun(mm)");		
-			minLiftedZ = Preferences.loadGlobalDouble(prefName + "MinimumZClearance(mm)");
+			minLiftedZ = -1; //Preferences.loadGlobalDouble(prefName + "MinimumZClearance(mm)");
 			// NB - store as 2ms ticks to allow longer pulses
 			valvePulseTime = 0.5*Preferences.loadGlobalDouble(prefName + "ValvePulseTime(ms)");
 			shells = Preferences.loadGlobalInt(prefName + "NumberOfShells(0..N)");
-			pauseBetweenSegments = Preferences.loadGlobalBool(prefName + "PauseBetweenSegments");
+			pauseBetweenSegments = false; //Preferences.loadGlobalBool(prefName + "PauseBetweenSegments");
 			extrusionFoundationWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionFoundationWidth(mm)");
 			extrusionLastFoundationWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionLastFoundationWidth(mm)");
-			separationFraction = Preferences.loadGlobalDouble(prefName + "SeparationFraction(0..1)");
+			separationFraction = 0.8; //Preferences.loadGlobalDouble(prefName + "SeparationFraction(0..1)");
 			arcCompensationFactor = Preferences.loadGlobalDouble(prefName + "ArcCompensationFactor(0..)");
 			arcShortSides = Preferences.loadGlobalDouble(prefName + "ArcShortSides(0..)");
 			extrudeRatio = Preferences.loadGlobalDouble(prefName + "ExtrudeRatio(0..)");
@@ -740,7 +740,7 @@ public abstract class GenericExtruder implements Extruder
     {
     	try
     	{
-    		return Preferences.loadGlobalDouble(prefName + "SeparationSpeed(mm/minute)");
+    		return 3000; //Preferences.loadGlobalDouble(prefName + "SeparationSpeed(mm/minute)");
     	} catch (Exception e)
     	{
     		System.err.println(e.toString());

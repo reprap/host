@@ -10,6 +10,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.io.File;
+import java.io.IOException;
+
 import javax.swing.JOptionPane;
 
 import org.reprap.Extruder;
@@ -42,32 +44,16 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     	String machine = "simulator";
     	
     	//toSNAPRepRapRadioButton.setSelected(false);
-    	
-    	try
-    	{
-    		machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
 
-    		//if(machine.equalsIgnoreCase("SNAPRepRap"))
-    		//{
-    		//	toSNAPRepRapRadioButton.setSelected(true);
-    		//	seenSNAP = true;
-    		//} else if(machine.equalsIgnoreCase("GCodeRepRap"))
-    		//{
-//    			if(org.reprap.Preferences.loadGlobalBool("GCodeUseSerial"))
-//    				toGCodeRepRapRadioButton.setSelected(true);
-//    			else
-//    				gCodeToFileRadioButton.setSelected(true);
-    			seenGCode = true;
-    		//} 
-    	} catch (Exception e)
-    	{
-            System.err.println("Failure trying to load 'RepRap_Machine' preference: " + e);
-            return;
-        }
-        
 
-        printer = org.reprap.Main.gui.getPrinter();
-        enableSLoad();
+    	machine = org.reprap.Preferences.RepRapMachine();
+
+
+    	seenGCode = true;
+
+
+    	printer = org.reprap.Main.gui.getPrinter();
+    	enableSLoad();
     }
     
     /**
@@ -593,41 +579,34 @@ private void selectorRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//G
 	@SuppressWarnings("unused")
 	String machine = "simulator";
 	boolean closeMessage = false;
-	try
+
+	machine = org.reprap.Preferences.RepRapMachine();
+
+	if(evt.getSource() == toGCodeRepRapRadioButton)
 	{
-		machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
-
-
-//		if(evt.getSource() == toSNAPRepRapRadioButton)
-//		{
-//			org.reprap.Preferences.setGlobalString("RepRap_Machine", "SNAPRepRap");
-//			if(seenGCode)
-//				closeMessage = true;
-//			seenSNAP = true;
-//		} else 
-		if(evt.getSource() == toGCodeRepRapRadioButton)
-		{
-			enableGLoad();
-			if(seenSNAP)
-				closeMessage = true;
-			seenGCode = true;
-		} else if(evt.getSource() == gCodeToFileRadioButton)
-		{
-
-			enableSLoad();
-			if(seenSNAP)
-				closeMessage = true;
-			seenGCode = true;
-		}
-		org.reprap.Preferences.saveGlobal();
-		printer.refreshPreferences();
-		if(!closeMessage)
-			return;
-		JOptionPane.showMessageDialog(null, "As you have changed the type of RepRap machine you are using,\nyou will have to exit this program and run it again.");
-	} catch (Exception ex)
+		enableGLoad();
+		if(seenSNAP)
+			closeMessage = true;
+		seenGCode = true;
+	} else if(evt.getSource() == gCodeToFileRadioButton)
 	{
-		JOptionPane.showMessageDialog(null, "Could not get preference 'RepRap_Machine'");
+
+		enableSLoad();
+		if(seenSNAP)
+			closeMessage = true;
+		seenGCode = true;
 	}
+	try {
+		org.reprap.Preferences.saveGlobal();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	printer.refreshPreferences();
+	if(!closeMessage)
+		return;
+	JOptionPane.showMessageDialog(null, "As you have changed the type of RepRap machine you are using,\nyou will have to exit this program and run it again.");
+
 }//GEN-LAST:event_selectorRadioButtonMousePressed
 
 private void getWebPageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getWebPageActionPerformed
@@ -688,18 +667,13 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 		JOptionPane.showMessageDialog(null, "Sorry.  Sending G Codes to SNAP RepRap machines is not yet implemented.");
 		return;
 	}
-	try
+
+	if(!org.reprap.Preferences.GCodeUseSerial())
 	{
-		if(!org.reprap.Preferences.loadGlobalBool("GCodeUseSerial"))
-		{
-			JOptionPane.showMessageDialog(null, "There is no point in sending a G Code file to a G Code file.");
-			return;
-		}
-	} catch (Exception e)
-	{
-		System.err.println("Preference GCodeUseSerial not found in preferences file.");
+		JOptionPane.showMessageDialog(null, "There is no point in sending a G Code file to a G Code file.");
 		return;
 	}
+
 	if(stlLoaded)
 	{
 		int response = JOptionPane.showOptionDialog(
@@ -809,11 +783,7 @@ private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
 
 private void displayPaths(boolean disp)
 {
-	try
-	{
-		org.reprap.Preferences.setGlobalBool("DisplaySimulation", disp);
-	} catch (Exception e)
-	{}	
+		org.reprap.Preferences.setSimulate(disp);
 }
 
 private void displayPathsCheckMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayPathsCheckMouseClicked
@@ -832,8 +802,8 @@ private void enableSLoad()
 	pcbButton.setBackground(new java.awt.Color(152, 99, 62));
 	try
 	{	
-		org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
-		org.reprap.Preferences.setGlobalString("GCodeUseSerial", "false");
+		org.reprap.Preferences.setRepRapMachine("GCodeRepRap");
+		org.reprap.Preferences.setGCodeUseSerial(false);
 	} catch (Exception e)
 	{
 		JOptionPane.showMessageDialog(null, e.toString());
@@ -853,8 +823,8 @@ private void enableGLoad()
     pcbButton.setBackground(new java.awt.Color(153, 153, 153));
 	try
 	{
-		org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
-		org.reprap.Preferences.setGlobalString("GCodeUseSerial", "true");
+		org.reprap.Preferences.setRepRapMachine("GCodeRepRap");
+		org.reprap.Preferences.setGCodeUseSerial(true);
 	} catch (Exception e)
 	{
 		JOptionPane.showMessageDialog(null, e.toString());

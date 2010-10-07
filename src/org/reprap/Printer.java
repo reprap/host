@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.swing.JCheckBoxMenuItem;
 import org.reprap.geometry.LayerRules;
-import org.reprap.devices.GenericStepperMotor;
+//import org.reprap.devices.GenericStepperMotor;
 
 public interface Printer {
 	
@@ -423,19 +423,19 @@ public interface Printer {
 	 * Get the X stepper
 	 * @return
 	 */
-	public GenericStepperMotor getXMotor();
+//	public GenericStepperMotor getXMotor();
 	
 	/**
 	 * Get the Y stepper
 	 * @return
 	 */
-	public GenericStepperMotor getYMotor();
+//	public GenericStepperMotor getYMotor();
 	
 	/**
 	 * Get the Z stepper
 	 * @return
 	 */
-	public GenericStepperMotor getZMotor();
+//	public GenericStepperMotor getZMotor();
 	
 //	/**
 //	 * Convert XY feedrates in mm/min to internal units

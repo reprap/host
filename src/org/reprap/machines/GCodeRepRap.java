@@ -16,7 +16,7 @@ import org.reprap.Preferences;
 import org.reprap.comms.GCodeReaderAndWriter;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
-import org.reprap.devices.GCodeStepperMotor;
+//import org.reprap.devices.GCodeStepperMotor;
 import org.reprap.geometry.LayerRules;
 
 import java.io.IOException;
@@ -50,9 +50,9 @@ public class GCodeRepRap extends GenericRepRap {
 	
 	public void loadMotors()
 	{
-		motorX = new GCodeStepperMotor(this, 1);
-		motorY = new GCodeStepperMotor(this, 2);
-		motorZ = new GCodeStepperMotor(this, 3);
+//		motorX = new GCodeStepperMotor(this, 1);
+//		motorY = new GCodeStepperMotor(this, 2);
+//		motorZ = new GCodeStepperMotor(this, 3);
 	}
 	
 	public void loadExtruders() throws Exception

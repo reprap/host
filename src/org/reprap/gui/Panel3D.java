@@ -110,17 +110,17 @@ abstract public class Panel3D extends JPanel {
 		// All this needs to go into Preferences.java
 		try
 		{
-		wv_location = Preferences.loadGlobalString("WorkingLocation");
+		wv_location = "reprap-wv.stl"; //Preferences.loadGlobalString("WorkingLocation");
 
 		// Translate and zoom scaling factors
 		
-		mouse_tf = Preferences.loadGlobalDouble("MouseTranslationFactor");
-		mouse_zf = Preferences.loadGlobalDouble("MouseZoomFactor");
+		mouse_tf = 50; //Preferences.loadGlobalDouble("MouseTranslationFactor");
+		mouse_zf = 50; //Preferences.loadGlobalDouble("MouseZoomFactor");
 		
-		RadiusFactor = Preferences.loadGlobalDouble("RadiusFactor");
-		BackFactor = Preferences.loadGlobalDouble("BackFactor");
-		FrontFactor = Preferences.loadGlobalDouble("FrontFactor");
-		BoundFactor = Preferences.loadGlobalDouble("BoundFactor");
+		RadiusFactor = 0.7; //Preferences.loadGlobalDouble("RadiusFactor");
+		BackFactor = 2.0; //Preferences.loadGlobalDouble("BackFactor");
+		FrontFactor = 0.001; //Preferences.loadGlobalDouble("FrontFactor");
+		BoundFactor = 3.0; //Preferences.loadGlobalDouble("BoundFactor");
 
 		xwv = Preferences.loadGlobalDouble("WorkingX(mm)"); // The RepRap machine...
 		ywv = Preferences.loadGlobalDouble("WorkingY(mm)"); // ...working volume in mm.
@@ -128,10 +128,10 @@ abstract public class Panel3D extends JPanel {
 
 		// Factors for front and back clipping planes and so on
 		
-		worldName = Preferences.loadGlobalString("WorldName");
-		wv_offset = new Vector3d(Preferences.loadGlobalDouble("WorkingOffsetX(mm)"),
-				Preferences.loadGlobalDouble("WorkingOffsetY(mm)"),
-				Preferences.loadGlobalDouble("WorkingOffsetZ(mm)"));
+		worldName = "RepRap-World"; //Preferences.loadGlobalString("WorldName");
+		wv_offset = new Vector3d(-17.3, //Preferences.loadGlobalDouble("WorkingOffsetX(mm)"),
+				-24.85, //Preferences.loadGlobalDouble("WorkingOffsetY(mm)"),
+				-2); //Preferences.loadGlobalDouble("WorkingOffsetZ(mm)"));
 
 		// The background, and other colours
 

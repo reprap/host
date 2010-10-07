@@ -26,9 +26,6 @@ public class XYZTabPanel extends javax.swing.JPanel {
 	private Thread agitateThread = null;
 	
     private void setPrefs() throws IOException {
-        
-        //XYfastSpeed = Preferences.loadGlobalInt("FastSpeed(0..255)");
-        //ZfastSpeed = Preferences.loadGlobalInt("MovementSpeedZ(0..255)");
     	
     	XYfastSpeed = printer.getExtruder().getFastXYFeedrate();
     	ZfastSpeed = printer.getFastFeedrateZ();

@@ -228,20 +228,16 @@ public class GerberGCode {
 	
 	public RrPolygonList getPolygons()
 	{
-		try 
+
+		if(Preferences.simulate())
 		{
-			if(Preferences.loadGlobalBool("DisplaySimulation"))
-			{
-				RrGraphics simulationPlot1 = new RrGraphics("PCB from gerber");
-//				if(currentPolygon != null)
-//					thePattern.add(new RrPolygon(currentPolygon));
-				simulationPlot1.init(pcb.box(), false, 0);
-				simulationPlot1.add(pcb);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			RrGraphics simulationPlot1 = new RrGraphics("PCB from gerber");
+			//				if(currentPolygon != null)
+			//					thePattern.add(new RrPolygon(currentPolygon));
+			simulationPlot1.init(pcb.box(), false, 0);
+			simulationPlot1.add(pcb);
 		}
+
 		RrPolygonList result = new RrPolygonList();
 		double penWidth = pcbPen.getExtrusionSize();
 		pcb = pcb.offset(-0.5*penWidth);

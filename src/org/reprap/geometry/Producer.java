@@ -48,7 +48,7 @@ public class Producer {
 		
 		RrRectangle gp = allSTLs.ObjectPlanRectangle();
 
-		if(Preferences.loadGlobalBool("DisplaySimulation"))
+		if(Preferences.simulate())
 		{
 			simulationPlot = new RrGraphics("RepRap building simulation");
 		} else
@@ -143,7 +143,7 @@ public class Producer {
 		
 		layerRules.getPrinter().startRun(layerRules);
 		
-		if(Preferences.loadGlobalBool("Subtractive"))
+		if(Preferences.Subtractive())
 			produceSubtractive();
 		else
 		{
@@ -432,7 +432,7 @@ public class Producer {
 
 	private void produceSubtractive() throws Exception 
 	{
-		System.err.println("Need to implement the Producer.produceSubtractive() function... :-)");
+		Debug.e("Need to implement the Producer.produceSubtractive() function... :-)");
 	}
 
 	/**

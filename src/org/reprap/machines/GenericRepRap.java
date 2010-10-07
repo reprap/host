@@ -10,8 +10,8 @@ import org.reprap.Preferences;
 import org.reprap.ReprapException;
 import org.reprap.devices.NullExtruder;
 import org.reprap.devices.GenericExtruder;
-import org.reprap.devices.GenericStepperMotor;
-import org.reprap.devices.NullStepperMotor;
+//import org.reprap.devices.GenericStepperMotor;
+//import org.reprap.devices.NullStepperMotor;
 import org.reprap.geometry.LayerRules;
 import org.reprap.gui.ContinuationMesage;
 //import org.reprap.gui.Previewer;
@@ -186,9 +186,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/**
 	 * Stepper motors for the 3 axis 
 	 */
-	public GenericStepperMotor motorX;
-	public GenericStepperMotor motorY;
-	public GenericStepperMotor motorZ;
+//	public GenericStepperMotor motorX;
+//	public GenericStepperMotor motorY;
+//	public GenericStepperMotor motorZ;
 	
 	public GenericRepRap() throws Exception
 	{
@@ -221,9 +221,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	public void loadMotors()
 	{
-		motorX = new NullStepperMotor(1);
-		motorY = new NullStepperMotor(2);
-		motorZ = new NullStepperMotor(3);
+//		motorX = new NullStepperMotor(1);
+//		motorY = new NullStepperMotor(2);
+//		motorZ = new NullStepperMotor(3);
 	}
 	
 	public void loadExtruders() throws Exception
@@ -263,16 +263,16 @@ public abstract class GenericRepRap implements CartesianPrinter
 		try
 		{
 			//load axis prefs
-			int axes = Preferences.loadGlobalInt("AxisCount");
+			int axes = 3;//Preferences.loadGlobalInt("AxisCount");
 			if (axes != 3)
 				throw new Exception("A Cartesian Bot must contain 3 axes");
 			
-			xYReZeroInterval =  Preferences.loadGlobalDouble("XYReZeroInterval(mm)");
+			xYReZeroInterval =  -1; //Preferences.loadGlobalDouble("XYReZeroInterval(mm)");
 
 			// TODO This should be from calibration
-			scaleX = Preferences.loadGlobalDouble("XAxisScale(steps/mm)");
-			scaleY = Preferences.loadGlobalDouble("YAxisScale(steps/mm)");
-			scaleZ = Preferences.loadGlobalDouble("ZAxisScale(steps/mm)");
+			scaleX = 7.99735; //Preferences.loadGlobalDouble("XAxisScale(steps/mm)");
+			scaleY = 7.99735; //Preferences.loadGlobalDouble("YAxisScale(steps/mm)");
+			scaleZ = 320; //Preferences.loadGlobalDouble("ZAxisScale(steps/mm)");
 
 			// Load our maximum feedrate variables
 			double maxFeedrateX = Preferences.loadGlobalDouble("MaximumFeedrateX(mm/minute)");
@@ -289,7 +289,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			fastXYFeedrate = Math.min(maxFeedrateX, maxFeedrateY);
 			setFastFeedrateZ(maxFeedrateZ);
 			
-			idleZ = Preferences.loadGlobalBool("IdleZAxis");
+			idleZ = true; //Preferences.loadGlobalBool("IdleZAxis");
 			
 			foundationLayers = Preferences.loadGlobalInt("FoundationLayers");
 			dumpX = Preferences.loadGlobalDouble("DumpX(mm)");
@@ -1080,26 +1080,26 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/**
 	 * @return the X stepper
 	 */
-	public GenericStepperMotor getXMotor()
-	{
-		return motorX;
-	}
-	
-	/**
-	 * @return the Y stepper
-	 */
-	public GenericStepperMotor getYMotor()
-	{
-		return motorY;
-	}
-	
-	/**
-	 * @return the Z stepper
-	 */	
-	public GenericStepperMotor getZMotor()
-	{
-		return motorZ;
-	}
+//	public GenericStepperMotor getXMotor()
+//	{
+//		return motorX;
+//	}
+//	
+//	/**
+//	 * @return the Y stepper
+//	 */
+//	public GenericStepperMotor getYMotor()
+//	{
+//		return motorY;
+//	}
+//	
+//	/**
+//	 * @return the Z stepper
+//	 */	
+//	public GenericStepperMotor getZMotor()
+//	{
+//		return motorZ;
+//	}
 	
 	public int getFoundationLayers()
 	{

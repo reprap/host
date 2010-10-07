@@ -288,13 +288,10 @@ public class GCodeReaderAndWriter
 		}
 		
 		simulationPlot = null;
-		try 
-		{
-			if(Preferences.loadGlobalBool("DisplaySimulation"))
-				simulationPlot = new RrGraphics("RepRap building simulation");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+
+		if(Preferences.simulate())
+			simulationPlot = new RrGraphics("RepRap building simulation");
+
 //		if(bufferThread == null)
 //		{
 //			System.err.println("GCodeWriter: attempt to write to non-existent buffer.");

@@ -33,31 +33,51 @@ public class Preferences {
 	
 	/*
 	 * This section deals with internal (i.e. not RepRap machine, but this code or
-	 * physics) precisions and accuracies - it should probably
-	 * get its data from the properties file...
+	 * physics) precisions and accuracies
 	 */
 	
 	private static final int grid = 100;             // Click outline polygons to a...
+	public static int grid() { return grid; }
+	
 	private static final double gridRes = 1.0/grid;  // ...10 micron grid
+	public static double gridRes() { return gridRes; }	
+	
 	private static final double lessGridSquare = gridRes*gridRes*0.01;  // Small squared size of a gridsquare
+	public static double lessGridSquare() { return lessGridSquare; }	
+	
 	private static final double tiny = 1.0e-12;      // A small number
+	public static double tiny() { return tiny; }	
+	
 	private static final double swell = 1.01;        // Quad tree swell factor
-	private static final double machineResolution = 0.1; // RepRap step size in mm - should 
-	                                                     // derive this from Axis1Scale and Axis2Scale
-
+	public static double swell() { return swell; }	
+	
+	private static final double machineResolution = 0.1; // RepRap step size in mm
+	public static double machineResolution() { return machineResolution; }
+	
 	private static final double absoluteZero = -273;
+	public static double absoluteZero() { return absoluteZero; }
+	
 	private static final double inToMM = 25.4;
+	public static double inchesToMillimetres() { return inToMM; }
 	
 	private static final Color3f black = new Color3f(0, 0, 0);
 	
-	public static int grid() { return grid; }
-	public static double gridRes() { return gridRes; }
-	public static double lessGridSquare() { return lessGridSquare; }
-	public static double tiny() { return tiny; }
-	public static double swell() { return swell; }
-	public static double inchesToMillimetres() { return inToMM; }
-	public static double machineResolution() { return machineResolution; }
-	public static double absoluteZero() { return absoluteZero; }
+	private static boolean displaySimulation = false;
+	public static boolean simulate() { return displaySimulation; }
+	public static void setSimulate(boolean s) { displaySimulation = s;}
+	
+	private static boolean subtractive = false;
+	public static boolean Subtractive() { return subtractive; }
+	public static void setSubtractive(boolean s) { subtractive = s;}
+	
+	private static boolean gCodeUseSerial = false;
+	public static boolean GCodeUseSerial() { return gCodeUseSerial; }
+	public static void setGCodeUseSerial(boolean s) { gCodeUseSerial = s;}	
+	
+	private static String repRapMachine="GCodeRepRap";
+	public static String RepRapMachine() { return repRapMachine; }
+	public static void setRepRapMachine(String s) { repRapMachine = s; }
+
 	public static Appearance unselectedApp()
 	{
 		Color3f unselectedColour = null;

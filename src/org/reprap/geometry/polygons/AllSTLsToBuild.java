@@ -818,9 +818,12 @@ public class AllSTLsToBuild
 					Rr2Point corner = Rr2Point.add(rr.sw(), new Rr2Point(-3, -3));
 					RrPolygon ell = new RrPolygon(borderPolygons.polygon(0).getAttributes(), false);
 					ell.add(corner);
+					ell.add(Rr2Point.add(corner, new Rr2Point(0, 10)));
 					ell.add(Rr2Point.add(corner, new Rr2Point(-2, 10)));
 					ell.add(Rr2Point.add(corner, new Rr2Point(-2, -2)));
 					ell.add(Rr2Point.add(corner, new Rr2Point(20, -2)));
+					ell.add(Rr2Point.add(corner, new Rr2Point(20, 0)));
+					ell.add(corner);
 					borderPolygons.add(0, ell);
 				}
 			} catch (Exception ex)

@@ -3,7 +3,7 @@ package org.reprap.machines;
 import java.io.IOException;
 
 import org.reprap.Extruder;
-import org.reprap.devices.NullStepperMotor;
+//import org.reprap.devices.NullStepperMotor;
 import org.reprap.devices.NullExtruder;
 
 /**
@@ -20,9 +20,9 @@ public class Simulator extends GenericRepRap {
 	
 	public void loadMotors()
 	{
-		motorX = new NullStepperMotor(1);
-		motorY = new NullStepperMotor(2);
-		motorZ = new NullStepperMotor(3);
+//		motorX = new NullStepperMotor(1);
+//		motorY = new NullStepperMotor(2);
+//		motorZ = new NullStepperMotor(3);
 	}
 	
 	public Extruder extruderFactory(int count)
