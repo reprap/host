@@ -43,6 +43,8 @@ public class GCodeRepRap extends GenericRepRap {
 
 		gcode = new GCodeReaderAndWriter();
 		gcode.queue("M110 ; Reset the line numbers");
+		gcode.queue("M115 ; Get the firmware version numbers etc");
+		Debug.d("Firmware configuration string: " + gcode.lastResponse());
 		loadExtruders();
 		
 		forceSelection = true;

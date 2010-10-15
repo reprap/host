@@ -39,6 +39,7 @@ public class GCodeReaderAndWriter
 	private double bTemp;
 	private double x, y, z, e;
 	private RrGraphics simulationPlot = null;
+	private String lastResp;
 	/**
 	 * Stop sending a file (if we are).
 	 */
@@ -195,6 +196,7 @@ public class GCodeReaderAndWriter
 //		responseAvailable = false;
 //		response = "0000";
 		opFileIndex = -1;
+		lastResp = "";
 		try
 		{
 			portName = Preferences.loadGlobalString("Port(name)");
@@ -676,6 +678,11 @@ public class GCodeReaderAndWriter
 		}
 		return e;
 	}
+	
+	public String lastResponse()
+	{
+		return lastResp;
+	}
 
 
 	/**
@@ -748,6 +755,7 @@ public class GCodeReaderAndWriter
 					if(!goAgain)
 					{
 						Debug.c("Response: " + resp);
+						lastResp = resp.substring(2);
 						return result;
 					}
 				} else
