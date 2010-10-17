@@ -21,6 +21,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
@@ -118,9 +119,9 @@ public class Main {
         
 
 
-        JMenu viewMenu = new JMenu("View");
-        viewMenu.setMnemonic(KeyEvent.VK_V);
-        menubar.add(viewMenu);
+//        JMenu viewMenu = new JMenu("View");
+//        viewMenu.setMnemonic(KeyEvent.VK_V);
+//        menubar.add(viewMenu);
 
 
 
@@ -178,13 +179,13 @@ public class Main {
         manipMenu.add(reorder);
         
         
-        JMenuItem deleteSTLW = new JMenuItem("Delete selected object", KeyEvent.VK_W);
-        deleteSTLW.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-        deleteSTLW.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				onDelete();
-			}});
-        manipMenu.add(deleteSTLW);
+//        JMenuItem deleteSTLW = new JMenuItem("Delete selected object", KeyEvent.VK_W);
+//        deleteSTLW.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+//        deleteSTLW.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				onDelete();
+//			}});
+//        manipMenu.add(deleteSTLW);
         
         JMenuItem deleteSTL = new JMenuItem("Delete selected object", KeyEvent.VK_DELETE);
         deleteSTL.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -198,22 +199,22 @@ public class Main {
 
         
         produceProduceB = new JMenuItem("Start build...", KeyEvent.VK_B);
-        produceProduceB.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
-        produceProduceB.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				onProduceB();
-			}});
-        //produceMenu.add(produceProduceB);
+//        produceProduceB.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
+//        produceProduceB.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				onProduceB();
+//			}});
+//        produceMenu.add(produceProduceB);
 
         cancelMenuItem = new JMenuItem("Cancel", KeyEvent.VK_P);
         cancelMenuItem.setEnabled(false);
-        cancelMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if(producer != null)
-					producer.setCancelled(true);
-			}});
-
-
+//        cancelMenuItem.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				if(producer != null)
+//					producer.setCancelled(true);
+//			}});
+//
+//
         segmentPause = new JCheckBoxMenuItem("Pause before segment");
 
 

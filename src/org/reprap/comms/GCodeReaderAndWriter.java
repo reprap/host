@@ -40,6 +40,7 @@ public class GCodeReaderAndWriter
 	private double x, y, z, e;
 	private RrGraphics simulationPlot = null;
 	private String lastResp;
+	private boolean nonRunningWarn;
 	/**
 	 * Stop sending a file (if we are).
 	 */
@@ -189,6 +190,7 @@ public class GCodeReaderAndWriter
 		ringLines = new long[buflen];
 		head = 0;
 		tail = 0;
+		nonRunningWarn = true;
 		lineNumber = 0;
 		//threadLock = false;
 		exhaustBuffer = false;
@@ -504,7 +506,9 @@ public class GCodeReaderAndWriter
 		
 		if(serialOutStream == null)
 		{
-			Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
+			if(nonRunningWarn)
+				Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.  Further attempts will not be reported.");
+			nonRunningWarn = false;
 			return;
 		}
 		if(retries > 3)
@@ -798,7 +802,7 @@ public class GCodeReaderAndWriter
 			CommPortIdentifier commId = CommPortIdentifier.getPortIdentifier(portName);
 			port = (SerialPort)commId.open(portName, 30000);
 		} catch (NoSuchPortException e) {
-			Debug.e("Error opening port: " + portName);
+			Debug.d("Can't open port: " + portName + " - no RepRap attached.");
 			return;
 		}
 		catch (PortInUseException e){

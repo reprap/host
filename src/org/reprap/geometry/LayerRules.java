@@ -119,8 +119,7 @@ public class LayerRules
 	{
 		printer = p;
 		
-		bBox = bb;
-		
+		bBox = new RrRectangle(bb);	
 		notStartedYet = true;
 
 		topDown = printer.getTopDown();
@@ -166,7 +165,7 @@ public class LayerRules
 	
 	public RrRectangle getBox()
 	{
-		return bBox;
+		return new RrRectangle(bBox); // Something horrible happens to return by reference here; hence copy...
 	}
 	
 	public boolean getTopDown() { return topDown; }
@@ -239,9 +238,9 @@ public class LayerRules
 		
 		if(getMachineLayer() < getFoundationLayers())
 		{
-			if(getMachineLayer() == getFoundationLayers() - 2)
-				angle = e.getEvenHatchDirection();
-			else
+//			if(getMachineLayer() == getFoundationLayers() - 2)
+//				angle = e.getEvenHatchDirection();
+//			else
 				angle = e.getOddHatchDirection();
 		} else
 		{

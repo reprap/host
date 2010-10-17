@@ -3,11 +3,16 @@ package org.reprap.geometry;
 import javax.swing.JCheckBoxMenuItem;
 import org.reprap.Preferences;
 import org.reprap.Printer;
+import org.reprap.Extruder;
+import org.reprap.Attributes;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.AllSTLsToBuild;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.geometry.polygons.RrPolygon;
+import org.reprap.geometry.polygons.RrCSG;
+import org.reprap.geometry.polygons.BooleanGrid;
+import org.reprap.geometry.polygons.BooleanGridList;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
@@ -44,10 +49,9 @@ public class Producer {
 		
 		allSTLs = bld.getSTLs();
 		
-		//stlc = new STLSlice(astl.things());
-		
 		RrRectangle gp = allSTLs.ObjectPlanRectangle();
-
+		gp = new RrRectangle(new Rr2Point(gp.x().low() - 6, gp.y().low() - 6), 
+		new Rr2Point(gp.x().high() + 6, gp.y().high() + 6));
 		if(Preferences.simulate())
 		{
 			simulationPlot = new RrGraphics("RepRap building simulation");
@@ -135,10 +139,10 @@ public class Producer {
 	
 	public void produce() throws Exception
 	{
-		RrRectangle gp = layerRules.getBox();
+//		RrRectangle gp = layerRules.getBox();
 		
-		gp = new RrRectangle(new Rr2Point(gp.x().low() - 6, gp.y().low() - 6), 
-				new Rr2Point(gp.x().high() + 6, gp.y().high() + 6));
+//		gp = new RrRectangle(new Rr2Point(gp.x().low() - 6, gp.y().low() - 6), 
+//				new Rr2Point(gp.x().high() + 6, gp.y().high() + 6));
 		
 		
 		layerRules.getPrinter().startRun(layerRules);
@@ -148,26 +152,26 @@ public class Producer {
 		else
 		{
 			if(layerRules.getTopDown())
-				produceAdditiveTopDown(gp);
+				produceAdditiveTopDown();
 			else
 				Debug.e("Producer.produce(): bottom-up builds no longer supported.");
 				//produceAdditiveGroundUp(gp);
 		}
 	}
 
-	//FIXME: so I work with BooleanGrids
 	private void fillFoundationRectangle(Printer reprap, RrRectangle gp) throws Exception
 	{
-//		RrCSG rect = RrCSG.RrCSGFromBox(gp);
-//		gp = gp.scale(1.1);
-//		Extruder e = reprap.getExtruder();
-//		RrCSGPolygon rcp = new RrCSGPolygon(rect, gp, new Attributes(e.getMaterial(), null, null, 
-//				e.getAppearance()));
-//		rcp.divide(Preferences.tiny(), 1.01);
-//		RrPolygonList h = rcp.hatch(layerRules.getHatchDirection(e), layerRules.getHatchWidth(e));
-//		LayerProducer lp = new LayerProducer(h, layerRules, simulationPlot);
-//		lp.plot();
-//		reprap.getExtruder().stopExtruding();
+		RrPolygonList shield = new RrPolygonList();
+		Extruder e = reprap.getExtruder();
+		Attributes fa = new Attributes(e.getMaterial(), null, null, e.getAppearance());
+//		if(Preferences.loadGlobalBool("Shield")) // Should the foundation have a shield, or not?
+//			shield.add(allSTLs.shieldPolygon(fa));
+		RrCSG rect = RrCSG.RrCSGFromBox(gp);
+		BooleanGrid bg = new BooleanGrid(rect, gp.scale(1.1), fa);
+		RrPolygonList h[] = {shield, bg.hatch(layerRules.getHatchDirection(e), layerRules.getHatchWidth(e), bg.attribute())};
+		LayerProducer lp = new LayerProducer(h, layerRules, simulationPlot);
+		lp.plot();
+		reprap.getExtruder().stopExtruding();
 		//reprap.setFeedrate(reprap.getFastFeedrateXY());
 	}
 	
@@ -227,81 +231,12 @@ public class Producer {
 		}
 	}
 	
-//	/**
-//	 * @throws Exception
-//	 */
-//	private void produceAdditiveGroundUp(RrRectangle gp) throws Exception 
-//	{		
-//		bld.mouseToWorld();
-//		
-//		Printer reprap = layerRules.getPrinter();
-//
-//		layFoundationGroundUp(gp);
-//		
-//		reprap.setSeparating(true);
-//		
-//		while(layerRules.getMachineLayer() < layerRules.getMachineLayerMax()) 
-//		{
-//			
-//			if (reprap.isCancelled())
-//				break;
-//			waitWhilePaused();
-//			
-//			Debug.d("Commencing layer at " + layerRules.getMachineZ());
-//			
-//			reprap.startingLayer(layerRules);
-//			
-//			// Change Z height
-//			//reprap.singleMove(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ());
-//			
-//			reprap.waitWhileBufferNotEmpty();
-//			reprap.slowBuffer();
-//			
-//			BooleanGridList slice;
-//			
-//			RrPolygonList allPolygons[] = new RrPolygonList[reprap.getExtruders().length];
-//			for(int extruder = 0; extruder < reprap.getExtruders().length; extruder++)
-//				allPolygons[extruder] = new RrPolygonList();
-//			
-//			for(int i = 0; i < allSTLs.size(); i++)
-//			{
-//				slice = allSTLs.slice(i, layerRules.getModelZ() + layerRules.getZStep()*0.5,
-//						reprap.getExtruders()); 
-//
-//				if(slice.size() > 0)
-//				{
-//					RrPolygonList fills = slice.computeInfill(layerRules);
-//					RrPolygonList borders = slice.computeOutlines(layerRules, fills);
-//					for(int pol = 0; pol < borders.size(); pol++)
-//					{
-//						RrPolygon p = borders.polygon(pol);
-//						allPolygons[p.getAttributes().getExtruder().getID()].add(p);
-//					}
-//					for(int pol = 0; pol < fills.size(); pol++)
-//					{
-//						RrPolygon p = fills.polygon(pol);
-//						allPolygons[p.getAttributes().getExtruder().getID()].add(p);
-//					}
-//				}
-//			}
-//			reprap.finishedLayer(layerRules);
-//			reprap.betweenLayers(layerRules);
-//			layer = null;
-//			slice = null;
-//			//slice.destroy();
-//			allSTLs.destroyLayer();
-//
-//			layerRules.step(reprap.getExtruder());
-//			reprap.setSeparating(false);
-//		}
-//		
-//		reprap.terminate();
-//	}
+
 	
 	/**
 	 * @throws Exception
 	 */
-	private void produceAdditiveTopDown(RrRectangle gp) throws Exception 
+	private void produceAdditiveTopDown() throws Exception 
 	{		
 		bld.mouseToWorld();
 		
@@ -321,9 +256,9 @@ public class Producer {
 				totalPhysicalExtruders++;
 				if(thisExtruder - lastExtruder != 1)
 				{
-					Debug.d("Producer.produceAdditiveTopDown(): Physical extruders out of sequence: " + 
+					Debug.e("Producer.produceAdditiveTopDown(): Physical extruders out of sequence: " + 
 							lastExtruder + " then " + thisExtruder);
-					Debug.d("(Physical extruder addresses should be sequential (or equal) starting at 0.)");
+					Debug.e("(Physical extruder addresses should be sequential (or equal) starting at 0.)");
 				}
 				lastExtruder = thisExtruder;				
 			}
@@ -362,6 +297,7 @@ public class Producer {
 			{
 					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules); //, startNearHere);
 					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
+					shield = false;
 					RrPolygonList support = allSTLs.computeSupport(stl, layerRules);
 					borders = borders.nearEnds(startNearHere, false, -1);
 					if(borders.size() > 0)
@@ -383,19 +319,19 @@ public class Producer {
 					}
 					for(int pol = 0; pol < borders.size(); pol++)
 					{
-						shield = false;
+						//shield = false;
 						RrPolygon p = borders.polygon(pol);
 						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
 					for(int pol = 0; pol < fills.size(); pol++)
 					{
-						shield = false;
+						//shield = false;
 						RrPolygon p = fills.polygon(pol);
 						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
 					for(int pol = 0; pol < support.size(); pol++)
 					{
-						shield = false;
+						//shield = false;
 						RrPolygon p = support.polygon(pol);
 						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
@@ -424,7 +360,7 @@ public class Producer {
 			
 		}
 		
-		layFoundationTopDown(gp);
+		layFoundationTopDown(layerRules.getBox());
 		
 		reprap.terminate();
 	}

@@ -5,12 +5,12 @@
  */
 package org.reprap.geometry;
 
-import java.io.IOException;
+//import java.io.IOException;
 
 import org.reprap.Printer;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
-import org.reprap.ReprapException;
+//import org.reprap.ReprapException;
 //import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.geometry.polygons.Rr2Point;
 //import org.reprap.geometry.polygons.RrCSGPolygonList;
