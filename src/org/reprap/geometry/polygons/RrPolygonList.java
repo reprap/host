@@ -967,22 +967,23 @@ public class RrPolygonList
 					RrPolygon pg = pp.polygon();
 
 					outline.add(start);
+					outline.setExtrudeEnd(outline.size() - 1);
 
 					if(en >= st)
 					{
 						for(int j = st; j <= en; j++)
 						{
 							outline.add(0, pg.point(j));  // Put it on the beginning...
-							//if(j < en)
-							//	outline.add(pg.point(j));     // ...and the end.
+							if(j < en)
+								outline.add(pg.point(j));     // ...and the end.
 						}
 					} else
 					{
 						for(int j = st; j >= en; j--)
 						{
 							outline.add(0, pg.point(j));
-							//if(j > en)
-							//	outline.add(pg.point(j));
+							if(j > en)
+								outline.add(pg.point(j));
 						}
 					}
 

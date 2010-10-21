@@ -122,7 +122,12 @@ public class RrPolygon
 	/**
 	 * The index of the last point to draw to, if there are more that should just be moved over
 	 */
-	private int drawEnd;
+	private int extrudeEnd;
+	
+	/**
+	 * The index of the last point at which the valve (if any) is open.
+	 */
+	private int valveEnd;
 	
 	/**
 	 * Destroy me and all that I point to
@@ -187,7 +192,8 @@ public class RrPolygon
 		att = a;
 		box = new RrRectangle();
 		closed = c;
-		drawEnd = -1;
+		extrudeEnd = -1;
+		valveEnd = -1;
 	}
 	
 	/**
@@ -252,12 +258,24 @@ public class RrPolygon
 	 * What's the last point to plot to?
 	 * @return
 	 */
-	public int drawEnd()
+	public int extrudeEnd()
 	{
-		if(drawEnd < 0)
+		if(extrudeEnd < 0)
 			return size() - 1;
 		else
-			return drawEnd;
+			return extrudeEnd;
+	}
+	
+	/**
+	 * What's the last point at which the valve should be open to?
+	 * @return
+	 */
+	public int valveEnd()
+	{
+		if(valveEnd < 0)
+			return size() - 1;
+		else
+			return valveEnd;
 	}
 		
 	/**
@@ -285,7 +303,8 @@ public class RrPolygon
 				speeds.add(new Double(p.speed(i)));
 		}
 		closed = p.closed;
-		drawEnd = p.drawEnd;
+		extrudeEnd = p.extrudeEnd;
+		valveEnd  = p.valveEnd;
 	}
 	
 	/**
@@ -312,8 +331,10 @@ public class RrPolygon
 			Debug.e("Rr2Point.add(): adding a point to a polygon with its speeds set.");
 		points.add(i, new Rr2Point(p));
 		box.expand(p);
-		if(i <= drawEnd)
-			drawEnd++;
+		if(i <= extrudeEnd)
+			extrudeEnd++;
+		if(i <= valveEnd)
+			valveEnd++;
 	}
 	
 	/**
@@ -342,9 +363,11 @@ public class RrPolygon
 		points.add(i, new Rr2Point(p));
 		speeds.add(i, s);
 		box.expand(p);
-		if(i <= drawEnd)
-			drawEnd++;
-	}
+		if(i <= extrudeEnd)
+			extrudeEnd++;
+		if(i <= valveEnd)
+			valveEnd++;
+	}		
 	
 	/**
 	 * Set a new point and speed
@@ -382,9 +405,18 @@ public class RrPolygon
 	 * Eet the last point to plot to
 	 * @param d
 	 */
-	public void setDrawEnd(int d)
+	public void setExtrudeEnd(int d)
 	{
-		drawEnd = d;
+		extrudeEnd = d;
+	}
+	
+	/**
+	 * Eet the last point to valve-open to
+	 * @param d
+	 */
+	public void setValveEnd(int d)
+	{
+		valveEnd = d;
 	}
 	
 	/**
@@ -406,12 +438,14 @@ public class RrPolygon
 	{
 		if(p.size() == 0)
 			return;
-		if(drawEnd >= 0)
-			Debug.e("Rr2Point.add(): adding a polygon to another polygon with its draw ending set.");
+		if(extrudeEnd >= 0 || valveEnd >= 0)
+			Debug.e("Rr2Point.add(): adding a polygon to another polygon with its extrude or valve ending set.");
 		for(int i = 0; i < p.size(); i++)
 		{
-			if(i == p.drawEnd)
-				drawEnd = size();
+			if(i == p.extrudeEnd)
+				extrudeEnd = size();
+			if(i == p.valveEnd)
+				valveEnd = size();
 			points.add(new Rr2Point(p.point(i)));
 		}
 		box.expand(p.box);
@@ -448,22 +482,28 @@ public class RrPolygon
 			Debug.e("Rr2Point.add(): attempt to add a polygon to another polygon when one has speeds and the other doesn't.");
 			return;
 		}
-		if(k <= drawEnd)
-			Debug.e("Rr2Point.add(): adding a polygon to another polygon with its draw ending set.");
+		if(k <= extrudeEnd || k <= valveEnd)
+			Debug.e("Rr2Point.add(): adding a polygon to another polygon with its extrude or valve ending set.");
 		int de = -1;
-		if (drawEnd >= 0)
-			de = drawEnd + p.size();
+		int dv = -1;
+		if (extrudeEnd >= 0)
+			de = extrudeEnd + p.size();
+		if (valveEnd >= 0)
+			dv = valveEnd + p.size();		
 		for(int i = 0; i < p.size(); i++)
 		{
-			if(i == p.drawEnd)
-				drawEnd = size();
+			if(i == p.extrudeEnd)
+				extrudeEnd = size();
+			if(i == p.valveEnd)
+				valveEnd = size();
 			if(speeds != null)
 				add(k, new Rr2Point(p.point(i)), p.speed(i));
 			else
 				points.add(k, new Rr2Point(p.point(i)));
 			k++;
 		}
-		drawEnd = Math.max(drawEnd, de);
+		extrudeEnd = Math.max(extrudeEnd, de);
+		valveEnd = Math.max(valveEnd, dv);
 		box.expand(p.box);
 	}
 	
@@ -515,8 +555,8 @@ public class RrPolygon
 	 */
 	public RrPolygon negate()
 	{
-		if(drawEnd >= 0)
-			Debug.e("Rr2Point.negate(): negating a polygon with its draw ending set.");
+		if(extrudeEnd >= 0 || valveEnd >= 0)
+			Debug.e("Rr2Point.negate(): negating a polygon with its extrude or valve ending set.");
 		RrPolygon result = new RrPolygon(att, closed);
 		for(int i = size() - 1; i >= 0; i--)
 		{
@@ -536,8 +576,8 @@ public class RrPolygon
 	 */
 	public RrPolygon randomStart()
 	{
-		if(drawEnd >= 0)
-			Debug.e("Rr2Point.randomStart(: randomizing a polygon with its draw ending set.");
+		if(extrudeEnd >= 0 || valveEnd >= 0)
+			Debug.e("Rr2Point.randomStart(: randomizing a polygon with its extrude or valve ending set.");
 		return newStart(rangen.nextInt(size()));
 	}
 	
@@ -548,8 +588,8 @@ public class RrPolygon
 	{
 		if(!isClosed())
 			Debug.e("RrPolygon.newStart(i): reordering an open polygon!");
-		if(drawEnd >= 0)
-			Debug.e("Rr2Point.newStart(i): reordering a polygon with its draw ending set.");		
+		if(extrudeEnd >= 0 || valveEnd >= 0)
+			Debug.e("Rr2Point.newStart(i): reordering a polygon with its extrude or valve ending set.");		
 		if(i < 0 || i >= size())
 		{
 			Debug.e("RrPolygon.newStart(i): dud index: " + i);
@@ -576,8 +616,8 @@ public class RrPolygon
 	{
 		if(size() == 0 || lc.getModelLayer() < 0)
 			return this;
-		if(drawEnd >= 0)
-			Debug.e("Rr2Point.incrementedStart(): incrementing a polygon with its draw ending set.");	
+		if(extrudeEnd >= 0 || valveEnd >= 0)
+			Debug.e("Rr2Point.incrementedStart(): incrementing a polygon with its extrude or valve ending set.");	
 		int i = lc.getModelLayer() % size();
 		return newStart(i);
 	}
@@ -620,10 +660,8 @@ public class RrPolygon
 	{
 		if(!p.isClosed())
 			Debug.e("RrPolygon.nearestVertexReorder(): called for non-closed polygon.");
-		if(drawEnd >= 0 || p.drawEnd >= 0)
-			Debug.e("Rr2Point.nearestVertexReorderMerge(): merging polygons with a draw ending set.");
-		if(drawEnd >= 0)
-			Debug.e("Rr2Point.add(): incrementing a polygon with its draw ending set.");
+		if(extrudeEnd >= 0 || p.extrudeEnd >= 0 || valveEnd >= 0 || p.valveEnd >= 0)
+			Debug.e("Rr2Point.nearestVertexReorderMerge(): merging polygons with a extrude or valve ending set.");
 		double d = Double.POSITIVE_INFINITY;
 		int myPoint = -1;
 		int itsPoint = -1;
@@ -692,12 +730,12 @@ public class RrPolygon
 	}
 	
 	/**
-	 * Backtrack a given distance, inserting a new point there and set drawEnd to it.
+	 * Backtrack a given distance, inserting a new point there and set extrudeEnd to it.
 	 * If drawEnd is already set, backtrack from that.
 	 * @param distance to backtrack
 	 * @return index of the inserted point
 	 */
-	public void backStep(double d)
+	public void backStepExtrude(double d)
 	{
 		if(d <= 0)
 			return;
@@ -705,12 +743,12 @@ public class RrPolygon
 		Rr2Point p, q;
 		int start, last;
 		
-		if(drawEnd >= 0)
-			start = drawEnd;
+		if(extrudeEnd >= 0)
+			start = extrudeEnd;
 		else
 			start = size() - 1;					
 
-		if(!isClosed() && drawEnd < 0)
+		if(!isClosed() && extrudeEnd < 0)
 				start--;
 		
 		if (start >= size() - 1)
@@ -745,12 +783,75 @@ public class RrPolygon
 					if(speeds != null)						
 						speeds.add(new Double(s)); 
 				}
-				drawEnd = j;
+				extrudeEnd = j;
 				return;
 			}
 			last = i;
 		}
-		drawEnd = 0;
+		extrudeEnd = 0;
+	}
+	
+	
+	/**
+	 * Backtrack a given distance, inserting a new point there and set valveEnd to it.
+	 * If drawEnd is already set, backtrack from that.
+	 * @param distance to backtrack
+	 * @return index of the inserted point
+	 */
+	public void backStepValve(double d)
+	{
+		if(d <= 0)
+			return;
+		
+		Rr2Point p, q;
+		int start, last;
+		
+		if(valveEnd >= 0)
+			start = valveEnd;
+		else
+			start = size() - 1;					
+
+		if(!isClosed() && valveEnd < 0)
+				start--;
+		
+		if (start >= size() - 1)
+			last = 0;
+		else
+			last = start + 1;
+		
+		double sum = 0;
+		for(int i = start; i >= 0; i--)
+		{
+			sum += Rr2Point.d(point(i), point(last));
+			if(sum > d)
+			{
+				sum = sum - d;
+				q = Rr2Point.sub(point(last), point(i));
+				p = Rr2Point.add(point(i), Rr2Point.mul(sum/q.mod(), q));
+				double s = 0;
+				if(speeds != null)
+				{
+					s = speeds.get(last) - speeds.get(i);
+					s = speeds.get(i) + s*sum/q.mod();
+				}
+				int j = i + 1;
+				if(j < size())
+				{
+					points.add(j, p);
+					if(speeds != null)
+						speeds.add(j, new Double(s)); 
+				} else
+				{
+					points.add(p);
+					if(speeds != null)						
+						speeds.add(new Double(s)); 
+				}
+				valveEnd = j;
+				return;
+			}
+			last = i;
+		}
+		valveEnd = 0;
 	}
 	
 	/**

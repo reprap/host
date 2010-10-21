@@ -420,7 +420,7 @@ public abstract class GenericExtruder implements Extruder
 			fastEFeedrate = Preferences.loadGlobalDouble(prefName + "FastEFeedrate(mm/minute)");
 			slowXYFeedrate = Preferences.loadGlobalDouble(prefName + "SlowXYFeedrate(mm/minute)");
 			maxAcceleration = Preferences.loadGlobalDouble(prefName + "MaxAcceleration(mm/minute/minute)");
-			middleStart = true; //Preferences.loadGlobalBool(prefName + "MiddleStart");
+			middleStart = Preferences.loadGlobalBool(prefName + "MiddleStart");
 			t0 = 0; //Preferences.loadGlobalInt(prefName + "t0(0..255)");
 			iSpeed = Preferences.loadGlobalDouble(prefName + "InfillSpeed(0..1)");
 			oSpeed = Preferences.loadGlobalDouble(prefName + "OutlineSpeed(0..1)");

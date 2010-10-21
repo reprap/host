@@ -340,6 +340,7 @@ public class Producer {
 
 			
 			LayerProducer lp = new LayerProducer(allPolygons, layerRules, simulationPlot);
+			layerRules.setFirstAndLast(allPolygons);
 			lp.plot();
 
 			reprap.finishedLayer(layerRules);

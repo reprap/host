@@ -137,21 +137,29 @@ abstract public class Panel3D extends JPanel {
 
 		// The background, and other colours
 
-		bgColour = new Color3f((float)Preferences.loadGlobalDouble("BackColourR(0..1)"), 
-				(float)Preferences.loadGlobalDouble("BackColourG(0..1)"), 
-				(float)Preferences.loadGlobalDouble("BackColourB(0..1)"));
+//		bgColour = new Color3f((float)Preferences.loadGlobalDouble("BackColourR(0..1)"), 
+//				(float)Preferences.loadGlobalDouble("BackColourG(0..1)"), 
+//				(float)Preferences.loadGlobalDouble("BackColourB(0..1)"));
+//		
+//		selectedColour = new Color3f((float)Preferences.loadGlobalDouble("SelectedColourR(0..1)"), 
+//				(float)Preferences.loadGlobalDouble("SelectedColourG(0..1)"), 
+//				(float)Preferences.loadGlobalDouble("SelectedColourB(0..1)"));
+//
+//		machineColour = new Color3f((float)Preferences.loadGlobalDouble("MachineColourR(0..1)"), 
+//				(float)Preferences.loadGlobalDouble("MachineColourG(0..1)"), 
+//				(float)Preferences.loadGlobalDouble("MachineColourB(0..1)"));
+//			
+//		unselectedColour = new Color3f((float)Preferences.loadGlobalDouble("UnselectedColourR(0..1)"), 
+//				(float)Preferences.loadGlobalDouble("UnselectedColourG(0..1)"), 
+//				(float)Preferences.loadGlobalDouble("UnselectedColourB(0..1)"));
 		
-		selectedColour = new Color3f((float)Preferences.loadGlobalDouble("SelectedColourR(0..1)"), 
-				(float)Preferences.loadGlobalDouble("SelectedColourG(0..1)"), 
-				(float)Preferences.loadGlobalDouble("SelectedColourB(0..1)"));
+		bgColour = new Color3f((float)0.9, (float)0.9, (float)0.9);
+		
+		selectedColour = new Color3f((float)0.6, (float)0.2, (float)0.2);
 
-		machineColour = new Color3f((float)Preferences.loadGlobalDouble("MachineColourR(0..1)"), 
-				(float)Preferences.loadGlobalDouble("MachineColourG(0..1)"), 
-				(float)Preferences.loadGlobalDouble("MachineColourB(0..1)"));
+		machineColour = new Color3f((float)0.3, (float)0.4, (float)0.3);
 			
-		unselectedColour = new Color3f((float)Preferences.loadGlobalDouble("UnselectedColourR(0..1)"), 
-				(float)Preferences.loadGlobalDouble("UnselectedColourG(0..1)"), 
-				(float)Preferences.loadGlobalDouble("UnselectedColourB(0..1)"));
+		unselectedColour = new Color3f((float)0.3, (float)0.3, (float)0.3);
 		} catch (Exception ex)
 		{
 			Debug.e("Refresh Panel3D preferences: " + ex.toString());

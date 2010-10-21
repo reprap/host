@@ -567,8 +567,8 @@ public class LayerProducer {
 		if(extrudeBackLength > 0 && valveBackLength > 0)
 			Debug.e("LayerProducer.plot(): extruder has both valve backoff and extrude backoff specified.");
 
-		p.backStep(extrudeBackLength);
-		p.backStep(valveBackLength);
+		p.backStepExtrude(extrudeBackLength);
+		p.backStepValve(valveBackLength);
 //
 //		if(extrudeBackLength > 0 && acc)
 //			stopExtruding = p.findBackPoint(extrudeBackLength);
@@ -647,8 +647,8 @@ public class LayerProducer {
 					currentFeedrate = p.speed(i);
 				
 				oldexoff = extrudeOff;
-				extrudeOff = (i > p.drawEnd() && extrudeBackLength > 0) || i == p.size()-1;
-				valveOff = (i > p.drawEnd() && valveBackLength > 0) || i == p.size()-1;			
+				extrudeOff = (i > p.extrudeEnd() && extrudeBackLength > 0) || i == p.size()-1;
+				valveOff = (i > p.valveEnd() && valveBackLength > 0) || i == p.size()-1;			
 				plot(p.point(i), next, extrudeOff, valveOff);
 				if(oldexoff ^ extrudeOff)
 					printer.printEndReverse();

@@ -6,6 +6,7 @@ import org.reprap.Extruder;
 import org.reprap.geometry.polygons.RrHalfPlane;
 import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.Rr2Point;
+import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.Preferences;
 import org.reprap.utilities.Debug;
 
@@ -14,7 +15,27 @@ import org.reprap.utilities.Debug;
  * rules for such things as infill patterns, support patterns etc.
  */
 public class LayerRules 
-{	
+{
+	/**
+	 * The coordinates of the first point plotted in a layer
+	 */
+	public Rr2Point[] firstPoint;
+	
+	/**
+	 * The extruder first used in a layer
+	 */	
+	public int[] firstExtruder;
+	
+	/**
+	 * The coordinates of the last point plotted in a layer
+	 */
+	public Rr2Point[] lastPoint;
+	
+	/**
+	 * The extruder last used in a layer
+	 */	
+	public int[] lastExtruder;
+	
 	/**
 	 * The machine
 	 */
@@ -142,6 +163,11 @@ public class LayerRules
 			machineLayer = 0;			
 		}
 		addToStep = 0;
+		
+		firstPoint = new Rr2Point[modelLayerMax+1];
+		firstExtruder = new int[modelLayerMax+1];
+		lastPoint = new Rr2Point[modelLayerMax+1];
+		lastExtruder = new int[modelLayerMax+1];
 
 		layingSupport = found;
 		Extruder[] es = printer.getExtruders();
@@ -183,6 +209,54 @@ public class LayerRules
 	public double getMachineZ() { return machineZ; }
 	
 	public int getModelLayer() { return modelLayer; }
+	
+	public void setFirstAndLast(RrPolygonList[] pl)
+	{
+		firstPoint[modelLayer] = null;
+		lastPoint[modelLayer] = null;
+		firstExtruder[modelLayer] = -1;
+		lastExtruder[modelLayer] = -1;
+		if(pl == null)
+			return;
+		if(pl.length <= 0)
+			return;
+		if(pl[0] == null)
+			return;
+		if(pl[0].size() <= 0)
+			return;
+		if(pl[0].polygon(0) == null)
+			return;
+		if(pl[0].polygon(0).size() <= 0)
+			return;
+		if(pl[pl.length - 1].size() <= 0)
+			return;
+		if(pl[pl.length - 1].polygon(pl[pl.length - 1].size()-1).size() <= 0)
+			return;
+		firstPoint[modelLayer] = pl[0].polygon(0).point(0);
+		firstExtruder[modelLayer] = pl[0].polygon(0).getAttributes().getExtruder().getID();
+		lastPoint[modelLayer] = pl[pl.length - 1].polygon(pl[pl.length - 1].size()-1).point(pl[pl.length - 1].polygon(pl[pl.length - 1].size()-1).size() - 1);
+		lastExtruder[modelLayer] = pl[pl.length - 1].polygon(pl[pl.length - 1].size()-1).getAttributes().getExtruder().getID();
+	}
+	
+	public Rr2Point getFirstPoint(int layer)
+	{
+		return firstPoint[layer];
+	}
+	
+	public Rr2Point getLastPoint(int layer)
+	{
+		return lastPoint[layer];
+	}
+	
+	public int getFirstExtruder(int layer)
+	{
+		return firstExtruder[layer];
+	}
+	
+	public int getLastExtruder(int layer)
+	{
+		return lastExtruder[layer];
+	}
 	
 	public int getModelLayerMax() { return modelLayerMax; }
 	

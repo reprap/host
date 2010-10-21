@@ -83,9 +83,7 @@ public class Preferences {
 		Color3f unselectedColour = null;
 		try
 		{
-			unselectedColour = new Color3f((float)Preferences.loadGlobalDouble("UnselectedColourR(0..1)"), 
-				(float)Preferences.loadGlobalDouble("UnselectedColourG(0..1)"), 
-				(float)Preferences.loadGlobalDouble("UnselectedColourB(0..1)"));
+			unselectedColour = new Color3f((float)0.3, (float)0.3, (float)0.3);
 		} catch (Exception ex)
 		{
 			ex.printStackTrace();

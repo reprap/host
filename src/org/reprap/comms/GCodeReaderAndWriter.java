@@ -214,6 +214,13 @@ public class GCodeReaderAndWriter
 
 		bufferThread = null;
 	}
+	
+	private void nonRunningWarning(String s)
+	{
+		if(nonRunningWarn)
+			Debug.d("GCodeReaderAndWriter(): attempt to " + s + " a non-running output buffer.  Further attempts will not be reported.");
+		nonRunningWarn = false;		
+	}
 
 	
 	public boolean buildingFromFile()
@@ -506,9 +513,7 @@ public class GCodeReaderAndWriter
 		
 		if(serialOutStream == null)
 		{
-			if(nonRunningWarn)
-				Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.  Further attempts will not be reported.");
-			nonRunningWarn = false;
+			nonRunningWarning("queue: \"" + cmd + "\" to");
 			return;
 		}
 		if(retries > 3)
@@ -577,7 +582,7 @@ public class GCodeReaderAndWriter
 	{
 		if(serialOutStream == null)
 		{
-			Debug.d("getETemp(): non-running output buffer.");
+			nonRunningWarning("getETemp() from ");
 			return 0;
 		}
 		if(eTemp == Double.NEGATIVE_INFINITY)
@@ -596,7 +601,7 @@ public class GCodeReaderAndWriter
 	{
 		if(serialOutStream == null)
 		{
-			Debug.d("getBTemp(): non-running output buffer.");
+			nonRunningWarning("getBTemp() from ");
 			return 0;
 		}
 		if(bTemp == Double.NEGATIVE_INFINITY)
@@ -615,7 +620,7 @@ public class GCodeReaderAndWriter
 	{
 		if(serialOutStream == null)
 		{
-			Debug.d("getX(): non-running output buffer.");
+			nonRunningWarning("getX() from ");
 			return 0;
 		}
 		if(x == Double.NEGATIVE_INFINITY)
@@ -634,7 +639,7 @@ public class GCodeReaderAndWriter
 	{
 		if(serialOutStream == null)
 		{
-			Debug.d("getY(): non-running output buffer.");
+			nonRunningWarning("getY() from ");
 			return 0;
 		}
 		if(y == Double.NEGATIVE_INFINITY)
@@ -653,7 +658,7 @@ public class GCodeReaderAndWriter
 	{
 		if(serialOutStream == null)
 		{
-			Debug.d("getZ(): non-running output buffer.");
+			nonRunningWarning("getZ() from ");
 			return 0;
 		}
 		if(z == Double.NEGATIVE_INFINITY)
@@ -672,7 +677,7 @@ public class GCodeReaderAndWriter
 	{
 		if(serialOutStream == null)
 		{
-			Debug.d("getE(): non-running output buffer.");
+			nonRunningWarning("getE() from ");
 			return 0;
 		}
 		if(e == Double.NEGATIVE_INFINITY)
