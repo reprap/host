@@ -1,0 +1,107 @@
+#!/bin/bash
+# host-package-release -- Packages Reprap host software into a .zip file and .deb package
+
+
+# init
+
+MACHINE="mendel"
+
+RELEASE=${1:-`date -u +%Y%m%d`}
+
+RELEASENAME="reprap-$MACHINE-$RELEASE"
+
+FILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
+    lib/reprap-icon.png lib/reprap.properties.dist lib/system-dependent/linux-i386/*\
+    lib/system-dependent/windows-i586/* lib/system-dependent/macosx/RepRap-Mac-Drivers.mpkg.zip LICENSE"
+
+SRCFILELIST="src/* build.xml build-user.xml .classpath .project \
+	host-package-release readme"
+
+LIBFILES="lib/*"
+
+DESIGNFILES="../$MACHINE ../electronics ../firmware"
+
+CLASSPATH=$CLASSPATH:./lib/j3dcore.jar
+CLASSPATH=$CLASSPATH:./lib/j3d-org-java3d-all.jar
+CLASSPATH=$CLASSPATH:./lib/j3dutils.jar
+CLASSPATH=$CLASSPATH:./lib/vecmath.jar
+CLASSPATH=$CLASSPATH:./lib/RXTXcomm.jar
+CLASSPATH=$CLASSPATH:./lib/swing-layout-1.0.3.jar
+CLASSPATH=$CLASSPATH:.
+export CLASSPATH
+
+# Remove any old jar directory
+[ -d jar ] && rm -rf jar
+
+# Recompile java files and create Reprap.jar
+ant clean jar || exit 1
+
+# Delete and then create temporary package directories
+rm -rf "release"
+mkdir "release"
+BASENAME="release/$RELEASENAME"
+mkdir "$BASENAME"
+SRCFILENAME="$BASENAME/src"
+mkdir "$SRCFILENAME"
+
+# Copy files into binary package directory
+for F in $FILELIST
+do
+  cp -p $F "$BASENAME"
+done
+
+echo "Executable created."
+
+# Copy README into package dir, substituting release string for RELEASE
+#   and the current UTC date for DATE
+NOW=`date -u +'%d %B %Y'`
+sed -e "s/RELEASE/$RELEASE/g" -e "s/DATE/$NOW/g" readme > "$BASENAME/readme"
+
+# Create README.txt for Windows people
+sed -e 's/$/\r/' readme > "$BASENAME/readme.txt"
+
+echo "READMEs created."
+
+# Now create the src archive
+for F in $SRCFILELIST
+do
+  cp -rp $F "$SRCFILENAME"
+done
+
+mkdir -p "$SRCFILENAME"/lib
+for F in $LIBFILES
+do
+  cp -pr $F "$SRCFILENAME"/lib
+done
+
+echo "Sources copied."
+
+for F in $DESIGNFILES
+do
+  cp -pr $F "$BASENAME"
+done
+
+#Remove local configuration files
+
+rm -f "$BASENAME"/firmware/FiveD_GCode/Extruder/configuration.h
+rm -f "$BASENAME"/firmware/FiveD_GCode/FiveD_GCode_Interpreter/configuration.h
+
+echo "Design files copied."
+
+# Omit all .svn subdirs
+cd "$BASENAME"
+find . -type d -name .svn |xargs rm -rf
+cd ..
+
+echo "Subversion references removed."
+
+# Create zip archive
+
+[ -f "$RELEASENAME".zip ] && rm "$RELEASENAME".zip
+zip -qr "$RELEASENAME.zip" "$RELEASENAME"
+cd ..
+
+
+echo "Zip file created."
+echo "RepRap Release $RELEASE created."
+

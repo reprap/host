@@ -1,0 +1,26 @@
+reprap-host (1.0.0.20090213) intrepid; urgency=low
+
+  * Packaged as part of build script which builds zip files and
+  * includes some .jar files which should be included as dependencies
+
+ -- Reece Arnott <rarnott@business.otago.ac.nz>  Fri, 13 Feb 2009 13:30:00 +0000
+
+reprap-host (0.8.2.20071214) hardy; urgency=low
+
+  * New approach to library dependencies, using classpath and
+  * (therefore) not running from inside a .jar archive.
+  * Include latest upstream code with nozzle wiping capabilities.
+
+ -- Jonathan Marsden <jmarsden@fastmail.fm>  Sat, 15 Dec 2007 06:46:00 +0000
+
+reprap-host (0.8.2.20071213) hardy; urgency=low
+
+  * Relaxed sun-java6-jre dependency (no version number test).
+
+ -- Jonathan Marsden <jmarsden@fastmail.fm>  Thu, 13 Dec 2007 16:44:00 +0000
+
+reprap-host (0.8.2.20071212) hardy; urgency=low
+
+  * Initial attempt at .deb packaging.
+
+ -- Jonathan Marsden <jmarsden@fastmail.fm>  Thu, 13 Dec 2007 08:01:25 +0000

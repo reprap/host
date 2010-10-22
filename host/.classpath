@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="org/reprap/geometry/polygons/code_generator/|org/reprap/geometry/polygons/code_generator/|org/reprap/gui/botConsole/GenericStepperPositionPanel.java|org/reprap/gui/botConsole/PrintTabPanel.java|org/reprap/gui/botConsole/GenericStepperPositionPanelOld.java|org/reprap/gui/botConsole/PrintTabPanelOld.java|org/reprap/gui/botConsole/XYZTabPanelOld.java" kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib"/>
+	<classpathentry kind="lib" path="lib/j3dcore.jar"/>
+	<classpathentry kind="lib" path="lib/j3d-org-java3d-all.jar"/>
+	<classpathentry kind="lib" path="lib/j3dutils.jar"/>
+	<classpathentry kind="lib" path="lib/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="lib/swing-layout-1.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/vecmath.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
