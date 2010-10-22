@@ -1,8 +1,0 @@
-?package(reprap-host):\
-	needs="x11" \
-	section="Applications/Science/Engineering" \
-	command="/usr/lib/reprap/reprap" \
-	title="Reprap" \
-	hints="3D Printing" \
-	icon="/usr/share/pixmaps/reprap.xpm" \
-	longtitle="RepRap: Host software to perform 3D Printing"
