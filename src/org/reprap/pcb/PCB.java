@@ -308,18 +308,19 @@ public class PCB {
 		gerberGcode = new GerberGCode(pcbPen, null, true); 
 		
 		bigBox = new RrRectangle();
-
+		RrRectangle r;
+		
 		// processing Gerber file
 		try {
 			in = new BufferedReader(new FileReader(inputTracksAndPads));
 
 			while((line = in.readLine()) != null)
 			{
-				RrRectangle r = processLine(line, false);
+				r = processLine(line, false);
 				if(r != null)
 					bigBox = RrRectangle.union(bigBox, r);
 			}
-			
+		
 			in.close();
 			
 			PCBOffsets.pcbo(bigBox);
@@ -327,7 +328,8 @@ public class PCB {
 			offsetX = PCBOffsets.getXoff() - bigBox.sw().x();
 			offsetY = PCBOffsets.getYoff() - bigBox.sw().y();
 			
-			bigBox = bigBox.translate(new Rr2Point(PCBOffsets.getXoff(), PCBOffsets.getYoff()));
+			bigBox = bigBox.translate(new Rr2Point(offsetX, offsetY));
+			
 			
 			in = new BufferedReader(new FileReader(inputTracksAndPads));
 			
