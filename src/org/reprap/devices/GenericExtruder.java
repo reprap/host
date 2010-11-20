@@ -1338,6 +1338,29 @@ public abstract class GenericExtruder implements Extruder
     	return purgeTime;
     }
     
+	/**
+	 * Purge the extruder
+	 */
+	public void purge(boolean homeZ) throws Exception
+	{
+		getPrinter().moveToPurge(!homeZ);
+		try
+		{
+			if(homeZ)
+				getPrinter().homeToZeroZ();
+			heatOn(true);
+			if(purgeTime > 0)
+			{
+				setExtrusion(getFastXYFeedrate(), false);
+				getPrinter().machineWait(purgeTime, false);
+				setExtrusion(0, false);
+				getPrinter().printEndReverse();
+				zeroExtrudedLength();
+			}
+		} catch (Exception e)
+		{}
+	}
+    
     /**
      * If this is true, plot outlines from the middle of their infilling hatch to reduce dribble at
      * their starts and ends.  If false, plot the outline as the outline.

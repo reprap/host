@@ -323,13 +323,25 @@ public abstract class GenericRepRap implements CartesianPrinter
 		selectExtruder(0);
 		getExtruder().zeroExtrudedLength();
 		
-		Debug.d("Homing machine");
-		home();
+		Debug.d("Homing machine in X and Y");
+		homeToZeroX();
+		homeToZeroY();
 
 		//Debug.d("Setting temperature");
 		//getExtruder().heatOn(true);
 		
+		// Move to the purge point, home Z and purge the extruder
 		getExtruder().purge(true);
+	}
+	
+	/**
+	 * Go to the purge point
+	 */
+	public void moveToPurge(boolean raiseZ)
+	{
+		if(raiseZ)
+			singleMove(currentX, currentY, currentZ + 1, getFastFeedrateZ());
+		singleMove(dumpX, dumpY, currentZ, getExtruder().getFastXYFeedrate());
 	}
 	
 	/* (non-Javadoc)

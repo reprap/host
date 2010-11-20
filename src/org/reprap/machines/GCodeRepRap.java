@@ -417,15 +417,6 @@ public class GCodeRepRap extends GenericRepRap {
 	
 	
 	/**
-	 * Go to the purge point
-	 */
-	public void moveToPurge()
-	{
-		singleMove(currentX, currentY, currentZ + 1, getFastFeedrateZ());
-		singleMove(dumpX, dumpY, currentZ, getExtruder().getFastXYFeedrate());
-	}
-	
-	/**
 	 * Go to the finish point
 	 */
 	public void moveToFinish()

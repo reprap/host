@@ -34,28 +34,7 @@ public class GCodeExtruder extends GenericExtruder
 		//}
 	}
 	
-	/**
-	 * Purge the extruder
-	 */
-	public void purge(boolean homeZ) throws Exception
-	{
-		if(purgeTime <= 0)
-			return;
-		getPrinter().moveToPurge();
-		try
-		{
-			if(homeZ)
-				getPrinter().homeToZeroZ();
-			heatOn(true);
-			setExtrusion(getFastXYFeedrate(), false);
-			getPrinter().machineWait(purgeTime, false);
-			setExtrusion(0, false);
-		} catch (Exception e)
-		{}
-		getPrinter().printEndReverse();
-		//getPrinter().home();
-		zeroExtrudedLength();
-	}
+
 	
 	public void setTemperature(double temperature, boolean wait) throws Exception
 	{

@@ -217,7 +217,7 @@ public interface Printer {
 	 * Move to the purge point
 	 *
 	 */
-	public void moveToPurge();
+	public void moveToPurge(boolean raiseZ);
 	
 	/**
 	 * @param previewer

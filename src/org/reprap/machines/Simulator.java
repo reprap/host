@@ -54,13 +54,6 @@ public class Simulator extends GenericRepRap {
 	}
 	
 	
-	/**
-	 * Go to the purge point
-	 */
-	public void moveToPurge()
-	{
-		singleMove(dumpX, dumpY, currentZ, getExtruder().getFastXYFeedrate());
-	}
 	
 	public void waitTillNotBusy() throws IOException {}
 	public void finishedLayer(int layerNumber) throws Exception {}
