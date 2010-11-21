@@ -734,6 +734,17 @@ public class GCodeReaderAndWriter
 					{
 						result = shutDown;
 						Debug.e("GCodeWriter.waitForResponse(): RepRap hard fault!  RepRap said: " + resp);
+						
+					} else if (resp.startsWith("//")) // immediate DEBUG "comment" from the firmware  ( like C++ )
+					{
+						Debug.d("GCodeWriter.waitForResponse(): " + resp);
+						resp = "";
+						goAgain = true;
+					} else if (resp.endsWith("\\")) // lines ending in a single backslash are considered "continued" to the next line, like "C"
+					{
+					//	Debug.d("GCodeWriter.waitForResponse(): " + resp);
+					//	resp = ""; don't clear the previuos response...
+						goAgain = true; // but do "go again"
 					} else if (resp.startsWith("rs")) // Re-send request?
 					{
 						lns = resp.substring(3);

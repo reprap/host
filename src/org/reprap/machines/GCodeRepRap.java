@@ -44,7 +44,9 @@ public class GCodeRepRap extends GenericRepRap {
 		gcode = new GCodeReaderAndWriter();
 		gcode.queue("M110 ; Reset the line numbers");
 		gcode.queue("M115 ; Get the firmware version numbers etc");
-		Debug.d("Firmware configuration string: " + gcode.lastResponse());
+		String FirmwareConfig = gcode.lastResponse();
+		FirmwareConfig = FirmwareConfig.replace('\\','\n'); //make it easier to read for humans if it has "continuations" 
+		Debug.d("Firmware configuration string: " + FirmwareConfig);
 		loadExtruders();
 		
 		forceSelection = true;
