@@ -1249,27 +1249,27 @@ public abstract class GenericExtruder implements Extruder
     
     /**
      * Get how much extrudate is deposited in a given time (in milliseconds)
-     * currentSpeed is in mm per minute
+     * currentSpeed is in mm per minute.  Valve extruders cannot know, so return 0.
      * @param time (ms)
      * @return
      */
     public double getDistanceFromTime(double time)
     {
-    	if(!es.isExtruding())
+    	if(!es.isExtruding() || valvePulseTime > 0)
     		return 0;
     	return es.speed()*time/60000.0;
     }
     
     /**
      * Get how much extrudate is deposited for a given xy movement
-     * currentSpeed is in mm per minute
+     * currentSpeed is in mm per minute.  Valve extruders cannot know, so return 0.
      * @param xyDistance (mm)
      * @param xyFeedrate (mm/minute)
      * @return
      */
     public double getDistance(double distance)
     {
-    	if(!es.isExtruding())
+    	if(!es.isExtruding() || valvePulseTime > 0)
     		return 0;
     	return extrudeRatio*distance;
     }
