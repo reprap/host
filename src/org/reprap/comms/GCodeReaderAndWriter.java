@@ -845,14 +845,10 @@ public class GCodeReaderAndWriter
 			Debug.d("An unsupported comms operation was encountered.\n" + e.toString());
 			return;		
 		}
+		
+		// Wait for baud rate change to take effect
+		try {Thread.sleep(1000);} catch (Exception e) {}
 
-/*			 
-		port.setSerialPortParams(baudRate,
-				SerialPort.DATABITS_8,
-				SerialPort.STOPBITS_1,
-				SerialPort.PARITY_NONE);
-*/		
-		// End of workround
 		
 		try {
 			port.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
