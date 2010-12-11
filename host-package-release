@@ -19,7 +19,21 @@ SRCFILELIST="src/* build.xml build-user.xml .classpath .project \
 
 LIBFILES="lib/*"
 
-DESIGNFILES="../$MACHINE ../electronics ../firmware"
+# Where are all the other non-host-software files we need to include?
+DESIGNFILES=""
+for i in ../$MACHINE ../electronics ../firmware
+do
+  if [ -d "$i" ]
+  then
+    DESIGNFILES="$DESIGNFILES $i"
+  elif [ -d ../"$i" ]
+  then
+    DESIGNFILES="$DESIGNFILES ../$i"
+  else
+    echo "ERROR: directory $i not found"
+    exit 1
+  fi
+done 
 
 CLASSPATH=$CLASSPATH:./lib/j3dcore.jar
 CLASSPATH=$CLASSPATH:./lib/j3d-org-java3d-all.jar
