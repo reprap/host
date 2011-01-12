@@ -1205,6 +1205,7 @@ public class BooleanGrid
 	
 	/**
 	 * Get the value at the point corresponding to somewhere in the real world
+	 * That is, membership test.
 	 * @param p
 	 * @return
 	 */

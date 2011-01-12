@@ -51,6 +51,19 @@ public class BooleanGridList
 		}
 		
 		/**
+		 * Is a point in any of the shapes?
+		 * @param p
+		 * @return
+		 */
+		public boolean membership(Rr2Point p)
+		{
+			for(int i = 0; i < size(); i++)
+				if(get(i).get(p))
+					return true;
+			return false;
+		}
+		
+		/**
 		 * Return the ith attribute
 		 * @param i
 		 * @return

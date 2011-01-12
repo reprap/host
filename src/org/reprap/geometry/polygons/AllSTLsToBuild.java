@@ -829,7 +829,7 @@ public class AllSTLsToBuild
 		
 		if(borderPolygons != null && borderPolygons.size() > 0)
 		{
-			borderPolygons.middleStarts(hatchedPolygons, layerConditions);
+			borderPolygons.middleStarts(hatchedPolygons, layerConditions, slice);
 			try
 			{
 				if(shield && Preferences.loadGlobalBool("Shield"))

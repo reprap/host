@@ -942,7 +942,7 @@ public class RrPolygonList
 	 * @param hatching
 	 * @param lc
 	 */
-	public void middleStarts(RrPolygonList hatching, LayerRules lc)
+	public void middleStarts(RrPolygonList hatching, LayerRules lc, BooleanGridList slice)
 	{
 		for(int i = 0; i < size(); i++)
 		{
@@ -965,31 +965,44 @@ public class RrPolygonList
 					int en = pp.end();
 
 					RrPolygon pg = pp.polygon();
-
-					outline.add(start);
-					outline.setExtrudeEnd(outline.size() - 1);
-
-					if(en >= st)
+					
+					// Check that the line from the start of the outline polygon to the first point
+					// of the tail-in is in solid.  If not, we have jumped between polygons and don't
+					// want to use that as a lead in.
+					
+					Rr2Point pDif = Rr2Point.sub(pg.point(st), start);
+					
+					Rr2Point pq1 = Rr2Point.add(start, Rr2Point.mul(0.25, pDif));
+					Rr2Point pq2 = Rr2Point.add(start, Rr2Point.mul(0.5, pDif));
+					Rr2Point pq3 = Rr2Point.add(start, Rr2Point.mul(0.5, pDif));
+					
+					if(slice.membership(pq1) & slice.membership(pq2) & slice.membership(pq3))
 					{
-						for(int j = st; j <= en; j++)
+						outline.add(start);
+						outline.setExtrudeEnd(outline.size() - 1);
+
+						if(en >= st)
 						{
-							outline.add(0, pg.point(j));  // Put it on the beginning...
-							if(j < en)
-								outline.add(pg.point(j));     // ...and the end.
-						}
-					} else
-					{
-						for(int j = st; j >= en; j--)
+							for(int j = st; j <= en; j++)
+							{
+								outline.add(0, pg.point(j));  // Put it on the beginning...
+								if(j < en)
+									outline.add(pg.point(j));     // ...and the end.
+							}
+						} else
 						{
-							outline.add(0, pg.point(j));
-							if(j > en)
-								outline.add(pg.point(j));
+							for(int j = st; j >= en; j--)
+							{
+								outline.add(0, pg.point(j));
+								if(j > en)
+									outline.add(pg.point(j));
+							}
 						}
+
+						set(i, outline);
+
+						hatching.cutPolygon(pp.pIndex(), st, en);
 					}
-
-					set(i, outline);
-
-					hatching.cutPolygon(pp.pIndex(), st, en);
 				}
 			}
 		}
