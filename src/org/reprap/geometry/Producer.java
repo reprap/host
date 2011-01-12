@@ -295,8 +295,9 @@ public class Producer {
 			Rr2Point startNearHere = new Rr2Point(0, 0);
 			for(int stl = 0; stl < allSTLs.size(); stl++)
 			{
-					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules); //, startNearHere);
+					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules);
 					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
+					fills = fills.cullShorts();
 					shield = false;
 					RrPolygonList support = allSTLs.computeSupport(stl, layerRules);
 					borders = borders.nearEnds(startNearHere, false, -1);

@@ -430,6 +430,20 @@ public class RrPolygon
 	public RrRectangle getBox() { return box; }
 	
 	/**
+	 * Sum of the edge lengths
+	 * @return
+	 */
+	public double getLength()
+	{
+		double len = 0;
+		for(int i = 1; i < size(); i++)
+			len = len + Rr2Point.d(point(i), point(i-1));
+		if(closed)
+			len = len + Rr2Point.d(point(0), point(size()-1));
+		return len;
+	}
+	
+	/**
 	 * Put a new polygon on the end
 	 * (N.B. Attributes of the new polygon are ignored)
 	 * @param p

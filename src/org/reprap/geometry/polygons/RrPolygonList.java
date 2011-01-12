@@ -1028,26 +1028,21 @@ public class RrPolygonList
 	}
 	
 	/**
-	 * Remove edges that are shorter than tiny from the
-	 *   polygons in the list if those edges are preceeded 
-	 *   by gap material.  
-	 * @param tiny
-	 * @return filtered polygon list
+	 * Remove polygons shorter than 3 times the infillwidth
+	 * @return
 	 */
-//	public RrPolygonList filterShorts(double tiny)
-//	{
-//		RrPolygonList r = new RrPolygonList();
-//		int i;
-//		RrPolygon p;
-//		
-//		for(i = 0; i < size(); i++)
-//		{
-//			p = polygon(i).filterShort(tiny);
-//			if(p.size() > 0)
-//				r.add(polygon(i));
-//		}
-//		return r;
-//	}
+	public RrPolygonList cullShorts()
+	{
+		RrPolygonList r = new RrPolygonList();
+		
+		for(int i = 0; i < size(); i++)
+		{
+			RrPolygon p = polygon(i);
+			if(p.getLength() > p.getAttributes().getExtruder().getExtrusionInfillWidth()*3)
+				r.add(p);
+		}
+		return r;
+	}
 	
 	/**
 	 * Is polygon i inside CSG polygon j?
