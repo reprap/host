@@ -957,6 +957,7 @@ public class RrPolygonList
 
 				Rr2Point start = outline.point(0);
 				PolPoint pp = hatching.ppSearch(start, -1);
+				boolean failed = true;
 				if(pp != null)
 				{
 					pp.findLongEnough(10, 30);
@@ -1002,8 +1003,11 @@ public class RrPolygonList
 						set(i, outline);
 
 						hatching.cutPolygon(pp.pIndex(), st, en);
+						failed = false;
 					}
 				}
+				if(failed)
+					set(i, outline.randomStart()); // Best we can do.
 			}
 		}
 	}
