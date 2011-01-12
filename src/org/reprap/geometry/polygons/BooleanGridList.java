@@ -136,8 +136,17 @@ public class BooleanGridList
 					}
 					if(outline)
 					{
-						for(int shell = 0; shell < shells; shell++)
-								result.add(get(i).offset(-multiplier*((double)shell + 0.5)*e.getExtrusionSize()));
+						int shell = 0;
+						boolean carryOn = true;
+						while(carryOn && shell < shells)
+						{
+							BooleanGrid thisOne = get(i).offset(-multiplier*((double)shell + 0.5)*e.getExtrusionSize());
+							if(thisOne.isEmpty())
+								carryOn = false;
+							else
+								result.add(thisOne);
+							shell++;
+						}
 					} else
 					{
 						// Must be a hatch.  Only do it if the gap is +ve or we're building the foundation
@@ -150,7 +159,7 @@ public class BooleanGridList
 							offSize = 3;
 						else
 							offSize = -multiplier*((double)shells + 0.5)*e.getExtrusionSize() + ife.getInfillOverlap();
-						if (e.getExtrusionInfillWidth() > 0 || foundation)  // Z valuesn't mattere here
+						if (e.getExtrusionInfillWidth() > 0 || foundation)  // Z value doesn't matter here
 								result.add(get(i).offset(offSize));
 					}
 				}
