@@ -1011,6 +1011,8 @@ public abstract class GenericExtruder implements Extruder
      */
     public double getValveDelayForLayer()
     {
+    	if(valvePulseTime < 0)
+    		return 0;
     	return valveDelayForLayer;
     }
     
@@ -1021,6 +1023,8 @@ public abstract class GenericExtruder implements Extruder
      */
     public double getValveDelayForPolygon()
     {
+    	if(valvePulseTime < 0)
+    		return 0;
     	return valveDelayForPolygon;
     }
     
@@ -1038,6 +1042,8 @@ public abstract class GenericExtruder implements Extruder
      */
     public double getValveOverRun()
     {
+    	if(valvePulseTime < 0)
+    		return 0;
     	return valveOverRun;
     }
     

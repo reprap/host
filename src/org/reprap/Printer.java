@@ -451,24 +451,24 @@ public interface Printer {
 //	 */	
 //	public int convertFeedrateToSpeedZ(double feedrate);
 	
-	/**
-	 * The X discretisation
-	 * @return
-	 */
-	public double getXStepsPerMM();
-	
-	/**
-	 * The Y discretisation
-	 * @return
-	 */
-	public double getYStepsPerMM();
-	
-	/**
-	 * The Z discretisation
-	 * @return
-	 */
-	public double getZStepsPerMM();
-	
+//	/**
+//	 * The X discretisation
+//	 * @return
+//	 */
+//	public double getXStepsPerMM();
+//	
+//	/**
+//	 * The Y discretisation
+//	 * @return
+//	 */
+//	public double getYStepsPerMM();
+//	
+//	/**
+//	 * The Z discretisation
+//	 * @return
+//	 */
+//	public double getZStepsPerMM();
+//	
 	/**
 	 * If we are using an output buffer, it's a good idea to wait till
 	 * it's empty between layers before computing the next one.

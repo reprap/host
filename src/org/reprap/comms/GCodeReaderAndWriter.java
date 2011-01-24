@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Date;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
@@ -706,9 +707,32 @@ public class GCodeReaderAndWriter
 		String lns;
 		resetReceived();
 		boolean goAgain;
+		Date timer = new Date();
+		long startWait = timer.getTime();
+		long timeNow;
+		long increment = 2000;
+		long longWait = 10*60*1000; // 10 mins...
 		
 		for(;;)
 		{
+			timeNow = timer.getTime() - startWait;
+			if(timeNow > increment)
+			{
+				Debug.d("GCodeReaderAndWriter().waitForResponse(): waited for " + timeNow/1000 + " seconds.");
+				increment = 2*increment;
+			}
+			
+			if(timeNow > longWait)
+			{
+				Debug.e("GCodeReaderAndWriter().waitForResponse(): waited for " + timeNow/1000 + " seconds.");
+				try {
+					queue("M0 ;shut RepRap down");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
 			try
 			{
 				i = serialInStream.read();
