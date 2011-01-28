@@ -118,7 +118,7 @@ public class AllSTLsToBuild
 		private int[] layerNumber;
 		private int ringPointer;
 		private final int noLayer = Integer.MIN_VALUE;
-		private final int ringSize = 5;
+		private final int ringSize = 7;
 		
 		public SliceCache()
 		{
