@@ -118,7 +118,7 @@ public class AllSTLsToBuild
 		private int[] layerNumber;
 		private int ringPointer;
 		private final int noLayer = Integer.MIN_VALUE;
-		private final int ringSize = 7;
+		private final int ringSize = 5;
 		
 		public SliceCache()
 		{
@@ -735,10 +735,10 @@ public class AllSTLsToBuild
 		
 		BooleanGridList adjacentSlices = slice(stl, layer+1, layerConditions);
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer+2, layerConditions), adjacentSlices);
-		adjacentSlices = BooleanGridList.intersections(slice(stl, layer+3, layerConditions), adjacentSlices);
+		//adjacentSlices = BooleanGridList.intersections(slice(stl, layer+3, layerConditions), adjacentSlices);
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer-1, layerConditions), adjacentSlices);
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer-2, layerConditions), adjacentSlices);
-		adjacentSlices = BooleanGridList.intersections(slice(stl, layer-3, layerConditions), adjacentSlices);
+		//adjacentSlices = BooleanGridList.intersections(slice(stl, layer-3, layerConditions), adjacentSlices);
 		BooleanGridList insides = null;
 		
 		// The insides are the bits that aren't surface.
