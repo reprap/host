@@ -193,8 +193,8 @@ public class BooleanGridList
 		}
 		
 		/**
-		 * Work out all the open polygond forming a set of infill hatches.  If surface
-		 * is true, these polygone are on the outside (top or bottom).  If it's false
+		 * Work out all the open polygons forming a set of infill hatches.  If surface
+		 * is true, these polygons are on the outside (top or bottom).  If it's false
 		 * they are in the interior.
 		 * @param layerConditions
 		 * @param surface

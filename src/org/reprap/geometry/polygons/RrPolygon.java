@@ -725,6 +725,33 @@ public class RrPolygon
 	}
 	
 	/**
+	 * Find the index of the polygon point that is at the start of the polygon's longest edge.
+	 * @param ln
+	 * @return
+	 */
+	public int longestEdgeStart()
+	{
+		double d = Double.NEGATIVE_INFINITY;
+		int result = -1;
+		int lim = size();
+		if(!closed)
+			lim--;
+		for(int i = 0; i < lim; i++)
+		{
+			int j = (i + 1)%size();
+			double d2 = Rr2Point.dSquared(point(i), point(j));
+			if(d2 > d)
+			{
+				d = d2;
+				result = i;
+			}
+		}
+		if(result < 0)
+			Debug.e("RrPolygon.longestEdgeStart(): no point found!");
+		return result;		
+	}
+	
+	/**
 	 * Signed area (-ve result means polygon goes anti-clockwise)
 	 * @return signed area
 	 */

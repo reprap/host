@@ -768,7 +768,7 @@ public class AllSTLsToBuild
 	}
 	
 	/**
-	 * Compute the polygon to lay down for the machine to wipe its node on.
+	 * Compute the polygon to lay down for the machine to wipe its nose on.
 	 * @param a
 	 * @return
 	 */
