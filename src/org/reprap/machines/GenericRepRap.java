@@ -905,8 +905,18 @@ public abstract class GenericRepRap implements CartesianPrinter
 		// The startup procedure has already done that
 		
 		if(lc.getMachineLayer() > 0 && Preferences.loadGlobalBool("InterLayerCooling"))
+		{
+			double liftZ = -1;
+			for(int i = 0; i < extruders.length; i++)
+				if(extruders[i].getLift() > liftZ)
+					liftZ = extruders[i].getLift();
+			double currentZ = getZ();
+			if(liftZ > 0)
+				singleMove(getX(), getY(), currentZ + liftZ, getFastFeedrateZ());
 			homeToZeroXYE();
-		else
+			if(liftZ > 0)
+				singleMove(getX(), getY(), currentZ, getFastFeedrateZ());				
+		} else
 		{
 			int extruderNow = extruder;
 			for(int i = 0; i < extruders.length; i++)
@@ -1089,95 +1099,12 @@ public abstract class GenericRepRap implements CartesianPrinter
 		statusWindow.setCancelled(isCancelled);
 	}
 	
-	/**
-	 * @return the X stepper
-	 */
-//	public GenericStepperMotor getXMotor()
-//	{
-//		return motorX;
-//	}
-//	
-//	/**
-//	 * @return the Y stepper
-//	 */
-//	public GenericStepperMotor getYMotor()
-//	{
-//		return motorY;
-//	}
-//	
-//	/**
-//	 * @return the Z stepper
-//	 */	
-//	public GenericStepperMotor getZMotor()
-//	{
-//		return motorZ;
-//	}
 	
 	public int getFoundationLayers()
 	{
 		return foundationLayers;
 	}
 	
-//	//TODO: MAKE THIS WORK!
-//	// Works for me! - AB
-//	public int convertFeedrateToSpeedXY(double feedrate)
-//	{
-//		//Debug.d("feedrate: " + feedrate);
-//		
-//		//pretty straightforward
-//		double stepsPerMinute = feedrate * scaleX;
-//		//Debug.d("steps/min: " + stepsPerMinute);
-//		
-//		//ticks per minute divided by the steps we need to take.
-//		double ticksBetweenSteps = 60000000.0 / (256.0 * stepsPerMinute);
-//		//Debug.d("ticks between steps: " + ticksBetweenSteps);
-//
-//		int picTimer = 256 - (int)Math.round(ticksBetweenSteps);
-//		//Debug.d("pic timer: " + picTimer);
-//		
-//		//bounds checking.
-//		picTimer = Math.min(255, picTimer);
-//		picTimer = Math.max(0, picTimer);
-//		
-//		return picTimer;
-//	}
-//
-//	
-//	//TODO: MAKE THIS WORK!
-//	public int convertFeedrateToSpeedZ(double feedrate)
-//	{
-//		//pretty straightforward
-//		double stepsPerMinute = feedrate * scaleZ;
-//		
-//		//ticks per minute divided by the steps we need to take.
-////		long ticksBetweenSteps = Math.round(60000000 / 256 / stepsPerMinute);
-////		int picTimer = (256 - (int)ticksBetweenSteps);
-//		double ticksBetweenSteps = 60000000.0 / (256.0 * stepsPerMinute);
-//		//Debug.d("ticks between steps: " + ticksBetweenSteps);
-//		
-//		//System.out.println("Z ticksBetweenSteps = " + ticksBetweenSteps);
-//
-//		int picTimer = 256 - (int)Math.round(ticksBetweenSteps);
-//		
-//		//bounds checking.
-//		picTimer = Math.min(255, picTimer);
-//		picTimer = Math.max(0, picTimer);
-//
-//		return picTimer;
-//	}
-//	
-//	public double getXStepsPerMM()
-//	{
-//		return scaleX;
-//	}
-//	public double getYStepsPerMM()
-//	{
-//		return scaleY;
-//	}
-//	public double getZStepsPerMM()
-//	{
-//		return scaleZ;
-//	}
 	
 	/**
 	 * Load an STL file to be made.

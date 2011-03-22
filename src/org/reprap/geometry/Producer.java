@@ -338,7 +338,6 @@ public class Producer {
 					}
 			}
 			
-
 			
 			LayerProducer lp = new LayerProducer(allPolygons, layerRules, simulationPlot);
 			layerRules.setFirstAndLast(allPolygons);
@@ -352,10 +351,7 @@ public class Producer {
 				reprap.setTop(reprap.getX(), reprap.getY(), reprap.getZ());
 				firstTimeRound = false;
 			}
-			//layer = null;
-			//slice = null;
-			
-			//slice.finalize();
+
 			allSTLs.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());
