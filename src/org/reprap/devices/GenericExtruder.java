@@ -379,7 +379,7 @@ public abstract class GenericExtruder implements Extruder
 	}
 
 	/**
-	 * Allow otthers to set our extrude length so that all logical extruders
+	 * Allow others to set our extrude length so that all logical extruders
 	 * talking to one physical extruder can use the same length instance.
 	 * @param e
 	 */

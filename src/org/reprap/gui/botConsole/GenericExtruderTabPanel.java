@@ -495,6 +495,15 @@ private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     	
     }//GEN-LAST:event_heatButtonActionPerformed
 
+private void setExtruderSpeed() {
+    try {
+            extruder.setExtrusion(extruding?Double.parseDouble(motorSpeedField.getText()):0, motorReverseCheck.isSelected());
+    } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Extruder exception: " + ex);
+            ex.printStackTrace();
+    }
+}
+
     private boolean extruding = false;
     
     private void extrudeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extrudeButtonActionPerformed
@@ -593,14 +602,7 @@ private void moveToDumpPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:
 			BotConsoleFrame.getXYZTabPanel().getPrinter().getDumpY(), z);
 }//GEN-LAST:event_moveToSwapPointAction
 
-private void setExtruderSpeed() {
-        try {
-                extruder.setExtrusion(extruding?Double.parseDouble(motorSpeedField.getText()):0, motorReverseCheck.isSelected());
-        } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Extruder exception: " + ex);
-                ex.printStackTrace();
-        }
-}
+
     
     public double getExtruderSpeed()
     {

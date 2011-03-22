@@ -99,46 +99,9 @@ public class LayerProducer {
 	 */
 	private boolean paused = false;
 
-	/**
-	 * The shape of the object built so far under the current layer
-	 */
-	//private BranchGroup lowerShell = null;
 
 	
-	/**
-	 * The polygons to infill
-	 */
-	//private RrPolygonList hatchedPolygons = null;
-	
 	private RrPolygonList allPolygons[];
-	
-	/**
-	 * The polygons to outline
-	 */
-	//private RrPolygonList borderPolygons = null;
-	
-	/**
-	 * Boolean Grid representation of the polygons as input
-	 */
-	//private BooleanGridList boolGrdSlice = null;
-	
-	/**
-	 * CSG representation of the polygons offset by the width of
-	 * the extruders
-	 */
-	//RrCSGPolygonList offBorder = null;
-	
-	/**
-	 * CSG representation of the polygons offset by the factor of the
-	 * width of the extruders needed to lay down internal cross-hatching
-	 */	
-	//BooleanGridList offHatch = null;
-	
-	/**
-	 * Counters use so that each material is plotted completely before
-	 * moving on to the next.
-	 */
-	//private int commonBorder, commonHatch;
 	
 	/**
 	 * The clue is in the name...
@@ -149,8 +112,7 @@ public class LayerProducer {
 	 * Record the end of each polygon as a clue where to start next
 	 */
 	private Rr2Point startNearHere = null;
-	
-	//private boolean shellSet = false;
+
 	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
@@ -166,30 +128,6 @@ public class LayerProducer {
 			return;
 		beingDestroyed = true;
 		
-		// Keep the lower shell - the graphics system is using it
-		
-		//lowerShell = null;
-
-		// Keep the printer; that's needed for the next layer
-
-		//printer = null;
-		
-//		if(hatchedPolygons != null)
-//			hatchedPolygons.destroy();
-//		hatchedPolygons = null;
-//		
-//		if(borderPolygons != null)
-//			borderPolygons.destroy();
-//		borderPolygons = null;
-//		
-//		//if(boolGrdSlice != null)
-//		//	boolGrdSlice.destroy();
-//		boolGrdSlice = null;
-//		
-//		//if(offHatch != null)
-//			//offHatch.destroy();
-//		offHatch = null;
-		
 		if(startNearHere != null)
 			startNearHere.destroy();
 		startNearHere = null;
@@ -197,61 +135,6 @@ public class LayerProducer {
 		beingDestroyed = false;
 	}
 	
-	/**
-	 * Destroy just me
-	 */
-//	protected void finalize() throws Throwable
-//	{
-//		// Keep the lower shell - the graphics system is using it
-//		
-//		//lowerShell = null;
-//
-//		// Keep the printer; that's needed for the next layer
-//
-//		//printer = null;
-//		
-////		hatchedPolygons = null;
-////		borderPolygons = null;
-////		boolGrdSlice = null;
-////		offHatch = null;
-//		allPolygons = null;
-//		startNearHere = null;
-//		super.finalize();
-//	}
-	
-	/**
-	 * Set up a layer consisting of a single material in a single pre-computed list.
-	 * Used for creating foundations.
-	 * @param pols
-	 * @param lc
-	 * @param simPlot
-	 * @throws Exception
-	 */
-//	public LayerProducer(RrPolygonList pols, LayerRules lc, RrGraphics simPlot) throws Exception 
-//	{
-//		layerConditions = lc;
-//		startNearHere = null; //new Rr2Point(0, 0);
-//		//lowerShell = null;
-//		//shellSet = false;
-//		simulationPlot = simPlot;
-//		
-//		boolGrdSlice = null;
-//		
-//		borderPolygons = null;
-//		
-//		hatchedPolygons = pols;
-//		
-//		
-//		if(simulationPlot != null)
-//		{
-//			if(!simulationPlot.isInitialised())
-//				simulationPlot.init(lc.getBox(), false);
-//			else
-//				simulationPlot.cleanPolygons();
-//		}
-//
-//	}
-//	
 	
 	/**
 	 * Set up a normal layer
@@ -261,54 +144,13 @@ public class LayerProducer {
 	 * @param simPlot
 	 * @throws Exception
 	 */
-	//public LayerProducer(BooleanGridList bgPols, LayerRules lc, RrGraphics simPlot) throws Exception 
 	public LayerProducer(RrPolygonList ap[], LayerRules lc, RrGraphics simPlot) throws Exception 
 	{
 		layerConditions = lc;
 		startNearHere = null;
-		//lowerShell = ls;
-		//shellSet = false;
 		simulationPlot = simPlot;
 		
 		allPolygons = ap;
-		
-		//boolGrdSlice = bgPols;
-		
-		// The next two are experimental for the moment...
-		
-		//inFillCalculations();
-		//supportCalculations();
-		
-		//offHatch = boolGrdSlice.offset(layerConditions, false);
-		
-//		if(layerConditions.getLayingSupport())
-//		{
-//			borderPolygons = null;
-//			offHatch = offHatch.union(lc.getPrinter().getExtruders());
-//		} else
-//		{
-//			BooleanGridList offBorder = boolGrdSlice.offset(layerConditions, true);
-//			borderPolygons = offBorder.borders();
-//		}
-//			
-//		hatchedPolygons = offHatch.hatch(layerConditions);
-//
-//
-//		if(borderPolygons != null && borderPolygons.size() > 0)
-//		{
-//			borderPolygons.middleStarts(hatchedPolygons, layerConditions);
-//			if(Preferences.loadGlobalBool("Shield"))
-//			{
-//				RrRectangle rr = lc.getBox();
-//				Rr2Point corner = Rr2Point.add(rr.sw(), new Rr2Point(-3, -3));
-//				RrPolygon ell = new RrPolygon(borderPolygons.polygon(0).getAttributes(), false);
-//				ell.add(corner);
-//				ell.add(Rr2Point.add(corner, new Rr2Point(-2, 10)));
-//				ell.add(Rr2Point.add(corner, new Rr2Point(-2, -2)));
-//				ell.add(Rr2Point.add(corner, new Rr2Point(20, -2)));
-//				borderPolygons.add(0, ell);
-//			}
-//		}
 		
 		if(simulationPlot != null)
 		{
@@ -512,13 +354,11 @@ public class LayerProducer {
 		double outlineFeedrate = att.getExtruder().getOutlineFeedrate();
 		double infillFeedrate = att.getExtruder().getInfillFeedrate();
 		
-		boolean acc = att.getExtruder().getMaxAcceleration() > 0; //Preferences.loadGlobalBool("Accelerating");
-			
-		//int leng = p.size();
+		boolean acc = att.getExtruder().getMaxAcceleration() > 0; 
 	
 		if(p.size() <= 1)
 		{
-			startNearHere = null;
+			//startNearHere = null;
 			return;
 		}
 
@@ -534,7 +374,7 @@ public class LayerProducer {
 		}
 		if (plotDist<Preferences.machineResolution()*0.5) {
 			Debug.d("Rejected line with "+p.size()+" points, length: "+plotDist);
-			startNearHere = null;
+			//startNearHere = null;
 			return;
 		}	
 		
@@ -542,21 +382,13 @@ public class LayerProducer {
 			printer.forceNextExtruder();
 		printer.selectExtruder(att);
 		
-// Don't do these with mid-point starting
-		
-//		if(p.isClosed() && att.getExtruder().incrementedStart())
-//			p = p.incrementedStart(layerConditions);
-//		else if(p.isClosed() && att.getExtruder().randomStart())
-//			p = p.randomStart();
-		
-		//int stopExtruding = p.size() + 10;
-		//int stopValve = stopExtruding;
 		
 		if (printer.isCancelled()) return;
 		
 		// If getMinLiftedZ() is negative, never lift the head
 		
-		Boolean lift = att.getExtruder().getMinLiftedZ() >= 0 || att.getExtruder().getLift() > 0;
+		double liftZ = att.getExtruder().getLift();
+		Boolean lift = att.getExtruder().getMinLiftedZ() >= 0 || liftZ > 0;
 		
 		if(acc)
 			p.setSpeeds(att.getExtruder().getSlowXYFeedrate(), p.isClosed()?outlineFeedrate:infillFeedrate, 
@@ -569,17 +401,16 @@ public class LayerProducer {
 
 		p.backStepExtrude(extrudeBackLength);
 		p.backStepValve(valveBackLength);
-//
-//		if(extrudeBackLength > 0 && acc)
-//			stopExtruding = p.findBackPoint(extrudeBackLength);
-//		
-//		if(valveBackLength <= 0)
-//			stopValve = Integer.MAX_VALUE;
-//		else if(acc)
-//			stopValve = p.findBackPoint(valveBackLength);
-
+		
+		double currentZ = printer.getZ();
+		if(liftZ > 0)
+			printer.singleMove(printer.getX(), printer.getY(), currentZ + liftZ, printer.getFastFeedrateZ());
+	
 		currentFeedrate = att.getExtruder().getFastXYFeedrate();
 		singleMove(p.point(0));
+		
+		if(liftZ > 0)
+			printer.singleMove(printer.getX(), printer.getY(), currentZ, printer.getFastFeedrateZ());
 		
 		if(acc)
 			currentFeedrate = p.speed(0);
@@ -603,57 +434,29 @@ public class LayerProducer {
 		boolean valveOff = false;
 		boolean oldexoff;
 		
-//		if(p.isClosed())
-//		{
-//			for(int j = 1; j <= p.size(); j++)
-//			{
-//				int i = j%p.size();
-//				Rr2Point next = p.point((j+1)%p.size());
-//				
-//				if (printer.isCancelled())
-//				{
-//					printer.stopMotor();
-//					singleMove(posNow());
-//					move(posNow(), posNow(), lift, true, true);
-//					return;
-//				}
-//				if(acc)
-//					currentFeedrate = p.speed(i);
-//				
-//				oldexoff = extrudeOff;
-//				extrudeOff = j > stopExtruding || j == p.size();
-//				valveOff = j > stopValve || j == p.size();
-//				
-//				plot(p.point(i), next, extrudeOff, valveOff);
-//				if(oldexoff ^ extrudeOff)
-//					printer.printEndReverse();
-//			}
-//		} else
-		
-//		{
-			for(int i = 1; i < p.size(); i++)
+		for(int i = 1; i < p.size(); i++)
+		{
+			Rr2Point next = p.point((i+1)%p.size());
+
+			if (printer.isCancelled())
 			{
-				Rr2Point next = p.point((i+1)%p.size());
-				
-				if (printer.isCancelled())
-				{
-					printer.stopMotor();
-					singleMove(posNow());
-					move(posNow(), posNow(), lift, lift, true);
-					return;
-				}
-				
-				if(acc)
-					currentFeedrate = p.speed(i);
-				
-				oldexoff = extrudeOff;
-				extrudeOff = (i > p.extrudeEnd() && extrudeBackLength > 0) || i == p.size()-1;
-				valveOff = (i > p.valveEnd() && valveBackLength > 0) || i == p.size()-1;			
-				plot(p.point(i), next, extrudeOff, valveOff);
-				if(oldexoff ^ extrudeOff)
-					printer.printEndReverse();
+				printer.stopMotor();
+				singleMove(posNow());
+				move(posNow(), posNow(), lift, lift, true);
+				return;
 			}
-//		}
+
+			if(acc)
+				currentFeedrate = p.speed(i);
+
+			oldexoff = extrudeOff;
+			extrudeOff = (i > p.extrudeEnd() && extrudeBackLength > 0) || i == p.size()-1;
+			valveOff = (i > p.valveEnd() && valveBackLength > 0) || i == p.size()-1;			
+			plot(p.point(i), next, extrudeOff, valveOff);
+			if(oldexoff ^ extrudeOff)
+				printer.printEndReverse();
+		}
+
 		
 		if(p.isClosed())
 			move(p.point(0), p.point(0), false, false, true);
@@ -674,62 +477,7 @@ public class LayerProducer {
 		}
 		
 	}
-	
-
-
-//	private int plotOneMaterial(RrPolygonList polygons, int i, boolean firstOneInLayer)
-//		throws ReprapException, IOException
-//	{
-//		String material = polygons.polygon(i).getAttributes().getMaterial();
-//		
-//		while(i < polygons.size() && polygons.polygon(i).getAttributes().getMaterial().equals(material))
-//		{
-//			if (layerConditions.getPrinter().isCancelled())
-//				return i;
-//			plot(polygons.polygon(i), firstOneInLayer);
-//			firstOneInLayer = false;
-//			i++;
-//		}
-//		return i;
-//	}
-	
-//	private boolean nextCommon(int ib, int ih)
-//	{
-//		if(borderPolygons == null || hatchedPolygons == null)
-//			return false;
-//		
-//		commonBorder = ib;
-//		commonHatch = ih;
-//		
-//		if(borderPolygons.size() <= 0)
-//		{
-//			commonHatch = hatchedPolygons.size();
-//			return false;
-//		}
-//
-//
-//		if(hatchedPolygons.size() <= 0)
-//		{
-//			commonBorder = borderPolygons.size();
-//			return false;
-//		}
-//
-//		for(int jb = ib; jb < borderPolygons.size(); jb++)
-//		{
-//			for(int jh = ih; jh < hatchedPolygons.size(); jh++)
-//			{
-//				if(borderPolygons.polygon(ib).getAttributes().getMaterial().equals(
-//						hatchedPolygons.polygon(ih).getAttributes().getMaterial()))
-//				{
-//					commonBorder = jb;
-//					commonHatch = jh;
-//					return true;
-//				}
-//			}
-//		}
-//		return false;
-//	}
-		
+			
 	/**
 	 * Master plot function - draw everything.  Supress border and/or hatch by
 	 * setting borderPolygons and/or hatchedPolygons null
@@ -737,8 +485,6 @@ public class LayerProducer {
 	 */
 	public void plot() throws Exception
 	{
-		//int ib, jb, ih, jh;
-
 		boolean firstOneInLayer = true;
 		
 		for(int i = 0; i < allPolygons.length; i++)
@@ -751,72 +497,6 @@ public class LayerProducer {
 				firstOneInLayer = false;
 			}
 		}
-
-//		//borderPolygons = borderPolygons.filterShorts(Preferences.machineResolution()*2);
-//		//hatchedPolygons = hatchedPolygons.filterShorts(Preferences.machineResolution()*2);
-//
-//		ib = 0;
-//		ih = 0;
-//		
-//		Printer printer = layerConditions.getPrinter();	
-//		
-//		while(nextCommon(ib, ih)) 
-//		{	
-//			for(jb = ib; jb < commonBorder; jb++)
-//			{
-//				if (printer.isCancelled())
-//					break;
-//				plot(borderPolygons.polygon(jb), firstOneInLayer);
-//				firstOneInLayer = false;
-//			}
-//			ib = commonBorder;
-//
-//			for(jh = ih; jh < commonHatch; jh++)
-//			{
-//				if (printer.isCancelled())
-//					break;
-//				plot(hatchedPolygons.polygon(jh), firstOneInLayer);
-//				firstOneInLayer = false;
-//			}
-//			ih = commonHatch;
-//
-//			firstOneInLayer = true;
-//			borderPolygons = borderPolygons.nearEnds(startNearHere);
-//			
-//			ib = plotOneMaterial(borderPolygons, ib, firstOneInLayer);
-//			firstOneInLayer = false;
-//			hatchedPolygons = hatchedPolygons.nearEnds(startNearHere);
-//			ih = plotOneMaterial(hatchedPolygons, ih, firstOneInLayer);	
-//		}
-//
-//		firstOneInLayer = true; // Not sure about this - AB
-//
-//		if(borderPolygons != null)
-//		{
-//			for(jb = ib; jb < borderPolygons.size(); jb++)
-//			{
-//				if (printer.isCancelled())
-//					break;
-//				plot(borderPolygons.polygon(jb), firstOneInLayer);
-//				firstOneInLayer = false;
-//			}
-//		}
-//
-//		if(hatchedPolygons != null)
-//		{
-//			for(jh = ih; jh < hatchedPolygons.size(); jh++)
-//			{
-//				if (printer.isCancelled())
-//					break;
-//				plot(hatchedPolygons.polygon(jh), firstOneInLayer);
-//				firstOneInLayer = false;
-//			}
-//		}
-////		if(!shellSet)
-////		{
-////			printer.setLowerShell(lowerShell);
-////			shellSet = true;
-////		}
 	}		
 	
 }
