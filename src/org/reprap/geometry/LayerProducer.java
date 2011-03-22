@@ -556,7 +556,7 @@ public class LayerProducer {
 		
 		// If getMinLiftedZ() is negative, never lift the head
 		
-		Boolean lift = att.getExtruder().getMinLiftedZ() >= 0;
+		Boolean lift = att.getExtruder().getMinLiftedZ() >= 0 || att.getExtruder().getLift() > 0;
 		
 		if(acc)
 			p.setSpeeds(att.getExtruder().getSlowXYFeedrate(), p.isClosed()?outlineFeedrate:infillFeedrate, 

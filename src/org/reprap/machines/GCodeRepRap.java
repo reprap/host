@@ -222,7 +222,7 @@ public class GCodeRepRap extends GenericRepRap {
 
 		double zFeedrate = round(getMaxFeedrateZ(), 1);
 		
-		double liftIncrement = extruders[extruder].getExtrusionHeight()/2;
+		double liftIncrement = extruders[extruder].getLift();  //extruders[extruder].getExtrusionHeight()/2;
 		double liftedZ = round(currentZ + liftIncrement, 4);
 
 		//go up first?
