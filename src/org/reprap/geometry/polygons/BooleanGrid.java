@@ -860,16 +860,6 @@ public class BooleanGrid
 	// Constructors and administration
 	
 	/**
-	 * Bye!
-	 */
-//	protected void finalize() throws Throwable
-//	{
-//		bits = null;
-//		visited = null;
-//		super.finalize();
-//	}
-	
-	/**
 	 * Back and forth from real to pixel/integer coordinates
 	 * @param i
 	 * @return
@@ -1599,7 +1589,7 @@ public class BooleanGrid
 	/**
 	 * Find a neighbour of a pixel that has not yet been visited, that is on an edge, and
 	 * that is nearest to a given neighbour direction, nd.  If nd < 0 the first unvisited
-	 * neighbour is returned.  If no valid neighbour exists, null is returned.  This prefrs to
+	 * neighbour is returned.  If no valid neighbour exists, null is returned.  This prefers to
 	 * visit valid pixels with few neighbours, and only after that tries to head in direction nd.
 	 * @param a
 	 * @param direction

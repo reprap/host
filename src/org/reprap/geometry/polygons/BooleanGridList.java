@@ -364,7 +364,7 @@ public class BooleanGridList
 		
 		/**
 		 * Return a list of differences between the entries in a and b.
-		 * Only pairs with the same attribute are intersected.  If an element
+		 * Only pairs with the same attribute are subtracted.  If an element
 		 * of a has no corresponding element in b, then an entry equal to a is returned
 		 * for that.
 		 * @param a

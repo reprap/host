@@ -736,7 +736,8 @@ public class AllSTLsToBuild
 		BooleanGridList adjacentSlices = slice(stl, layer+1, layerConditions);
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer+2, layerConditions), adjacentSlices);
 		//adjacentSlices = BooleanGridList.intersections(slice(stl, layer+3, layerConditions), adjacentSlices);
-		adjacentSlices = BooleanGridList.intersections(slice(stl, layer-1, layerConditions), adjacentSlices);
+		BooleanGridList justBelow = slice(stl, layer-1, layerConditions);
+		adjacentSlices = BooleanGridList.intersections(justBelow, adjacentSlices);
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer-2, layerConditions), adjacentSlices);
 		//adjacentSlices = BooleanGridList.intersections(slice(stl, layer-3, layerConditions), adjacentSlices);
 		BooleanGridList insides = null;
