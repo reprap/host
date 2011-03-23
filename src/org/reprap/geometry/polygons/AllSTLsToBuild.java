@@ -752,14 +752,17 @@ public class AllSTLsToBuild
 		{
 			insides = BooleanGridList.intersections(slice, adjacentSlices);
 			outsides = BooleanGridList.differences(slice, adjacentSlices);
-			outsides = outsides.offset(layerConditions, false, -1);
+			outsides = outsides.offset(layerConditions, false, -2);
 			outsides = BooleanGridList.intersections(outsides, slice);				
 		}
 			
 		outsides = outsides.offset(layerConditions, false, 1);
 		
 		if(insides != null)
+		{
 			insides = insides.offset(layerConditions, false, 1);
+			insides = BooleanGridList.differences(insides, outsides);
+		}
 		RrPolygonList hatchedPolygons = outsides.hatch(layerConditions, true);
 			
 		if(insides != null)
