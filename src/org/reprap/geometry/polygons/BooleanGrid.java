@@ -297,12 +297,6 @@ public class BooleanGrid
 		 */
 		private boolean closed;
 		
-//		protected void finalize() throws Throwable
-//		{
-//			points = null;
-//			super.finalize();
-//		}
-		
 		public iPolygon(boolean c)
 		{
 			points = new ArrayList<iPoint>();
@@ -1662,39 +1656,49 @@ public class BooleanGrid
 		return op;		
 	}
 	
-//	/**
-//	 * Recursive flood-fill search of solid pixels p and its neighbours to find an
-//	 * unvisited edge pixel.
-//	 * @param p
-//	 * @param depth
-//	 * @return
-//	 */
-//	private iPoint searchNearby(iPoint p, int depth)
-//	{
-//		//System.out.println("point: " + p.toString() + ", depth: " + depth +
-//		//		", edge:" + isSloppyEdgePixel(p) + ", vis: " + vGet(p) + ", solid: " + get(p));
-//		if(depth > searchDepth)
-//			return null;
-//		if(!vGet(p) || depth == 0)
-//		{
-//			if(isEdgePixel(p) && depth > 0)
-//				return p;
-//
-//			if(get(p))
-//			{
-//				vSet(p, true);
-//				for(int i = 0; i < 8; i++)
-//				{
-//					iPoint q = p.add(neighbour[i]);
-//					iPoint r = searchNearby(q, depth + 1);
-//					if(r != null)
-//						return r;
-//				}
-//			}
-//		}
-//
-//		return null;
-//	}
+	/**
+	 * Recursive flood-fill of solid pixels from p to return a BooleanGrid of 
+	 * just the shape connected to that pixel.
+	 * @param p
+	 * @return
+	 */
+	private void floodCopy_r(iPoint p, BooleanGrid newGrid)
+	{
+		if(newGrid.vGet(p))
+			return;
+		if(!this.get(p))
+			return;
+		
+		newGrid.set(p, true);
+		newGrid.vSet(p, true);
+		
+		for(int i = 0; i < 8; i++)
+		{
+			iPoint q = p.add(neighbour[i]);
+			floodCopy_r(q, newGrid);
+		}		
+	}
+	
+	/**
+	 * Recursive flood-fill of solid pixels from p to return a BooleanGrid of 
+	 * just the shape connected to that pixel.
+	 * @param p
+	 * @return
+	 */
+	public BooleanGrid floodCopy(Rr2Point pp)
+	{
+		iPoint p = new iPoint(pp);
+		if(!this.inside(p))
+			return nothingThere;
+		BooleanGrid result = new BooleanGrid();
+		result.att = this.att;
+		result.visited = null;
+		result.rec= new iRectangle(this.rec);
+		result.bits = new BitSet(result.rec.size.x*result.rec.size.y);
+		floodCopy_r(p, result);
+		result.resetVisited();
+		return result;
+	}
 	
 	/**
 	 * Calculate the 4-bit marching squares value for a point
@@ -1724,64 +1728,6 @@ public class BooleanGrid
 	private iPolygonList iAllPerimitersRaw()
 	{
 		return marchAll();
-//		iPolygonList result = new iPolygonList();
-//		iPolygon ip;
-//		
-//		push("Computing edges... ");
-//		
-//		iPoint thisPoint;
-//		
-//		int i = findUnvisitedEdgeIndex(0);
-//		long d2;
-//		
-//		while(i >= 0)
-//		{
-//			ip = new iPolygon(true);
-//			thisPoint = pixel(i);
-//			int direction = -1;
-//			iPoint newPoint;
-//			while(thisPoint != null)
-//			{
-//				ip.add(thisPoint);
-//				vSet(thisPoint, true);
-//				newPoint = findUnvisitedNeighbourOnEdgeInDirection(thisPoint, direction);
-//				if(newPoint != null)
-//					direction = neighbourIndex(newPoint.sub(thisPoint)); // Try to go in the same direction
-//				else
-//				{
-//					d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
-//					if(d2 > 2)
-//					{
-//						//printNearby(thisPoint);
-//						newPoint = searchNearby(thisPoint, 0);
-//						if(newPoint != null)
-//						{
-//							iPoint dir = newPoint.sub(thisPoint);
-//							//System.out.println("Found nearby sq dist = " + dir.magnitude2());
-//							direction = directionToNeighbour(new Rr2Point(dir.x, dir.y));
-//						}
-//					}
-//				}
-//				thisPoint = newPoint;
-//			}
-//
-//			d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
-//			if(d2 > searchDepth*searchDepth)
-//			{
-//				Debug.e("BooleanGrid.iAllPerimitersRaw(): unjoined ends:" + d2);
-//				//printNearby(ip.point(0), 6);
-//				//printNearby(ip.point(ip.size() - 1), 6);
-//			}
-//
-//			if(ip.size() >= 3)
-//				result.add(ip);
-//			
-//			i = findUnvisitedEdgeIndex(i + 1);
-//		}
-//		
-//		resetVisited();
-//		pop();
-//		return result;
 	}
 	
 	/**

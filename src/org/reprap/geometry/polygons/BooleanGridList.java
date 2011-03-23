@@ -195,12 +195,14 @@ public class BooleanGridList
 		/**
 		 * Work out all the open polygons forming a set of infill hatches.  If surface
 		 * is true, these polygons are on the outside (top or bottom).  If it's false
-		 * they are in the interior.
+		 * they are in the interior.  If overrideDirection is not null, that is used as the hatch
+		 * direction.  Otherwise the hatch is provided by layerConditions.
 		 * @param layerConditions
 		 * @param surface
+		 * @param overrideDirection
 		 * @return
 		 */
-		public RrPolygonList hatch(LayerRules layerConditions, boolean surface) //, Rr2Point startNearHere)
+		public RrPolygonList hatch(LayerRules layerConditions, boolean surface, RrHalfPlane overrideDirection) //, Rr2Point startNearHere)
 		{
 			RrPolygonList result = new RrPolygonList();
 			boolean foundation = layerConditions.getLayingSupport();
@@ -222,7 +224,13 @@ public class BooleanGridList
 				} else
 					ei = e;
 				if(ei != null)
-					result.add(get(i).hatch(layerConditions.getHatchDirection(ei), layerConditions.getHatchWidth(ei), att)); //, startNearHere)); 
+				{
+					RrHalfPlane hatchLine = layerConditions.getHatchDirection(ei);
+					if(overrideDirection != null)
+						hatchLine = overrideDirection;
+					result.add(get(i).hatch(hatchLine, layerConditions.getHatchWidth(ei), att)); 
+					
+				}
 			}	
 			return result;
 		}
@@ -361,17 +369,37 @@ public class BooleanGridList
 			return result.unionDuplicates();
 		}
 		
+		/**
+		 * Return only those elements in the list that have no support material specified
+		 * @return
+		 */
+		public BooleanGridList cullNonNull()
+		{
+			BooleanGridList result = new BooleanGridList();
+
+			for(int i = 0; i < size(); i++)
+				if(get(i).attribute().getExtruder().getSupportExtruderNumber() < 0)
+					result.add(get(i));
+			
+			return result;
+		}
+		
 		
 		/**
 		 * Return a list of differences between the entries in a and b.
 		 * Only pairs with the same attribute are subtracted.  If an element
 		 * of a has no corresponding element in b, then an entry equal to a is returned
 		 * for that.
+		 * 
+		 * If onlyNullSupport is true then only entries in a with support equal to null are
+		 * considered.  Otherwise ordinary set difference is returned.
+		 * 
 		 * @param a
 		 * @param b
+		 * @param onlyNullSupport
 		 * @return
 		 */
-		public static BooleanGridList differences(BooleanGridList a, BooleanGridList b)
+		public static BooleanGridList differences(BooleanGridList a, BooleanGridList b, boolean onlyNullSupport)
 		{
 			BooleanGridList result = new BooleanGridList();
 			
@@ -381,6 +409,10 @@ public class BooleanGridList
 				return result;
 			if(a.size() <= 0)
 				return result;
+			
+			if(onlyNullSupport)
+				a = a.cullNonNull();
+			
 			if(b == null)
 				return a;
 			if(b.size() <= 0)

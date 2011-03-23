@@ -709,7 +709,28 @@ public class AllSTLsToBuild
 		
 		// Finally compute the support hatch.
 		
-		return support.hatch(layerConditions, false); //, null);
+		return support.hatch(layerConditions, false, null);
+	}
+	
+	/**
+	 * Compute the bridge infill for unsupported polygons for a slice.  This is very heuristic...
+	 * @param unSupported
+	 * @param slice
+	 * @param layerConditions
+	 * @return
+	 */
+	public RrPolygonList bridges(BooleanGridList unSupported, BooleanGridList lands, LayerRules layerConditions)
+	{
+		RrPolygonList result = new RrPolygonList();
+		
+		RrPolygonList bridgePolygons = unSupported.borders();
+		
+		for(int i = 0; i < bridgePolygons.size(); i++)
+		{
+			RrPolygon bridgePolygon = bridgePolygons.polygon(i);
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -749,14 +770,16 @@ public class AllSTLsToBuild
 		
 		BooleanGridList nothingAbove = slice;
 		BooleanGridList unSupported = null;
+		BooleanGridList lands = null;
 		if(adjacentSlices != null && layerConditions.getModelLayer() > 1)
 		{
 			insides = BooleanGridList.intersections(slice, adjacentSlices);
-			nothingAbove = BooleanGridList.differences(slice, adjacentSlices);
-			unSupported = BooleanGridList.differences(nothingAbove, supportBeneath);
-			nothingAbove = BooleanGridList.differences(nothingAbove, unSupported);
+			nothingAbove = BooleanGridList.differences(slice, adjacentSlices, false);
+			unSupported = BooleanGridList.differences(nothingAbove, supportBeneath, true);
+			nothingAbove = BooleanGridList.differences(nothingAbove, unSupported, false);
 			nothingAbove = nothingAbove.offset(layerConditions, false, -2);
 			nothingAbove = BooleanGridList.intersections(nothingAbove, slice);
+			//lands = BooleanGridList.intersections(nothingAbove, insides);
 			unSupported = unSupported.offset(layerConditions, false, -2); // -2 indents us a little into the inside volume
 			unSupported = BooleanGridList.intersections(unSupported, slice);
 		}
@@ -768,15 +791,17 @@ public class AllSTLsToBuild
 		if(insides != null)
 		{
 			insides = insides.offset(layerConditions, false, 1);
-			insides = BooleanGridList.differences(insides, nothingAbove);  // Don't overplot the indented area
-			insides = BooleanGridList.differences(insides, unSupported);
+			lands = BooleanGridList.intersections(unSupported, insides);
+			insides = BooleanGridList.differences(insides, nothingAbove, false);  // Don't overplot the indented area
+			insides = BooleanGridList.differences(insides, unSupported, false);
 		}
-		RrPolygonList hatchedPolygons = nothingAbove.hatch(layerConditions, true);
-		if(unSupported != null)
-			hatchedPolygons.add(unSupported.hatch(layerConditions, true));
+		
+		RrPolygonList hatchedPolygons = nothingAbove.hatch(layerConditions, true, null);
+		if(unSupported != null && lands != null)
+			hatchedPolygons.add(bridges(unSupported, lands, layerConditions));
 			
 		if(insides != null)
-			hatchedPolygons.add(insides.hatch(layerConditions, false));
+			hatchedPolygons.add(insides.hatch(layerConditions, false, null));
 		
 		return hatchedPolygons;
 	}
