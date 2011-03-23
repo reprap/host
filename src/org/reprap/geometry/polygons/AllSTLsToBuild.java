@@ -736,8 +736,8 @@ public class AllSTLsToBuild
 		BooleanGridList adjacentSlices = slice(stl, layer+1, layerConditions);
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer+2, layerConditions), adjacentSlices);
 		//adjacentSlices = BooleanGridList.intersections(slice(stl, layer+3, layerConditions), adjacentSlices);
-		BooleanGridList justBelow = slice(stl, layer-1, layerConditions);
-		adjacentSlices = BooleanGridList.intersections(justBelow, adjacentSlices);
+		BooleanGridList supportBeneath = slice(stl, layer-1, layerConditions);
+		adjacentSlices = BooleanGridList.intersections(supportBeneath, adjacentSlices);
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer-2, layerConditions), adjacentSlices);
 		//adjacentSlices = BooleanGridList.intersections(slice(stl, layer-3, layerConditions), adjacentSlices);
 		BooleanGridList insides = null;
@@ -747,23 +747,33 @@ public class AllSTLsToBuild
 		// We grow the outsides just into the insides (nowhere else) to
 		// ensure that they go a little way into the inside infill.
 		
-		BooleanGridList outsides = slice;
+		BooleanGridList nothingAbove = slice;
+		BooleanGridList unSupported = null;
 		if(adjacentSlices != null && layerConditions.getModelLayer() > 1)
 		{
 			insides = BooleanGridList.intersections(slice, adjacentSlices);
-			outsides = BooleanGridList.differences(slice, adjacentSlices);
-			outsides = outsides.offset(layerConditions, false, -2);
-			outsides = BooleanGridList.intersections(outsides, slice);				
+			nothingAbove = BooleanGridList.differences(slice, adjacentSlices);
+			unSupported = BooleanGridList.differences(nothingAbove, supportBeneath);
+			nothingAbove = BooleanGridList.differences(nothingAbove, unSupported);
+			nothingAbove = nothingAbove.offset(layerConditions, false, -2);
+			nothingAbove = BooleanGridList.intersections(nothingAbove, slice);
+			unSupported = unSupported.offset(layerConditions, false, -2); // -2 indents us a little into the inside volume
+			unSupported = BooleanGridList.intersections(unSupported, slice);
 		}
 			
-		outsides = outsides.offset(layerConditions, false, 1);
+		nothingAbove = nothingAbove.offset(layerConditions, false, 1);
+		if(unSupported != null)
+			unSupported = unSupported.offset(layerConditions, false, 1);
 		
 		if(insides != null)
 		{
 			insides = insides.offset(layerConditions, false, 1);
-			insides = BooleanGridList.differences(insides, outsides);
+			insides = BooleanGridList.differences(insides, nothingAbove);  // Don't overplot the indented area
+			insides = BooleanGridList.differences(insides, unSupported);
 		}
-		RrPolygonList hatchedPolygons = outsides.hatch(layerConditions, true);
+		RrPolygonList hatchedPolygons = nothingAbove.hatch(layerConditions, true);
+		if(unSupported != null)
+			hatchedPolygons.add(unSupported.hatch(layerConditions, true));
 			
 		if(insides != null)
 			hatchedPolygons.add(insides.hatch(layerConditions, false));
