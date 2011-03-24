@@ -771,6 +771,27 @@ public class RrPolygon
 	}
 	
 	/**
+	 * Return the mean edge length
+	 * @return
+	 */
+	public double meanEdge()
+	{
+		double result = 0;
+		
+		for(int i = 1; i < size() - 1; i++)
+			result = result + Rr2Point.d(point(i), point(i+1));
+		
+		if(closed)
+		{
+			result = result + Rr2Point.d(point(0), point(size()-1));
+			return result/size();
+		}
+		
+		return
+			result/(size() - 1);	
+	}
+	
+	/**
 	 * Backtrack a given distance, inserting a new point there and set extrudeEnd to it.
 	 * If drawEnd is already set, backtrack from that.
 	 * @param distance to backtrack

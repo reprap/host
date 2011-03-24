@@ -713,6 +713,37 @@ public class AllSTLsToBuild
 	}
 	
 	/**
+	 * This finds an individual land in landPattern
+	 * @param landPattern
+	 * @return
+	 */
+	private BooleanGrid findLand(BooleanGrid landPattern)
+	{
+		Rr2Point seed = landPattern.findSeed();
+		if(seed == null)
+			return null;
+		
+		return landPattern.floodCopy(seed);
+	}
+	
+	/**
+	 * This finds the bridges that cover cen.  It assumes that there is only one material at one point in space...
+	 * @param unSupported
+	 * @param cen1
+	 * @return
+	 */
+	int findBridges(BooleanGridList unSupported, Rr2Point cen)
+	{
+		for(int i = 0; i < unSupported.size(); i++)
+		{
+			BooleanGrid bridges = unSupported.get(i);
+			if(bridges.get(cen))
+				return i;
+		}
+		return -1;
+	}
+	
+	/**
 	 * Compute the bridge infill for unsupported polygons for a slice.  This is very heuristic...
 	 * @param unSupported
 	 * @param slice
@@ -723,11 +754,103 @@ public class AllSTLsToBuild
 	{
 		RrPolygonList result = new RrPolygonList();
 		
-		RrPolygonList bridgePolygons = unSupported.borders();
-		
-		for(int i = 0; i < bridgePolygons.size(); i++)
+		for(int i = 0; i < lands.size(); i++)
 		{
-			RrPolygon bridgePolygon = bridgePolygons.polygon(i);
+			BooleanGrid landPattern = lands.get(i);
+			BooleanGrid land1;
+			
+			// Find a land
+			
+			while((land1 = findLand(landPattern)) != null)
+			{
+				// Find the middle of the land
+				
+				Rr2Point cen1 = land1.findCentroid();
+				if(cen1 == null)
+				{
+					Debug.e("AllSTLsToBuild.bridges(): First land found with no centroid!");
+					return result;
+				}
+				
+				// Wipe this land from the land pattern
+				
+				land1.offset(0.5); // Slight hack...
+				landPattern = BooleanGrid.difference(landPattern, land1);
+				
+				// Find the bridge that goes with the land
+				
+				int bridgesIndex = findBridges(unSupported, cen1);
+				if(bridgesIndex < 0)
+				{
+					Debug.e("AllSTLsToBuild.bridges(): Land found with no corresponding bridge!");
+					return result;
+				}
+				BooleanGrid bridges = unSupported.get(bridgesIndex);
+				
+				// The bridge must cover the land too
+				
+				BooleanGrid bridge = bridges.floodCopy(cen1);
+				if(bridge == null)
+					continue;
+				
+				// Find the other land (the first has been wiped)
+				
+				BooleanGrid land2 = BooleanGrid.intersection(bridge, landPattern);
+				
+				// Find the middle of this land
+				
+				Rr2Point cen2 = land2.findCentroid();
+				if(cen2 == null)
+				{
+					Debug.e("AllSTLsToBuild.bridges(): Second land found with no centroid!");
+					return result;
+				}
+				
+				// Wipe this land from the land pattern
+				
+				land2.offset(0.5); // Slight hack...
+				landPattern = BooleanGrid.difference(landPattern, land2);
+				
+				// (Roughly) what direction does the bridge go in?
+				
+				Rr2Point centroidDirection = Rr2Point.sub(cen2, cen1).norm();
+				Rr2Point bridgeDirection = centroidDirection;
+				
+				// Fine the edge of the bridge that is nearest parallel to that, and use that as the fill direction
+				
+				double spMax = Double.NEGATIVE_INFINITY;
+				double sp;
+				RrPolygonList bridgeOutline = bridge.allPerimiters(bridge.attribute());
+				for(int pol = 0; pol < bridgeOutline.size(); pol++)
+				{
+					RrPolygon polygon = bridgeOutline.polygon(i);
+					double tooSmall = polygon.meanEdge();
+					for(int vertex1 = 0; vertex1 < polygon.size(); vertex1++)
+					{
+						int vertex2 = vertex1+1;
+						if(vertex2 >= polygon.size()) // We know the polygon must be closed...
+							vertex2 = 0;
+						Rr2Point edge = Rr2Point.sub(polygon.point(vertex2), polygon.point(vertex1));
+						if(edge.mod() > tooSmall)
+						{
+							if((sp = Math.abs(Rr2Point.mul(edge, centroidDirection))) > spMax)
+							{
+								spMax = sp;
+								bridgeDirection = edge;
+							}
+						}
+					}
+				}
+				
+				// Build the bridge
+				
+				result.add(bridge.hatch(new RrHalfPlane(new Rr2Point(0,0), bridgeDirection), 
+						bridge.attribute().getExtruder().getExtrusionInfillWidth(), 
+						bridge.attribute()));
+				
+				// We shouldn't need to remove the bridge from the bridge patterns; no other lands should
+				// intersect it.
+			}
 		}
 		
 		return result;

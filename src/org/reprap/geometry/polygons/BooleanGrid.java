@@ -1235,6 +1235,71 @@ public class BooleanGrid
 	}
 	
 	/**
+	 * Find a set point
+	 * @return
+	 */
+	private iPoint findSeed_i()
+	{
+		for(int x = 0; x < rec.size.x; x++)
+			for(int y = 0; y < rec.size.y; y++)
+			{
+				iPoint p = new iPoint(x, y);
+				if(get(p))
+					return p;
+			}
+		return null;
+	}
+	
+	/**
+	 * Find a set point
+	 * @return
+	 */
+	public Rr2Point findSeed()
+	{
+		iPoint p = findSeed_i();
+		if(p == null)
+			return null;
+		else
+			return p.realPoint();
+	}
+	
+	/**
+	 * Find the centroid of the shape(s)
+	 * @return
+	 */
+	private iPoint findCentroid_i()
+	{
+		iPoint sum = new iPoint(0,0);
+		int points = 0;
+		for(int x = 0; x < rec.size.x; x++)
+			for(int y = 0; y < rec.size.y; y++)
+			{
+				iPoint p = new iPoint(x, y);
+				if(get(p))
+				{
+					sum = sum.add(p);
+					points++;
+				}
+			}
+		if(points == 0)
+			return null;
+		return new iPoint(sum.x/points, sum.y/points);
+	}
+	
+	/**
+	 * Find the centroid of the shape(s)
+	 * @return
+	 */
+	public Rr2Point findCentroid()
+	{
+		iPoint p = findCentroid_i();
+		if(p == null)
+			return null;
+		else
+			return p.realPoint();
+	}
+	
+	/**
 	 * Generate the entire image from a CSG experession recursively
 	 * using a quad tree.
 	 * @param ipsw
@@ -1656,28 +1721,24 @@ public class BooleanGrid
 		return op;		
 	}
 	
-	/**
-	 * Recursive flood-fill of solid pixels from p to return a BooleanGrid of 
-	 * just the shape connected to that pixel.
-	 * @param p
-	 * @return
-	 */
-	private void floodCopy_r(iPoint p, BooleanGrid newGrid)
-	{
-		if(newGrid.vGet(p))
-			return;
-		if(!this.get(p))
-			return;
-		
-		newGrid.set(p, true);
-		newGrid.vSet(p, true);
-		
-		for(int i = 0; i < 8; i++)
-		{
-			iPoint q = p.add(neighbour[i]);
-			floodCopy_r(q, newGrid);
-		}		
-	}
+//	/**
+//	 * Recursive flood-fill of solid pixels from p to return a BooleanGrid of 
+//	 * just the shape connected to that pixel.
+//	 * @param p
+//	 * @return
+//	 */
+//	private void floodCopy_r(iPoint p, BooleanGrid newGrid)
+//	{
+//		if(!this.get(p) || newGrid.get(p))
+//			return;
+//		
+//		newGrid.set(p, true);
+//		
+//		floodCopy_r(p.add(neighbour[1]), newGrid);
+//		floodCopy_r(p.add(neighbour[3]), newGrid);
+//		floodCopy_r(p.add(neighbour[5]), newGrid);
+//		floodCopy_r(p.add(neighbour[7]), newGrid);
+//	}
 	
 	/**
 	 * Recursive flood-fill of solid pixels from p to return a BooleanGrid of 
@@ -1688,15 +1749,46 @@ public class BooleanGrid
 	public BooleanGrid floodCopy(Rr2Point pp)
 	{
 		iPoint p = new iPoint(pp);
-		if(!this.inside(p))
+		if(!this.inside(p) || !this.get(p))
 			return nothingThere;
 		BooleanGrid result = new BooleanGrid();
 		result.att = this.att;
 		result.visited = null;
 		result.rec= new iRectangle(this.rec);
 		result.bits = new BitSet(result.rec.size.x*result.rec.size.y);
-		floodCopy_r(p, result);
-		result.resetVisited();
+		
+		// We implement our own floodfill stack, rather than using recursion to
+		// avoid having to specify a big Java stack just for this one function.
+		
+		int top = 100000;
+		iPoint[] stack = new iPoint[top];
+		int sp = 0;
+		stack[sp] = p;
+		iPoint q;
+		
+		while(sp > -1)
+		{
+			p = stack[sp];
+			sp--;
+
+			result.set(p, true);
+			
+			for(int i = 1; i < 8; i = i+2)
+			{
+				q = p.add(neighbour[i]);
+				if(this.get(q) && !result.get(q))
+				{
+					sp++;
+					if(sp >= top)
+					{
+						Debug.e("BooleanGrid.floodCopy(): stack overflow!");
+						return result;
+					}
+					stack[sp] = q;
+				}
+			}
+		}
+		
 		return result;
 	}
 	
