@@ -587,5 +587,19 @@ public interface Extruder
 	 * @return
 	 */
 	public double getOddHatchDirection();
+	   /**
+     * Get the extrude ratio
+     * @return
+     */
+    public double getExtrudeRatio();
+
+    
+    /**
+     * Set the extrude ratio.  Only to be used if you know what you
+     * are doing.  It's a good idea to set it back when you've finished...
+     * @param er
+     */
+    public void setExtrudeRatio(double er);
+	
 	
 }

@@ -1279,6 +1279,25 @@ public abstract class GenericExtruder implements Extruder
     		return 0;
     	return extrudeRatio*distance;
     }
+    
+    /**
+     * Get the extrude ratio
+     * @return
+     */
+    public double getExtrudeRatio()
+    {
+    	return extrudeRatio;
+    }
+    
+    /**
+     * Set the extrude ratio.  Only to be used if you know what you
+     * are doing.  It's a good idea to set it back when you've finished...
+     * @param er
+     */
+    public void setExtrudeRatio(double er)
+    {
+    	extrudeRatio = er;
+    }
 	
     /**
      * Find out if we're working in 5D

@@ -76,6 +76,7 @@ import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.Extruder;
 import org.reprap.geometry.LayerRules;
+import org.reprap.geometry.polygons.PolygonAttributes;
 import org.reprap.machines.VelocityProfile;
 import org.reprap.utilities.Debug;
 
@@ -109,6 +110,9 @@ public class RrPolygon
 	 */
 	private Attributes att = null;
 	
+	
+	private PolygonAttributes pa = null;
+	
 	/**
 	 * The minimum enclosing X-Y box round the polygon
 	 */
@@ -132,51 +136,39 @@ public class RrPolygon
 	/**
 	 * Destroy me and all that I point to
 	 */
-	public void destroy() 
-	{
-		if(beingDestroyed) // Prevent infinite loop
-			return;
-		beingDestroyed = true;
-		
-		if(speeds != null)
-		{
-			for(int i = 0; i < size(); i++)
-				speeds.set(i, null);
-		}
-		speeds = null;
-		
-		if(points != null)
-		{
-			for(int i = 0; i < size(); i++)
-			{
-				points.get(i).destroy();
-				points.set(i, null);
-			}
-		}
-		points = null;
-		
-		if(box != null)
-			box.destroy();
-		box = null;
-		
-		// Don't destroy the attribute - that may still be needed
-		
-		//if(att != null)
-		//	att.destroy();
-		att = null;
-		beingDestroyed = false;
-	}
-	
-	/**
-	 * Destroy just me
-	 */
-//	protected void finalize() throws Throwable
+//	public void destroy() 
 //	{
-//		points = null;
+//		if(beingDestroyed) // Prevent infinite loop
+//			return;
+//		beingDestroyed = true;
+//		
+//		if(speeds != null)
+//		{
+//			for(int i = 0; i < size(); i++)
+//				speeds.set(i, null);
+//		}
 //		speeds = null;
-//		att = null;
+//		
+//		if(points != null)
+//		{
+//			for(int i = 0; i < size(); i++)
+//			{
+//				points.get(i).destroy();
+//				points.set(i, null);
+//			}
+//		}
+//		points = null;
+//		
+//		if(box != null)
+//			box.destroy();
 //		box = null;
-//		super.finalize();
+//		
+//		// Don't destroy the attribute - that may still be needed
+//		
+//		//if(att != null)
+//		//	att.destroy();
+//		att = null;
+//		beingDestroyed = false;
 //	}
 	
 	
@@ -194,6 +186,7 @@ public class RrPolygon
 		closed = c;
 		extrudeEnd = -1;
 		valveEnd = -1;
+		pa = null;
 	}
 	
 	/**
@@ -205,6 +198,15 @@ public class RrPolygon
 	{
 		//return new Rr2Point(points.get(i));
 		return points.get(i);
+	}
+	
+	/**
+	 * Get the polygon attribute (may be null)
+	 * @return
+	 */
+	public PolygonAttributes getPolygonAttribute()
+	{
+		return pa;
 	}
 	
 	/**
@@ -288,7 +290,8 @@ public class RrPolygon
 	}
 	
 	/**
-	 * Deep copy - NB: attributes _not_ deep copied
+	 * Deep copy - NB: Attributes _not_ deep copied, but
+	 * PolygonAttribute are.
 	 * @param p
 	 */
 	public RrPolygon(RrPolygon p)
@@ -305,6 +308,19 @@ public class RrPolygon
 		closed = p.closed;
 		extrudeEnd = p.extrudeEnd;
 		valveEnd  = p.valveEnd;
+		if(p.pa != null)
+			pa = new PolygonAttributes(p.pa);
+		else
+			pa = null;
+	}
+	
+	/**
+	 * Set the polygon attribute
+	 * @return
+	 */
+	public void setPolygonAttribute(PolygonAttributes p)
+	{
+		pa = p;
 	}
 	
 	/**

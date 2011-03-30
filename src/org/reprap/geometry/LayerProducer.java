@@ -15,6 +15,7 @@ import org.reprap.Preferences;
 import org.reprap.geometry.polygons.Rr2Point;
 //import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.geometry.polygons.RrPolygon;
+import org.reprap.geometry.polygons.PolygonAttributes;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.utilities.Debug;
@@ -350,6 +351,7 @@ public class LayerProducer {
 	private void plot(RrPolygon p, boolean firstOneInLayer) throws Exception
 	{
 		Attributes att = p.getAttributes();
+		PolygonAttributes pAtt = p.getPolygonAttribute();
 		Printer printer = layerConditions.getPrinter();
 		double outlineFeedrate = att.getExtruder().getOutlineFeedrate();
 		double infillFeedrate = att.getExtruder().getInfillFeedrate();
@@ -434,6 +436,11 @@ public class LayerProducer {
 		boolean valveOff = false;
 		boolean oldexoff;
 		
+		double oldFeedFactor = att.getExtruder().getExtrudeRatio();
+		
+		if(pAtt != null)
+			att.getExtruder().setExtrudeRatio(oldFeedFactor*pAtt.getBridgeThin());
+		
 		for(int i = 1; i < p.size(); i++)
 		{
 			Rr2Point next = p.point((i+1)%p.size());
@@ -457,6 +464,9 @@ public class LayerProducer {
 				printer.printEndReverse();
 		}
 
+		// Restore sanity
+		
+		att.getExtruder().setExtrudeRatio(oldFeedFactor);
 		
 		if(p.isClosed())
 			move(p.point(0), p.point(0), false, false, true);

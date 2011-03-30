@@ -3,6 +3,7 @@ package org.reprap.geometry.polygons;
 import java.util.List;
 import java.util.ArrayList;
 import org.reprap.geometry.LayerRules;
+import org.reprap.geometry.polygons.PolygonAttributes;
 import org.reprap.gui.STLObject;
 import org.reprap.Attributes;
 import org.reprap.Extruder;
@@ -802,56 +803,68 @@ public class AllSTLsToBuild
 				Rr2Point cen2 = land2.findCentroid();
 				if(cen2 == null)
 				{
-					Debug.e("AllSTLsToBuild.bridges(): Second land found with no centroid!");
-					return result;
-				}
-				
-				// Wipe this land from the land pattern
-				
-				land2.offset(0.5); // Slight hack...
-				landPattern = BooleanGrid.difference(landPattern, land2);
-				
-				// (Roughly) what direction does the bridge go in?
-				
-				Rr2Point centroidDirection = Rr2Point.sub(cen2, cen1).norm();
-				Rr2Point bridgeDirection = centroidDirection;
-				
-				// Fine the edge of the bridge that is nearest parallel to that, and use that as the fill direction
-				
-				double spMax = Double.NEGATIVE_INFINITY;
-				double sp;
-				RrPolygonList bridgeOutline = bridge.allPerimiters(bridge.attribute());
-				for(int pol = 0; pol < bridgeOutline.size(); pol++)
+					Debug.d("AllSTLsToBuild.bridges(): Second land found with no centroid!");
+					
+					// No second land implies a ring of support - just infill it.
+					
+					result.add(bridge.hatch(layerConditions.getHatchDirection(bridge.attribute().getExtruder()), 
+							bridge.attribute().getExtruder().getExtrusionInfillWidth(), 
+							bridge.attribute()));
+				} else
 				{
-					RrPolygon polygon = bridgeOutline.polygon(i);
-					double tooSmall = polygon.meanEdge();
-					for(int vertex1 = 0; vertex1 < polygon.size(); vertex1++)
+
+					// Wipe this land from the land pattern
+
+					land2.offset(0.5); // Slight hack...
+					landPattern = BooleanGrid.difference(landPattern, land2);
+
+					// (Roughly) what direction does the bridge go in?
+
+					Rr2Point centroidDirection = Rr2Point.sub(cen2, cen1).norm();
+					Rr2Point bridgeDirection = centroidDirection;
+
+					// Fine the edge of the bridge that is nearest parallel to that, and use that as the fill direction
+
+					double spMax = Double.NEGATIVE_INFINITY;
+					double sp;
+					RrPolygonList bridgeOutline = bridge.allPerimiters(bridge.attribute());
+					for(int pol = 0; pol < bridgeOutline.size(); pol++)
 					{
-						int vertex2 = vertex1+1;
-						if(vertex2 >= polygon.size()) // We know the polygon must be closed...
-							vertex2 = 0;
-						Rr2Point edge = Rr2Point.sub(polygon.point(vertex2), polygon.point(vertex1));
-						if(edge.mod() > tooSmall)
+						RrPolygon polygon = bridgeOutline.polygon(i);
+						double tooSmall = polygon.meanEdge();
+						for(int vertex1 = 0; vertex1 < polygon.size(); vertex1++)
 						{
-							if((sp = Math.abs(Rr2Point.mul(edge, centroidDirection))) > spMax)
+							int vertex2 = vertex1+1;
+							if(vertex2 >= polygon.size()) // We know the polygon must be closed...
+								vertex2 = 0;
+							Rr2Point edge = Rr2Point.sub(polygon.point(vertex2), polygon.point(vertex1));
+							if(edge.mod() > tooSmall)
 							{
-								spMax = sp;
-								bridgeDirection = edge;
+								if((sp = Math.abs(Rr2Point.mul(edge, centroidDirection))) > spMax)
+								{
+									spMax = sp;
+									bridgeDirection = edge;
+								}
 							}
 						}
 					}
+
+					// Build the bridge
+
+					result.add(bridge.hatch(new RrHalfPlane(new Rr2Point(0,0), bridgeDirection), 
+							bridge.attribute().getExtruder().getExtrusionInfillWidth(), 
+							bridge.attribute()));
+
+					// We shouldn't need to remove the bridge from the bridge patterns; no other lands should
+					// intersect it.
 				}
-				
-				// Build the bridge
-				
-				result.add(bridge.hatch(new RrHalfPlane(new Rr2Point(0,0), bridgeDirection), 
-						bridge.attribute().getExtruder().getExtrusionInfillWidth(), 
-						bridge.attribute()));
-				
-				// We shouldn't need to remove the bridge from the bridge patterns; no other lands should
-				// intersect it.
 			}
 		}
+		
+//		PolygonAttributes pa = new PolygonAttributes();
+//		pa.setBridgeThin(0.5); // Test value - needs to be an extruder parameter
+//		for(int i = 0; i < result.size(); i++)
+//			result.polygon(i).setPolygonAttribute(pa);
 		
 		return result;
 	}

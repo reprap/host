@@ -455,38 +455,30 @@ public class RrPolygonList
 	 */
 	private boolean beingDestroyed = false;
 	
-	/**
-	 * Destroy me and all that I point to
-	 */
-	public void destroy() 
-	{
-		if(beingDestroyed) // Prevent infinite loop
-			return;
-		beingDestroyed = true;
-		if(polygons != null)
-		{
-			for(int i = 0; i < size(); i++)
-			{
-				polygons.get(i).destroy();
-				polygons.set(i,null);
-			}
-			polygons = null;
-		}
-		if(box != null)
-			box.destroy();
-		box = null;
-		beingDestroyed = false;
-	}
-	
-	/**
-	 * Destroy just me
-	 */
-//	protected void finalize() throws Throwable
+//	/**
+//	 * Destroy me and all that I point to
+//	 */
+//	public void destroy() 
 //	{
-//		polygons = null;
+//		if(beingDestroyed) // Prevent infinite loop
+//			return;
+//		beingDestroyed = true;
+//		if(polygons != null)
+//		{
+//			for(int i = 0; i < size(); i++)
+//			{
+//				polygons.get(i).destroy();
+//				polygons.set(i,null);
+//			}
+//			polygons = null;
+//		}
+//		if(box != null)
+//			box.destroy();
 //		box = null;
-//		super.finalize();
+//		beingDestroyed = false;
 //	}
+	
+
 	
 	/**
 	 * Empty constructor
