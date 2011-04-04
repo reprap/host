@@ -641,12 +641,28 @@ public abstract class GenericRepRap implements CartesianPrinter
 //		printTo(endX, endY, endZ, turnOff);
 //	}
 	
+	private void checkCoordinates(double x, double y, double z)
+	{
+		try
+		{
+		if(x > Preferences.loadGlobalDouble("WorkingX(mm)") || x < 0)
+			Debug.e("Attempt to move x to " + x + " which is outside [0, " + Preferences.loadGlobalDouble("WorkingX(mm)") + "]");
+		if(y > Preferences.loadGlobalDouble("WorkingY(mm)") || y < 0)
+			Debug.e("Attempt to move y to " + y + " which is outside [0, " + Preferences.loadGlobalDouble("WorkingY(mm)") + "]");
+		if(z > Preferences.loadGlobalDouble("WorkingZ(mm)") || z < 0)
+			Debug.e("Attempt to move z to " + z + " which is outside [0, " + Preferences.loadGlobalDouble("WorkingZ(mm)") + "]");
+		} catch (Exception e)
+		{}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#moveTo(double, double, double, boolean, boolean)
 	 */
 	public void moveTo(double x, double y, double z, double feedRate, boolean startUp, boolean endUp) throws ReprapException, IOException, Exception
 	{
 		if (isCancelled()) return;
+		
+		checkCoordinates(x, y, z);
 
 		totalDistanceMoved += segmentLength(x - currentX, y - currentY);
 		
