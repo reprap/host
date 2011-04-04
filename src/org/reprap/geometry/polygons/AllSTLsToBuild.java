@@ -776,7 +776,12 @@ public class AllSTLsToBuild
 				// Wipe this land from the land pattern
 				
 				land1.offset(0.5); // Slight hack...
-				landPattern = BooleanGrid.difference(landPattern, land1);
+				try {
+					landPattern = BooleanGrid.difference(landPattern, land1);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 				// Find the bridge that goes with the land
 				
@@ -796,7 +801,13 @@ public class AllSTLsToBuild
 				
 				// Find the other land (the first has been wiped)
 				
-				BooleanGrid land2 = BooleanGrid.intersection(bridge, landPattern);
+				BooleanGrid land2 = null;
+				try {
+					land2 = BooleanGrid.intersection(bridge, landPattern);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				
 				// Find the middle of this land
 				
@@ -816,7 +827,12 @@ public class AllSTLsToBuild
 					// Wipe this land from the land pattern
 
 					land2.offset(0.5); // Slight hack...
-					landPattern = BooleanGrid.difference(landPattern, land2);
+					try {
+						landPattern = BooleanGrid.difference(landPattern, land2);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
 					// (Roughly) what direction does the bridge go in?
 

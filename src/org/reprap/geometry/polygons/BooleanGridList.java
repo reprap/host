@@ -361,7 +361,7 @@ public class BooleanGridList
 				{
 					if(abg.attribute().getExtruder().getID() == b.attribute(j).getExtruder().getID())
 					{
-						result.add(BooleanGrid.intersection(abg, b.get(j)));	
+						result.add(BooleanGrid.intersection(abg, b.get(j)));
 						break;
 					}
 				}

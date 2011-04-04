@@ -2493,10 +2493,7 @@ public class BooleanGrid
 		Rr2Point org = big.ne();
 		
 		switch(quadPointing)
-		{
-		case 0:
-			break;
-			
+		{	
 		case 1:
 			org = big.nw();
 			break;
@@ -2508,9 +2505,10 @@ public class BooleanGrid
 		case 3:
 			org = big.se();
 			break;
-			
+		
+		case 0:
 		default:
-			Debug.e("BooleanGrid.hatch(): The atan2 function doesn't seem to work...");
+			break;
 		}
 		
 		RrHalfPlane hatcher = new 
@@ -2689,7 +2687,8 @@ public class BooleanGrid
 	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
 	{
 		if(d.att != e.att)
-			Debug.e("BooleanGrid.union(): attempt to union two bitmaps with different attributes.");
+			Debug.e("BooleanGrid.union(): attempt to union two bitmaps of different materials: " +
+					d.attribute().getMaterial() + " and " + e.attribute().getMaterial()	);
 		return union(d, e, d.att);
 	}
 	
@@ -2737,7 +2736,8 @@ public class BooleanGrid
 	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
 	{
 		if(d.att != e.att)
-			Debug.e("BooleanGrid.union(): attempt to union two bitmaps with different attributes.");
+			Debug.e("BooleanGrid.intersection(): attempt to intersect two bitmaps of different materials: " +
+					d.attribute().getMaterial() + " and " + e.attribute().getMaterial()	);
 		return intersection(d, e, d.att);
 	}
 	
@@ -2790,7 +2790,8 @@ public class BooleanGrid
 	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
 	{
 		if(d.att != e.att)
-			Debug.e("BooleanGrid.union(): attempt to union two bitmaps with different attributes.");
+			Debug.e("BooleanGrid.difference(): attempt to subtract two bitmaps of different materials: " +
+					d.attribute().getMaterial() + " and " + e.attribute().getMaterial()	);
 		return difference(d, e, d.att);
 	}
 }
