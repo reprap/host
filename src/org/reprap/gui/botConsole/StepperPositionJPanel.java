@@ -52,17 +52,17 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
         case 1:
                 axis = "X";
                 //motor = printer.getXMotor();
-                axisLength = 200; // TODO: Replace with Prefs when Java3D parameters work for small wv's.
+                axisLength = Preferences.loadGlobalDouble("WorkingX(mm)"); // TODO: Replace with Prefs when Java3D parameters work for small wv's.
                 break;
         case 2:
                 axis = "Y";
                 //motor = printer.getYMotor();
-                axisLength = 200; // TODO: Replace with Prefs when Java3D parameters work for small wv's.
+                axisLength = Preferences.loadGlobalDouble("WorkingY(mm)"); // TODO: Replace with Prefs when Java3D parameters work for small wv's.
                 break;
         case 3:
                 axis = "Z";
                 //motor = printer.getZMotor();
-                axisLength = 140; // TODO: Replace with Prefs when Java3D parameters work for small wv's.
+                axisLength = Preferences.loadGlobalDouble("WorkingZ(mm)"); // TODO: Replace with Prefs when Java3D parameters work for small wv's.
                 break;
         default:
                 axis = "X";
