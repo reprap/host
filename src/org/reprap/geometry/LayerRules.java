@@ -361,8 +361,9 @@ public class LayerRules
 		
 		if(topDown)
 		{
-			machineZ -= (sZ + addToStep);
+			//machineZ -= (sZ + addToStep);
 			machineLayer--;
+			machineZ = sZ*machineLayer + addToStep;
 			ld = getFoundationLayers() - getMachineLayer();
 			if(ld == 2)
 				addToStep = sZ*(1 - e.getSeparationFraction());
@@ -372,8 +373,9 @@ public class LayerRules
 				addToStep = 0;
 		} else
 		{
-			machineZ += (sZ + addToStep);
+			//machineZ += (sZ + addToStep);
 			machineLayer++;
+			machineZ = sZ*machineLayer + addToStep;
 			ld = getFoundationLayers() - getMachineLayer();
 			if(ld == 2)
 				addToStep = -sZ*(1 - e.getSeparationFraction());
@@ -404,13 +406,14 @@ public class LayerRules
 		double sZ = e.getExtrusionHeight();
 		if(topDown)
 		{
-			modelZ -= (sZ + addToStep);
-			modelLayer--;			
+			//modelZ -= (sZ + addToStep);
+			modelLayer--;
 		} else
 		{
-			modelZ += (sZ + addToStep);
+			//modelZ += (sZ + addToStep);
 			modelLayer++;
 		}
+		modelZ = modelLayer*sZ + addToStep;
 		addToStep = 0;
 		stepMachine(e);
 	}
