@@ -744,6 +744,15 @@ public class AllSTLsToBuild
 		return -1;
 	}
 	
+	private void nameAtt(BooleanGridList bgl, String name)
+	{
+		for(int i = 0; i < bgl.size(); i++)
+		{
+			Attributes a = bgl.get(i).attribute();
+			Debug.e(name + " has material: " + a.getMaterial());
+		}
+	}
+	
 	/**
 	 * Compute the bridge infill for unsupported polygons for a slice.  This is very heuristic...
 	 * @param unSupported
@@ -776,12 +785,8 @@ public class AllSTLsToBuild
 				// Wipe this land from the land pattern
 				
 				land1.offset(0.5); // Slight hack...
-				try {
-					landPattern = BooleanGrid.difference(landPattern, land1);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				
+				landPattern = BooleanGrid.difference(landPattern, land1);
 				
 				// Find the bridge that goes with the land
 				
@@ -802,12 +807,8 @@ public class AllSTLsToBuild
 				// Find the other land (the first has been wiped)
 				
 				BooleanGrid land2 = null;
-				try {
-					land2 = BooleanGrid.intersection(bridge, landPattern);
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+
+				land2 = BooleanGrid.intersection(bridge, landPattern);
 				
 				// Find the middle of this land
 				
@@ -827,12 +828,8 @@ public class AllSTLsToBuild
 					// Wipe this land from the land pattern
 
 					land2.offset(0.5); // Slight hack...
-					try {
-						landPattern = BooleanGrid.difference(landPattern, land2);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+
+					landPattern = BooleanGrid.difference(landPattern, land2);
 
 					// (Roughly) what direction does the bridge go in?
 
@@ -907,12 +904,15 @@ public class AllSTLsToBuild
 		// we are (at least partly) surface
 		
 		BooleanGridList adjacentSlices = slice(stl, layer+1, layerConditions);
+		BooleanGridList supportBeneath = null;
+
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer+2, layerConditions), adjacentSlices);
 		//adjacentSlices = BooleanGridList.intersections(slice(stl, layer+3, layerConditions), adjacentSlices);
-		BooleanGridList supportBeneath = slice(stl, layer-1, layerConditions);
+		supportBeneath = slice(stl, layer-1, layerConditions);
 		adjacentSlices = BooleanGridList.intersections(supportBeneath, adjacentSlices);
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer-2, layerConditions), adjacentSlices);
 		//adjacentSlices = BooleanGridList.intersections(slice(stl, layer-3, layerConditions), adjacentSlices);
+
 		BooleanGridList insides = null;
 		
 		// The insides are the bits that aren't surface.

@@ -18,12 +18,6 @@ public class BooleanGridList
 
 		private List<BooleanGrid> shapes = null;
 		
-//		protected void finalize() throws Throwable
-//		{
-//			shapes = null;
-//			super.finalize();
-//		}
-		
 		public BooleanGridList()
 		{
 			shapes = new ArrayList<BooleanGrid>();
@@ -225,9 +219,11 @@ public class BooleanGridList
 					ei = e;
 				if(ei != null)
 				{
-					RrHalfPlane hatchLine = layerConditions.getHatchDirection(ei);
+					RrHalfPlane hatchLine;
 					if(overrideDirection != null)
 						hatchLine = overrideDirection;
+					else
+						hatchLine = layerConditions.getHatchDirection(ei);
 					result.add(get(i).hatch(hatchLine, layerConditions.getHatchWidth(ei), att)); 
 					
 				}

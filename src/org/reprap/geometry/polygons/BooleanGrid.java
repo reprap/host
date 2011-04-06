@@ -2686,10 +2686,11 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
 	{
-		if(d.att != e.att)
+		BooleanGrid result = union(d, e, d.att);
+		if(result != nothingThere && d.att != e.att)
 			Debug.e("BooleanGrid.union(): attempt to union two bitmaps of different materials: " +
 					d.attribute().getMaterial() + " and " + e.attribute().getMaterial()	);
-		return union(d, e, d.att);
+		return result;
 	}
 	
 	
@@ -2735,10 +2736,11 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
 	{
-		if(d.att != e.att)
+		BooleanGrid result = intersection(d, e, d.att);
+		if(result != nothingThere && d.att != e.att)
 			Debug.e("BooleanGrid.intersection(): attempt to intersect two bitmaps of different materials: " +
 					d.attribute().getMaterial() + " and " + e.attribute().getMaterial()	);
-		return intersection(d, e, d.att);
+		return result;
 	}
 	
 	/**
@@ -2789,9 +2791,10 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
 	{
-		if(d.att != e.att)
+		BooleanGrid result = difference(d, e, d.att);
+		if(result != nothingThere && d.att != e.att)
 			Debug.e("BooleanGrid.difference(): attempt to subtract two bitmaps of different materials: " +
 					d.attribute().getMaterial() + " and " + e.attribute().getMaterial()	);
-		return difference(d, e, d.att);
+		return result;
 	}
 }
