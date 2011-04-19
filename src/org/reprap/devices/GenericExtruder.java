@@ -410,10 +410,13 @@ public abstract class GenericExtruder implements Extruder
 			extrusionPWM = Preferences.loadGlobalDouble(prefName + "ExtrusionPWM(0..1)");
 			extrusionTemp = Preferences.loadGlobalDouble(prefName + "ExtrusionTemp(C)");
 			extrusionSize = Preferences.loadGlobalDouble(prefName + "ExtrusionSize(mm)");
-			extrusionHeight = Preferences.loadGlobalDouble(prefName + "ExtrusionHeight(mm)");
-			extrusionInfillWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionInfillWidth(mm)");
-			lowerFineLayers = 3; //Preferences.loadGlobalInt(prefName + "LowerFineLayers(0...)");
-			upperFineLayers = 3; //Preferences.loadGlobalInt(prefName + "UpperFineLayers(0...)");
+			extrusionHeight = Preferences.loadGlobalDouble(prefName + "ExtrusionHeight(mm)");		
+			if (Preferences.loadGlobalDouble(prefName + "ExtrusionInfillWidth(mm)")==-1)
+				extrusionInfillWidth =  extrusionSize/Preferences.loadGlobalDouble(prefName + "ExtrusionPercentInfill(0..1)");
+			else
+				extrusionInfillWidth =  Preferences.loadGlobalDouble(prefName + "ExtrusionInfillWidth(mm)");
+			lowerFineLayers = 2; //Preferences.loadGlobalInt(prefName + "LowerFineLayers(0...)");
+			upperFineLayers = 2; //Preferences.loadGlobalInt(prefName + "UpperFineLayers(0...)");
 			extrusionBroadWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionBroadWidth(mm)");		
 			coolingPeriod = Preferences.loadGlobalDouble(prefName + "CoolingPeriod(s)");
 			fastXYFeedrate = Preferences.loadGlobalDouble(prefName + "FastXYFeedrate(mm/minute)");
