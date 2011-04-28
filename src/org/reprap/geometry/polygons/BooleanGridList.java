@@ -30,6 +30,9 @@ public class BooleanGridList
 		public BooleanGridList(BooleanGridList a)
 		{
 			shapes = new ArrayList<BooleanGrid>();
+			
+			if(a == null) return;
+			
 			for(int i = 0; i < a.size(); i++)
 				shapes.add(new BooleanGrid(a.get(i)));
 		}
@@ -93,7 +96,10 @@ public class BooleanGridList
 		public void add(BooleanGrid b)
 		{
 			if(b == null)
+			{
 				Debug.e("BooleanGridList.add(): attempt to add null BooleanGrid.");
+				return;
+			}
 			if(b != BooleanGrid.nullBooleanGrid())
 				shapes.add(b);
 		}
@@ -147,7 +153,7 @@ public class BooleanGridList
 						boolean carryOn = true;
 						while(carryOn && shell < shells)
 						{
-							BooleanGrid thisOne = get(i).offset(-multiplier*((double)shell + 0.5)*e.getExtrusionSize());
+							BooleanGrid thisOne = get(i).offset(multiplier*((double)shell + 0.5)*e.getExtrusionSize());
 							if(thisOne.isEmpty())
 								carryOn = false;
 							else
@@ -164,8 +170,10 @@ public class BooleanGridList
 							ife = es[ei];
 						if(foundation)
 							offSize = 3;
+						else if(multiplier < 0)
+							offSize = multiplier*((double)shells + 0.5)*e.getExtrusionSize() + ife.getInfillOverlap();
 						else
-							offSize = -multiplier*((double)shells + 0.5)*e.getExtrusionSize() + ife.getInfillOverlap();
+							offSize = multiplier*((double)shells + 0.5)*e.getExtrusionSize();
 						if (e.getExtrusionInfillWidth() > 0 || foundation)  // Z value doesn't matter here
 								result.add(get(i).offset(offSize));
 					}
@@ -290,15 +298,15 @@ public class BooleanGridList
 		public static BooleanGridList unions(BooleanGridList a, BooleanGridList b)
 		{
 			BooleanGridList result = new BooleanGridList();
-			
-			if(a == b)
-				return a;
+
 			if(a == null)
-				return b;
-			if(a.size() <= 0)
 				return b;
 			if(b == null)
 				return a;
+			if(a == b)
+				return a;
+			if(a.size() <= 0)
+				return b;
 			if(b.size() <= 0)
 				return a;
 			
@@ -343,10 +351,10 @@ public class BooleanGridList
 		public static BooleanGridList intersections(BooleanGridList a, BooleanGridList b)
 		{
 			BooleanGridList result = new BooleanGridList();
-			if(a == b)
-				return a;
 			if(a == null || b == null)
 				return result;
+			if(a == b)
+				return a;
 			if(a.size() <= 0  || b.size() <= 0)
 				return result;
 			
@@ -380,6 +388,21 @@ public class BooleanGridList
 			return result;
 		}
 		
+		/**
+		 * Return only those elements in the list that have support material specified
+		 * @return
+		 */
+		public BooleanGridList cullNull()
+		{
+			BooleanGridList result = new BooleanGridList();
+
+			for(int i = 0; i < size(); i++)
+				if(get(i).attribute().getExtruder().getSupportExtruderNumber() >= 0)
+					result.add(get(i));
+			
+			return result;
+		}
+		
 		
 		/**
 		 * Return a list of differences between the entries in a and b.
@@ -395,22 +418,18 @@ public class BooleanGridList
 		 * @param onlyNullSupport
 		 * @return
 		 */
-		public static BooleanGridList differences(BooleanGridList a, BooleanGridList b, boolean onlyNullSupport)
+		public static BooleanGridList differences(BooleanGridList a, BooleanGridList b)
 		{
 			BooleanGridList result = new BooleanGridList();
-			
-			if(a == b)
-				return result;
+
 			if(a == null)
+				return result;			
+			if(b == null)
+				return a;			
+			if(a == b)
 				return result;
 			if(a.size() <= 0)
 				return result;
-			
-			if(onlyNullSupport)
-				a = a.cullNonNull();
-			
-			if(b == null)
-				return a;
 			if(b.size() <= 0)
 				return a;
 			

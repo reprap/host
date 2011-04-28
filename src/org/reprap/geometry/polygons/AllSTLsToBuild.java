@@ -665,7 +665,7 @@ public class AllSTLsToBuild
 		
 		BooleanGridList allThis = new BooleanGridList();
 		allThis.add(unionOfThisLayer);
-		allThis = allThis.offset(layerConditions, true, -3);  // -3 is a bit of a hack...
+		allThis = allThis.offset(layerConditions, true, 3);  // 3 is a bit of a hack...
 		
 		if(allThis.size() > 0)
 			unionOfThisLayer = allThis.get(0);
@@ -760,7 +760,7 @@ public class AllSTLsToBuild
 	 * @param layerConditions
 	 * @return
 	 */
-	public RrPolygonList bridges(BooleanGridList unSupported, BooleanGridList lands, LayerRules layerConditions)
+	public RrPolygonList bridgeHatch(BooleanGridList unSupported, BooleanGridList lands, LayerRules layerConditions)
 	{
 		RrPolygonList result = new RrPolygonList();
 		
@@ -868,9 +868,12 @@ public class AllSTLsToBuild
 							bridge.attribute().getExtruder().getExtrusionInfillWidth(), 
 							bridge.attribute()));
 
-					// We shouldn't need to remove the bridge from the bridge patterns; no other lands should
-					// intersect it.
+					
 				}
+				// remove the bridge from the bridge patterns.
+				BooleanGridList b = new BooleanGridList();
+				b.add(bridge);
+				unSupported = BooleanGridList.differences(unSupported, b);
 			}
 		}
 		
@@ -891,6 +894,9 @@ public class AllSTLsToBuild
 	 */
 	public RrPolygonList computeInfill(int stl, LayerRules layerConditions) //, Rr2Point startNearHere)
 	{
+		
+		RrPolygonList hatchedPolygons;
+		
 		// No more additions or movements, please
 		
 		freeze();
@@ -900,18 +906,69 @@ public class AllSTLsToBuild
 		int layer = layerConditions.getMachineLayer();
 		BooleanGridList slice = slice(stl, layerConditions.getModelLayer(), layerConditions);
 		
+		// Get the bottom and top out of the way
+		
+		if(layerConditions.getModelLayer() < 2 || layerConditions.getModelLayer() > layerConditions.getModelLayerMax() - 3)
+		{
+			slice = slice.offset(layerConditions, false, -1);
+			hatchedPolygons = slice.hatch(layerConditions, true, null);
+			return hatchedPolygons;
+		}
+		
 		// If we are solid but the slices around us weren't, we need some fine infill as
 		// we are (at least partly) surface
 		
-		BooleanGridList adjacentSlices = slice(stl, layer+1, layerConditions);
+		BooleanGridList above = slice(stl, layer+2, layerConditions);
+		above = BooleanGridList.intersections(slice(stl, layer+1, layerConditions), above);
+		
+		BooleanGridList below = slice(stl, layer-2, layerConditions);
+		below = BooleanGridList.intersections(slice(stl, layer-1, layerConditions), below);
+	
+		BooleanGridList nothingabove = BooleanGridList.differences(slice, above);
+		BooleanGridList nothingbelow = BooleanGridList.differences(slice, below);
+		nothingabove = BooleanGridList.differences(nothingabove, nothingbelow);
+
+		BooleanGridList insides = BooleanGridList.differences(slice, nothingbelow);
+		insides = BooleanGridList.differences(insides, nothingabove);
+		
+		BooleanGridList bridges = nothingbelow.cullNonNull();
+		nothingbelow = nothingbelow.cullNull();
+		
+		BooleanGridList surfaces = BooleanGridList.unions(nothingbelow, nothingabove);
+		
+		bridges = bridges.offset(layerConditions, false, 2);
+		bridges = BooleanGridList.intersections(bridges, slice);
+		BooleanGridList lands = BooleanGridList.intersections(bridges, BooleanGridList.unions(insides,surfaces));
+		
+		insides = BooleanGridList.differences(insides, lands);
+		surfaces = BooleanGridList.differences(surfaces, lands);
+		
+		bridges = bridges.offset(layerConditions, false, 0.75);
+		insides = insides.offset(layerConditions, false, 0.75);
+		surfaces = surfaces.offset(layerConditions, false, 0.75);
+		
+		bridges = BooleanGridList.intersections(bridges, slice);
+		insides = BooleanGridList.intersections(insides, slice);
+		surfaces = BooleanGridList.intersections(surfaces, slice);
+		
+		bridges = bridges.offset(layerConditions, false, -1);
+		insides = insides.offset(layerConditions, false, -1);
+		surfaces = surfaces.offset(layerConditions, false, -1);
+		
+		hatchedPolygons = insides.hatch(layerConditions, false, null);
+		hatchedPolygons.add(surfaces.hatch(layerConditions, true, null));
+		hatchedPolygons.add(bridgeHatch(bridges, lands, layerConditions));
+	
+		return hatchedPolygons;
+	/*	
+		
+	BooleanGridList adjacentSlices = slice(stl, layer+1, layerConditions);
 		BooleanGridList supportBeneath = null;
 
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer+2, layerConditions), adjacentSlices);
-		//adjacentSlices = BooleanGridList.intersections(slice(stl, layer+3, layerConditions), adjacentSlices);
 		supportBeneath = slice(stl, layer-1, layerConditions);
 		adjacentSlices = BooleanGridList.intersections(supportBeneath, adjacentSlices);
 		adjacentSlices = BooleanGridList.intersections(slice(stl, layer-2, layerConditions), adjacentSlices);
-		//adjacentSlices = BooleanGridList.intersections(slice(stl, layer-3, layerConditions), adjacentSlices);
 
 		BooleanGridList insides = null;
 		
@@ -948,7 +1005,7 @@ public class AllSTLsToBuild
 			insides = BooleanGridList.differences(insides, unSupported, false);
 		}
 		
-		RrPolygonList hatchedPolygons = nothingAbove.hatch(layerConditions, true, null);
+		hatchedPolygons = nothingAbove.hatch(layerConditions, true, null);
 		if(unSupported != null && lands != null)
 			hatchedPolygons.add(bridges(unSupported, lands, layerConditions));
 			
@@ -956,6 +1013,9 @@ public class AllSTLsToBuild
 			hatchedPolygons.add(insides.hatch(layerConditions, false, null));
 		
 		return hatchedPolygons;
+		
+	*/	
+
 	}
 	
 	/**
@@ -1004,7 +1064,7 @@ public class AllSTLsToBuild
 			borderPolygons = null;
 		} else
 		{
-			BooleanGridList offBorder = slice.offset(layerConditions, true, 1);
+			BooleanGridList offBorder = slice.offset(layerConditions, true, -1);
 			borderPolygons = offBorder.borders();
 		}
 
