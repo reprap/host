@@ -744,14 +744,14 @@ public class AllSTLsToBuild
 		return -1;
 	}
 	
-	private void nameAtt(BooleanGridList bgl, String name)
-	{
-		for(int i = 0; i < bgl.size(); i++)
-		{
-			Attributes a = bgl.get(i).attribute();
-			Debug.e(name + " has material: " + a.getMaterial());
-		}
-	}
+//	private void nameAtt(BooleanGridList bgl, String name)
+//	{
+//		for(int i = 0; i < bgl.size(); i++)
+//		{
+//			Attributes a = bgl.get(i).attribute();
+//			Debug.e(name + " has material: " + a.getMaterial());
+//		}
+//	}
 	
 	/**
 	 * Compute the bridge infill for unsupported polygons for a slice.  This is very heuristic...
@@ -776,17 +776,18 @@ public class AllSTLsToBuild
 				// Find the middle of the land
 				
 				Rr2Point cen1 = land1.findCentroid();
-				if(cen1 == null)
-				{
-					Debug.e("AllSTLsToBuild.bridges(): First land found with no centroid!");
-					return result;
-				}
 				
 				// Wipe this land from the land pattern
 				
-				land1.offset(0.5); // Slight hack...
+				//land1.offset(0.5); // Slight hack...
 				
 				landPattern = BooleanGrid.difference(landPattern, land1);
+				
+				if(cen1 == null)
+				{
+					Debug.e("AllSTLsToBuild.bridges(): First land found with no centroid!");
+					continue;
+				}
 				
 				// Find the bridge that goes with the land
 				
@@ -794,7 +795,7 @@ public class AllSTLsToBuild
 				if(bridgesIndex < 0)
 				{
 					Debug.e("AllSTLsToBuild.bridges(): Land found with no corresponding bridge!");
-					return result;
+					continue;
 				}
 				BooleanGrid bridges = unSupported.get(bridgesIndex);
 				
@@ -827,7 +828,7 @@ public class AllSTLsToBuild
 
 					// Wipe this land from the land pattern
 
-					land2.offset(0.5); // Slight hack...
+					//land2.offset(0.5); // Slight hack...
 
 					landPattern = BooleanGrid.difference(landPattern, land2);
 
