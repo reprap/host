@@ -794,7 +794,7 @@ public class AllSTLsToBuild
 				int bridgesIndex = findBridges(unSupported, cen1);
 				if(bridgesIndex < 0)
 				{
-					Debug.e("AllSTLsToBuild.bridges(): Land found with no corresponding bridge!");
+					Debug.d("AllSTLsToBuild.bridges(): Land found with no corresponding bridge!");
 					continue;
 				}
 				BooleanGrid bridges = unSupported.get(bridgesIndex);
@@ -893,8 +893,9 @@ public class AllSTLsToBuild
 	 * @param startNearHere
 	 * @return
 	 */
-	public RrPolygonList computeInfill(int stl, LayerRules layerConditions) //, Rr2Point startNearHere)
+	public RrPolygonList computeInfill(int stl, LayerRules layerConditions) 
 	{
+		// Where the result will be stored.
 		
 		RrPolygonList hatchedPolygons;
 		
@@ -907,7 +908,7 @@ public class AllSTLsToBuild
 		int layer = layerConditions.getMachineLayer();
 		BooleanGridList slice = slice(stl, layerConditions.getModelLayer(), layerConditions);
 		
-		// Get the bottom and top out of the way
+		// Get the bottom and top out of the way - no fancy calculations needed.
 		
 		if(layerConditions.getModelLayer() < 2 || layerConditions.getModelLayer() > layerConditions.getModelLayerMax() - 3)
 		{
@@ -916,45 +917,90 @@ public class AllSTLsToBuild
 			return hatchedPolygons;
 		}
 		
-		// If we are solid but the slices around us weren't, we need some fine infill as
-		// we are (at least partly) surface
+		// If we are solid but the slices above or below us weren't, we need some fine infill as
+		// we are (at least partly) surface.
+		
+		// The intersection of the slices above does not need surface infill...
 		
 		BooleanGridList above = slice(stl, layer+2, layerConditions);
 		above = BooleanGridList.intersections(slice(stl, layer+1, layerConditions), above);
 		
+		// ...nor does the intersection of those below.
+		
 		BooleanGridList below = slice(stl, layer-2, layerConditions);
 		below = BooleanGridList.intersections(slice(stl, layer-1, layerConditions), below);
 	
+		// The bit of the slice with nothing above it needs fine infill...
+		
 		BooleanGridList nothingabove = BooleanGridList.differences(slice, above);
+		
+		// ...as does the bit with nothing below.
+		
 		BooleanGridList nothingbelow = BooleanGridList.differences(slice, below);
-		nothingabove = BooleanGridList.differences(nothingabove, nothingbelow);
+		
+//		// Remove regions common to both - we don't want to infill them twice.
+//		
+//		nothingabove = BooleanGridList.differences(nothingabove, nothingbelow);
 
+		// Find the region that is not surface.
+		
 		BooleanGridList insides = BooleanGridList.differences(slice, nothingbelow);
 		insides = BooleanGridList.differences(insides, nothingabove);
 		
+		// Parts with nothing under them that have no support material
+		// need to have bridges constructed to do the best for in-air infill.
+		
 		BooleanGridList bridges = nothingbelow.cullNonNull();
+		
+		// The remainder with nothing under them will be supported by support material
+		// and so needs no special treatment.
+		
 		nothingbelow = nothingbelow.cullNull();
+		
+		// All the parts of this slice that need surface infill
 		
 		BooleanGridList surfaces = BooleanGridList.unions(nothingbelow, nothingabove);
 		
+		// Make the bridges fatter, then crop them to the slice.
+		// This will make them interpenetrate at their ends/sides to give
+		// bridge landing areas.
+		
 		bridges = bridges.offset(layerConditions, false, 2);
 		bridges = BooleanGridList.intersections(bridges, slice);
+		
+		// Find the landing areas as a separate set of shapes that go with the bridges.
+		
 		BooleanGridList lands = BooleanGridList.intersections(bridges, BooleanGridList.unions(insides,surfaces));
+		
+		// The landing areas will be infilled by the bridge-filling function along with the bridges,
+		// so remove them from the other areas.
 		
 		insides = BooleanGridList.differences(insides, lands);
 		surfaces = BooleanGridList.differences(surfaces, lands);
+		
+		// Shapes will be outlined, and so need to be shrunk to allow for that.  But they
+		// must not also shrink from each other internally.  So initially expand them so they overlap
+		// (The 0.75 is a bit of a hack, but it seems to work)...
 		
 		bridges = bridges.offset(layerConditions, false, 0.75);
 		insides = insides.offset(layerConditions, false, 0.75);
 		surfaces = surfaces.offset(layerConditions, false, 0.75);
 		
+		// Now intersect them with the slice so the outer edges are back where they should be.
+		
 		bridges = BooleanGridList.intersections(bridges, slice);
 		insides = BooleanGridList.intersections(insides, slice);
 		surfaces = BooleanGridList.intersections(surfaces, slice);
 		
+		// Now shrink them so the edges are in a bit to allow the outlines to
+		// be put round the outside.  The inner joins should now shrink back to be
+		// adjacent to each other as they should be.
+		
 		bridges = bridges.offset(layerConditions, false, -1);
 		insides = insides.offset(layerConditions, false, -1);
 		surfaces = surfaces.offset(layerConditions, false, -1);
+		
+		// Generate the infill patterns.
 		
 		hatchedPolygons = insides.hatch(layerConditions, false, null);
 		hatchedPolygons.add(surfaces.hatch(layerConditions, true, null));
