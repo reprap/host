@@ -845,21 +845,21 @@ public class AllSTLsToBuild
 					for(int pol = 0; pol < bridgeOutline.size(); pol++)
 					{
 						RrPolygon polygon = bridgeOutline.polygon(i);
-						double tooSmall = polygon.meanEdge();
+						//double tooSmall = polygon.meanEdge();
 						for(int vertex1 = 0; vertex1 < polygon.size(); vertex1++)
 						{
 							int vertex2 = vertex1+1;
 							if(vertex2 >= polygon.size()) // We know the polygon must be closed...
 								vertex2 = 0;
 							Rr2Point edge = Rr2Point.sub(polygon.point(vertex2), polygon.point(vertex1));
-							if(edge.mod() > tooSmall)
-							{
+							//if(edge.mod() > tooSmall)
+							//{
 								if((sp = Math.abs(Rr2Point.mul(edge, centroidDirection))) > spMax)
 								{
 									spMax = sp;
 									bridgeDirection = edge;
 								}
-							}
+							//}
 						}
 					}
 
