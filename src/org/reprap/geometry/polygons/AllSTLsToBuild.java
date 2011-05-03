@@ -32,6 +32,35 @@ import javax.vecmath.Tuple3d;
 public class AllSTLsToBuild 
 {	
 	/**
+	 * Class to hold infill patterns
+	 * @author ensab
+	 *
+	 */
+	class InFillPatterns
+	{
+		BooleanGridList bridges;
+		BooleanGridList insides;
+		BooleanGridList surfaces;	
+		RrPolygonList hatchedPolygons;
+		
+		InFillPatterns()
+		{
+			bridges = new BooleanGridList();
+			insides = new BooleanGridList();
+			surfaces = new BooleanGridList();
+			hatchedPolygons = new RrPolygonList();
+		}
+		
+		InFillPatterns(InFillPatterns ifp)
+		{
+			bridges = ifp.bridges;
+			insides = ifp.insides;
+			surfaces = ifp.surfaces;
+			hatchedPolygons = ifp.hatchedPolygons;
+		}
+	}
+	
+	/**
 	 * 3D bounding box
 	 * @author ensab
 	 *
@@ -753,16 +782,20 @@ public class AllSTLsToBuild
 //		}
 //	}
 	
+
 	/**
 	 * Compute the bridge infill for unsupported polygons for a slice.  This is very heuristic...
-	 * @param unSupported
-	 * @param slice
+	 * 
+	 * @param infill
+	 * @param lands
 	 * @param layerConditions
 	 * @return
+	 * 
 	 */
-	public RrPolygonList bridgeHatch(BooleanGridList unSupported, BooleanGridList lands, LayerRules layerConditions)
+	public InFillPatterns bridgeHatch(InFillPatterns infill, BooleanGridList lands, LayerRules layerConditions)
 	{
-		RrPolygonList result = new RrPolygonList();
+		InFillPatterns result = new InFillPatterns(infill);
+		BooleanGridList b;
 		
 		for(int i = 0; i < lands.size(); i++)
 		{
@@ -779,8 +812,6 @@ public class AllSTLsToBuild
 				
 				// Wipe this land from the land pattern
 				
-				//land1.offset(0.5); // Slight hack...
-				
 				landPattern = BooleanGrid.difference(landPattern, land1);
 				
 				if(cen1 == null)
@@ -791,13 +822,13 @@ public class AllSTLsToBuild
 				
 				// Find the bridge that goes with the land
 				
-				int bridgesIndex = findBridges(unSupported, cen1);
+				int bridgesIndex = findBridges(result.bridges, cen1);
 				if(bridgesIndex < 0)
 				{
-					Debug.d("AllSTLsToBuild.bridges(): Land found with no corresponding bridge!");
+					Debug.d("AllSTLsToBuild.bridges(): Land found with no corresponding bridge.");
 					continue;
 				}
-				BooleanGrid bridges = unSupported.get(bridgesIndex);
+				BooleanGrid bridges = result.bridges.get(bridgesIndex);
 				
 				// The bridge must cover the land too
 				
@@ -816,19 +847,23 @@ public class AllSTLsToBuild
 				Rr2Point cen2 = land2.findCentroid();
 				if(cen2 == null)
 				{
-					Debug.d("AllSTLsToBuild.bridges(): Second land found with no centroid!");
+					Debug.d("AllSTLsToBuild.bridges(): Second land found with no centroid.");
 					
 					// No second land implies a ring of support - just infill it.
 					
-					result.add(bridge.hatch(layerConditions.getHatchDirection(bridge.attribute().getExtruder()), 
+					result.hatchedPolygons.add(bridge.hatch(layerConditions.getHatchDirection(bridge.attribute().getExtruder()), 
 							bridge.attribute().getExtruder().getExtrusionInfillWidth(), 
 							bridge.attribute()));
+					
+					// Remove this bridge (in fact, just its lands) from the other infill patterns.
+					
+					b = new BooleanGridList();
+					b.add(bridge);
+					result.insides = BooleanGridList.differences(result.insides, b);
+					result.surfaces = BooleanGridList.differences(result.surfaces, b);
 				} else
 				{
-
 					// Wipe this land from the land pattern
-
-					//land2.offset(0.5); // Slight hack...
 
 					landPattern = BooleanGrid.difference(landPattern, land2);
 
@@ -845,43 +880,42 @@ public class AllSTLsToBuild
 					for(int pol = 0; pol < bridgeOutline.size(); pol++)
 					{
 						RrPolygon polygon = bridgeOutline.polygon(i);
-						//double tooSmall = polygon.meanEdge();
+
 						for(int vertex1 = 0; vertex1 < polygon.size(); vertex1++)
 						{
 							int vertex2 = vertex1+1;
 							if(vertex2 >= polygon.size()) // We know the polygon must be closed...
 								vertex2 = 0;
 							Rr2Point edge = Rr2Point.sub(polygon.point(vertex2), polygon.point(vertex1));
-							//if(edge.mod() > tooSmall)
-							//{
-								if((sp = Math.abs(Rr2Point.mul(edge, centroidDirection))) > spMax)
-								{
-									spMax = sp;
-									bridgeDirection = edge;
-								}
-							//}
+
+							if((sp = Math.abs(Rr2Point.mul(edge, centroidDirection))) > spMax)
+							{
+								spMax = sp;
+								bridgeDirection = edge;
+							}
+
 						}
 					}
 
 					// Build the bridge
 
-					result.add(bridge.hatch(new RrHalfPlane(new Rr2Point(0,0), bridgeDirection), 
+					result.hatchedPolygons.add(bridge.hatch(new RrHalfPlane(new Rr2Point(0,0), bridgeDirection), 
 							bridge.attribute().getExtruder().getExtrusionInfillWidth(), 
 							bridge.attribute()));
-
 					
+					// Remove this bridge (in fact, just its lands) from the other infill patterns.
+					
+					b = new BooleanGridList();
+					b.add(bridge);
+					result.insides = BooleanGridList.differences(result.insides, b);
+					result.surfaces = BooleanGridList.differences(result.surfaces, b);
 				}
 				// remove the bridge from the bridge patterns.
-				BooleanGridList b = new BooleanGridList();
+				b = new BooleanGridList();
 				b.add(bridge);
-				unSupported = BooleanGridList.differences(unSupported, b);
+				result.bridges = BooleanGridList.differences(result.bridges, b);
 			}
 		}
-		
-//		PolygonAttributes pa = new PolygonAttributes();
-//		pa.setBridgeThin(0.5); // Test value - needs to be an extruder parameter
-//		for(int i = 0; i < result.size(); i++)
-//			result.polygon(i).setPolygonAttribute(pa);
 		
 		return result;
 	}
@@ -897,7 +931,7 @@ public class AllSTLsToBuild
 	{
 		// Where the result will be stored.
 		
-		RrPolygonList hatchedPolygons;
+		InFillPatterns infill = new InFillPatterns();
 		
 		// No more additions or movements, please
 		
@@ -913,8 +947,8 @@ public class AllSTLsToBuild
 		if(layerConditions.getModelLayer() < 2 || layerConditions.getModelLayer() > layerConditions.getModelLayerMax() - 3)
 		{
 			slice = slice.offset(layerConditions, false, -1);
-			hatchedPolygons = slice.hatch(layerConditions, true, null);
-			return hatchedPolygons;
+			infill.hatchedPolygons = slice.hatch(layerConditions, true, null);
+			return infill.hatchedPolygons;
 		}
 		
 		// If we are solid but the slices above or below us weren't, we need some fine infill as
@@ -937,20 +971,16 @@ public class AllSTLsToBuild
 		// ...as does the bit with nothing below.
 		
 		BooleanGridList nothingbelow = BooleanGridList.differences(slice, below);
-		
-//		// Remove regions common to both - we don't want to infill them twice.
-//		
-//		nothingabove = BooleanGridList.differences(nothingabove, nothingbelow);
 
 		// Find the region that is not surface.
 		
-		BooleanGridList insides = BooleanGridList.differences(slice, nothingbelow);
-		insides = BooleanGridList.differences(insides, nothingabove);
+		infill.insides = BooleanGridList.differences(slice, nothingbelow);
+		infill.insides = BooleanGridList.differences(infill.insides, nothingabove);
 		
 		// Parts with nothing under them that have no support material
 		// need to have bridges constructed to do the best for in-air infill.
 		
-		BooleanGridList bridges = nothingbelow.cullNonNull();
+		infill.bridges = nothingbelow.cullNonNull();
 		
 		// The remainder with nothing under them will be supported by support material
 		// and so needs no special treatment.
@@ -959,54 +989,50 @@ public class AllSTLsToBuild
 		
 		// All the parts of this slice that need surface infill
 		
-		BooleanGridList surfaces = BooleanGridList.unions(nothingbelow, nothingabove);
+		infill.surfaces = BooleanGridList.unions(nothingbelow, nothingabove);
 		
 		// Make the bridges fatter, then crop them to the slice.
 		// This will make them interpenetrate at their ends/sides to give
 		// bridge landing areas.
 		
-		bridges = bridges.offset(layerConditions, false, 2);
-		bridges = BooleanGridList.intersections(bridges, slice);
+		infill.bridges = infill.bridges.offset(layerConditions, false, 2);
+		infill.bridges = BooleanGridList.intersections(infill.bridges, slice);
 		
 		// Find the landing areas as a separate set of shapes that go with the bridges.
 		
-		BooleanGridList lands = BooleanGridList.intersections(bridges, BooleanGridList.unions(insides,surfaces));
-		
-		// The landing areas will be infilled by the bridge-filling function along with the bridges,
-		// so remove them from the other areas.
-		
-		insides = BooleanGridList.differences(insides, lands);
-		surfaces = BooleanGridList.differences(surfaces, lands);
+		BooleanGridList lands = BooleanGridList.intersections(infill.bridges, BooleanGridList.unions(infill.insides,infill.surfaces));
 		
 		// Shapes will be outlined, and so need to be shrunk to allow for that.  But they
 		// must not also shrink from each other internally.  So initially expand them so they overlap
 		// (The 0.75 is a bit of a hack, but it seems to work)...
 		
-		bridges = bridges.offset(layerConditions, false, 0.75);
-		insides = insides.offset(layerConditions, false, 0.75);
-		surfaces = surfaces.offset(layerConditions, false, 0.75);
+		infill.bridges = infill.bridges.offset(layerConditions, false, 0.75);
+		infill.insides = infill.insides.offset(layerConditions, false, 0.75);
+		infill.surfaces = infill.surfaces.offset(layerConditions, false, 0.75);
 		
 		// Now intersect them with the slice so the outer edges are back where they should be.
 		
-		bridges = BooleanGridList.intersections(bridges, slice);
-		insides = BooleanGridList.intersections(insides, slice);
-		surfaces = BooleanGridList.intersections(surfaces, slice);
+		infill.bridges = BooleanGridList.intersections(infill.bridges, slice);
+		infill.insides = BooleanGridList.intersections(infill.insides, slice);
+		infill.surfaces = BooleanGridList.intersections(infill.surfaces, slice);
 		
 		// Now shrink them so the edges are in a bit to allow the outlines to
 		// be put round the outside.  The inner joins should now shrink back to be
 		// adjacent to each other as they should be.
 		
-		bridges = bridges.offset(layerConditions, false, -1);
-		insides = insides.offset(layerConditions, false, -1);
-		surfaces = surfaces.offset(layerConditions, false, -1);
+		infill.bridges = infill.bridges.offset(layerConditions, false, -1);
+		infill.insides = infill.insides.offset(layerConditions, false, -1);
+		infill.surfaces = infill.surfaces.offset(layerConditions, false, -1);
 		
-		// Generate the infill patterns.
+		// Generate the infill patterns.  We do the bridges first, as each bridge subtracts its
+		// lands from the other two sets of shapes.  We want that, so they don't get infilled twice.
 		
-		hatchedPolygons = insides.hatch(layerConditions, false, null);
-		hatchedPolygons.add(surfaces.hatch(layerConditions, true, null));
-		hatchedPolygons.add(bridgeHatch(bridges, lands, layerConditions));
+		infill = bridgeHatch(infill, lands, layerConditions);
+		infill.hatchedPolygons.add(infill.insides.hatch(layerConditions, false, null));
+		infill.hatchedPolygons.add(infill.surfaces.hatch(layerConditions, true, null));
+		
 	
-		return hatchedPolygons;
+		return infill.hatchedPolygons;
 	/*	
 		
 	BooleanGridList adjacentSlices = slice(stl, layer+1, layerConditions);
