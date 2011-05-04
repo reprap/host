@@ -325,7 +325,7 @@ public class GCodeReaderAndWriter
 				{
 					while ((line = fileInStream.readLine()) != null) 
 					{
-						bufferQueue(line, 0);
+						bufferQueue(line);
 						bytes += line.length();
 						fractionDone = (double)bytes/(double)fileInStreamLength;
 						setFractionDone(fractionDone, -1, -1);
@@ -507,8 +507,8 @@ public class GCodeReaderAndWriter
 	/**
 	 * Queue a command.  
 	 */
-	private void bufferQueue(String cmd, int retries) throws Exception
-	{
+	private void bufferQueue(String cmd) throws Exception
+	{	
 		if(simulationPlot != null)
 			simulationPlot.add(cmd);
 		
@@ -517,11 +517,8 @@ public class GCodeReaderAndWriter
 			nonRunningWarning("queue: \"" + cmd + "\" to");
 			return;
 		}
-		if(retries > 3)
-		{
-			Debug.e("bufferQueue(): too many retries (" + retries + ") sending " + cmd);
-			return;			
-		}
+		
+
 		if(sendLine(cmd))
 		{
 			long resp = waitForResponse();
@@ -531,6 +528,7 @@ public class GCodeReaderAndWriter
 			} else if (resp == allSentOK)
 			{
 				lineNumber++;
+				return;
 			} else // Must be a re-send line number
 			{
 				long gotTo = lineNumber;
@@ -539,10 +537,18 @@ public class GCodeReaderAndWriter
 				while(lineNumber <= gotTo && !rCmd.contentEquals(""))
 				{
 					rCmd = ringGet(lineNumber);
-					bufferQueue(rCmd, retries+1);  // Is recursion clever; or stupid?
+					if(sendLine(rCmd))
+					{
+						resp = waitForResponse();
+						if (resp == allSentOK)
+							return;
+						if(resp == shutDown)
+							throw new Exception("The RepRap machine has flagged a hard error!");
+					}
 				}
 			}
 		} 
+		Debug.e("bufferQueue(): failed to send " + cmd);	
 	}
 	
 	private void resetReceived()
@@ -588,7 +594,7 @@ public class GCodeReaderAndWriter
 		}
 		if(eTemp == Double.NEGATIVE_INFINITY)
 		{
-			Debug.e("GCodeReaderAndWriter.getETemp() - no value stored!");
+			Debug.d("GCodeReaderAndWriter.getETemp() - no value stored!");
 			return 0;
 		}
 		return eTemp;
@@ -607,7 +613,7 @@ public class GCodeReaderAndWriter
 		}
 		if(bTemp == Double.NEGATIVE_INFINITY)
 		{
-			Debug.e("GCodeReaderAndWriter.getBTemp() - no value stored!");
+			Debug.d("GCodeReaderAndWriter.getBTemp() - no value stored!");
 			return 0;
 		}
 		return bTemp;
@@ -823,7 +829,7 @@ public class GCodeReaderAndWriter
 			fileOutStream.println(cmd);
 			Debug.c("G-code: " + cmd + " written to file");
 		} else
-			bufferQueue(cmd, 0);
+			bufferQueue(cmd);
 	}
 	
 
