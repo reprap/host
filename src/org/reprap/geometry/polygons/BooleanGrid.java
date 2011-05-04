@@ -1760,7 +1760,7 @@ public class BooleanGrid
 		// We implement our own floodfill stack, rather than using recursion to
 		// avoid having to specify a big Java stack just for this one function.
 		
-		int top = 100000;
+		int top = 200000;
 		iPoint[] stack = new iPoint[top];
 		int sp = 0;
 		stack[sp] = p;
