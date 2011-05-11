@@ -265,6 +265,7 @@ public class Producer {
 		}
 		
 		RrPolygonList allPolygons[] = new RrPolygonList[totalPhysicalExtruders];
+		RrPolygonList tempPolygons[] = new RrPolygonList[totalPhysicalExtruders];
 		
 		boolean firstTimeRound = true;
 		
@@ -300,7 +301,9 @@ public class Producer {
 					fills = fills.cullShorts();
 					shield = false;
 					RrPolygonList support = allSTLs.computeSupport(stl, layerRules);
-					borders = borders.nearEnds(startNearHere, false, -1);
+					/*
+				    borders = borders.nearEnds(startNearHere, false, -1);
+					
 					if(borders.size() > 0)
 					{
 						RrPolygon last = borders.polygon(borders.size() - 1);
@@ -318,23 +321,42 @@ public class Producer {
 						RrPolygon last = support.polygon(support.size() - 1);
 						startNearHere = last.point(last.size() - 1);
 					}
+					*/
+					for(int physicalExtruder = 0; physicalExtruder < allPolygons.length; physicalExtruder++)
+						tempPolygons[physicalExtruder] = new RrPolygonList();
 					for(int pol = 0; pol < borders.size(); pol++)
 					{
 						//shield = false;
 						RrPolygon p = borders.polygon(pol);
-						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
+						tempPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
 					for(int pol = 0; pol < fills.size(); pol++)
 					{
 						//shield = false;
 						RrPolygon p = fills.polygon(pol);
-						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
+						tempPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
 					for(int pol = 0; pol < support.size(); pol++)
 					{
 						//shield = false;
 						RrPolygon p = support.polygon(pol);
-						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
+						tempPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
+					}
+					for(int physicalExtruder = 0; physicalExtruder < allPolygons.length; physicalExtruder++)
+					{
+						if(tempPolygons[physicalExtruder].size() > 0)
+						{
+							double linkUp = tempPolygons[physicalExtruder].polygon(0).getAttributes().getExtruder().getExtrusionSize();
+							linkUp = (4*linkUp*linkUp);
+							tempPolygons[physicalExtruder].radicalReOrder(linkUp);
+							tempPolygons[physicalExtruder] = tempPolygons[physicalExtruder].nearEnds(startNearHere, false, -1);
+							if(tempPolygons[physicalExtruder].size() > 0)
+							{
+								RrPolygon last = tempPolygons[physicalExtruder].polygon(tempPolygons[physicalExtruder].size() - 1);
+								startNearHere = last.point(last.size() - 1);
+							}
+							allPolygons[physicalExtruder].add(tempPolygons[physicalExtruder]);
+						}
 					}
 			}
 			

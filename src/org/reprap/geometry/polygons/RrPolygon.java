@@ -129,47 +129,21 @@ public class RrPolygon
 	private int extrudeEnd;
 	
 	/**
+	 * The squared distance from the end of the polygon of the extrude end
+	 */
+	private double extrudeEndDistance2;
+	
+	/**
 	 * The index of the last point at which the valve (if any) is open.
 	 */
 	private int valveEnd;
 	
 	/**
-	 * Destroy me and all that I point to
+	 * The squared distance from the end of the polygon of the valve end
 	 */
-//	public void destroy() 
-//	{
-//		if(beingDestroyed) // Prevent infinite loop
-//			return;
-//		beingDestroyed = true;
-//		
-//		if(speeds != null)
-//		{
-//			for(int i = 0; i < size(); i++)
-//				speeds.set(i, null);
-//		}
-//		speeds = null;
-//		
-//		if(points != null)
-//		{
-//			for(int i = 0; i < size(); i++)
-//			{
-//				points.get(i).destroy();
-//				points.set(i, null);
-//			}
-//		}
-//		points = null;
-//		
-//		if(box != null)
-//			box.destroy();
-//		box = null;
-//		
-//		// Don't destroy the attribute - that may still be needed
-//		
-//		//if(att != null)
-//		//	att.destroy();
-//		att = null;
-//		beingDestroyed = false;
-//	}
+	private double valveEndDistance2;
+	
+
 	
 	
 	/**
@@ -186,7 +160,25 @@ public class RrPolygon
 		closed = c;
 		extrudeEnd = -1;
 		valveEnd = -1;
+		extrudeEndDistance2 = 0;
+		valveEndDistance2 = 0;
 		pa = null;
+	}
+	
+	/**
+	 * Set the polygon as closed
+	 */
+	public void setClosed()
+	{
+		closed = true;
+	}
+	
+	/**
+	 * Set the polygon not closed
+	 */
+	public void setOpen()
+	{
+		closed = false;
 	}
 	
 	/**
@@ -257,6 +249,31 @@ public class RrPolygon
 	}
 	
 	/**
+	 * Something has been done to the polygon that may require its
+	 * extrude and valve endings to be updated
+	 */
+	private void updateExtrudeValveEnd()
+	{
+		if(extrudeEnd >= 0)
+		{
+			if(extrudeEndDistance2 <= 0)
+			{
+				extrudeEnd = -1;
+				extrudeEndDistance2 =  0;
+				return;
+			}
+			double d2 = 0;
+			System.out.println("Updating e...");
+		}
+		if(valveEnd >= 0)
+		{
+			System.out.println("Updating v...");
+		}
+		// if speeds are set, interpolate
+	}
+	
+	
+	/**
 	 * What's the last point to plot to?
 	 * @return
 	 */
@@ -308,6 +325,8 @@ public class RrPolygon
 		closed = p.closed;
 		extrudeEnd = p.extrudeEnd;
 		valveEnd  = p.valveEnd;
+		extrudeEndDistance2 = p.extrudeEndDistance2;
+		valveEndDistance2 = p.valveEndDistance2;
 		if(p.pa != null)
 			pa = new PolygonAttributes(p.pa);
 		else
@@ -334,6 +353,7 @@ public class RrPolygon
 			Debug.e("Rr2Point.add(): adding a point to a polygon with its speeds set.");
 		points.add(new Rr2Point(p));
 		box.expand(p);
+		updateExtrudeValveEnd();
 	}
 	
 	/**
@@ -345,12 +365,20 @@ public class RrPolygon
 	{
 		if(speeds != null)
 			Debug.e("Rr2Point.add(): adding a point to a polygon with its speeds set.");
+		
 		points.add(i, new Rr2Point(p));
 		box.expand(p);
+		boolean update = false;
 		if(i <= extrudeEnd)
 			extrudeEnd++;
+		else
+			update = true;
 		if(i <= valveEnd)
 			valveEnd++;
+		else
+			update = true;
+		if(update)
+			updateExtrudeValveEnd();
 	}
 	
 	/**
@@ -364,6 +392,7 @@ public class RrPolygon
 			Debug.e("Rr2Point.set(): adding a point to a polygon with its speeds set.");
 		points.set(i, new Rr2Point(p));
 		box.expand(p);  // Note if the old point was on the convex hull, and the new one is within, box will be too big after this
+		updateExtrudeValveEnd();
 	}
 
 	/**
@@ -375,14 +404,24 @@ public class RrPolygon
 	public void add(int i, Rr2Point p, double s)
 	{
 		if(speeds == null)
+		{
 			Debug.e("Rr2Point.add(): adding a point and a speed to a polygon without its speeds set.");
+			return;
+		}
 		points.add(i, new Rr2Point(p));
 		speeds.add(i, s);
 		box.expand(p);
+		boolean update = false;
 		if(i <= extrudeEnd)
 			extrudeEnd++;
+		else
+			update = true;
 		if(i <= valveEnd)
 			valveEnd++;
+		else
+			update = true;
+		if(update)
+			updateExtrudeValveEnd();
 	}		
 	
 	/**
@@ -398,6 +437,7 @@ public class RrPolygon
 		points.set(i, new Rr2Point(p));
 		speeds.set(i, s);
 		box.expand(p); // Note if the old point was on the convex hull, and the new one is within, box will be too big after this
+		updateExtrudeValveEnd();
 	}
 	
 	/**
@@ -421,18 +461,20 @@ public class RrPolygon
 	 * Eet the last point to plot to
 	 * @param d
 	 */
-	public void setExtrudeEnd(int d)
+	public void setExtrudeEnd(int d, double d2)
 	{
 		extrudeEnd = d;
+		extrudeEndDistance2 = d2;
 	}
 	
 	/**
 	 * Eet the last point to valve-open to
 	 * @param d
 	 */
-	public void setValveEnd(int d)
+	public void setValveEnd(int d, double d2)
 	{
 		valveEnd = d;
+		valveEndDistance2 = d2;
 	}
 	
 	/**
@@ -471,13 +513,8 @@ public class RrPolygon
 		if(extrudeEnd >= 0 || valveEnd >= 0)
 			Debug.e("Rr2Point.add(): adding a polygon to another polygon with its extrude or valve ending set.");
 		for(int i = 0; i < p.size(); i++)
-		{
-			if(i == p.extrudeEnd)
-				extrudeEnd = size();
-			if(i == p.valveEnd)
-				valveEnd = size();
 			points.add(new Rr2Point(p.point(i)));
-		}
+
 		box.expand(p.box);
 		if(speeds == null)
 		{
@@ -494,6 +531,7 @@ public class RrPolygon
 		{
 			speeds.add(new Double(p.speed(i)));
 		}
+		updateExtrudeValveEnd();
 	}
 	
 	/**
@@ -511,30 +549,17 @@ public class RrPolygon
 		{
 			Debug.e("Rr2Point.add(): attempt to add a polygon to another polygon when one has speeds and the other doesn't.");
 			return;
-		}
-		if(k <= extrudeEnd || k <= valveEnd)
-			Debug.e("Rr2Point.add(): adding a polygon to another polygon with its extrude or valve ending set.");
-		int de = -1;
-		int dv = -1;
-		if (extrudeEnd >= 0)
-			de = extrudeEnd + p.size();
-		if (valveEnd >= 0)
-			dv = valveEnd + p.size();		
+		}	
 		for(int i = 0; i < p.size(); i++)
 		{
-			if(i == p.extrudeEnd)
-				extrudeEnd = size();
-			if(i == p.valveEnd)
-				valveEnd = size();
 			if(speeds != null)
 				add(k, new Rr2Point(p.point(i)), p.speed(i));
 			else
 				points.add(k, new Rr2Point(p.point(i)));
 			k++;
 		}
-		extrudeEnd = Math.max(extrudeEnd, de);
-		valveEnd = Math.max(valveEnd, dv);
 		box.expand(p.box);
+		updateExtrudeValveEnd();
 	}
 	
 	/**
@@ -585,8 +610,6 @@ public class RrPolygon
 	 */
 	public RrPolygon negate()
 	{
-		if(extrudeEnd >= 0 || valveEnd >= 0)
-			Debug.e("Rr2Point.negate(): negating a polygon with its extrude or valve ending set.");
 		RrPolygon result = new RrPolygon(att, closed);
 		for(int i = size() - 1; i >= 0; i--)
 		{
@@ -598,6 +621,9 @@ public class RrPolygon
 		{
 			result.setSpeed(i, speed(i)); 
 		}
+		result.setExtrudeEnd(extrudeEnd, extrudeEndDistance2);
+		result.setValveEnd(valveEnd, valveEndDistance2);
+		result.updateExtrudeValveEnd();
 		return result;
 	}
 	
@@ -606,8 +632,6 @@ public class RrPolygon
 	 */
 	public RrPolygon randomStart()
 	{
-		if(extrudeEnd >= 0 || valveEnd >= 0)
-			Debug.e("Rr2Point.randomStart(: randomizing a polygon with its extrude or valve ending set.");
 		return newStart(rangen.nextInt(size()));
 	}
 	
@@ -618,8 +642,7 @@ public class RrPolygon
 	{
 		if(!isClosed())
 			Debug.e("RrPolygon.newStart(i): reordering an open polygon!");
-		if(extrudeEnd >= 0 || valveEnd >= 0)
-			Debug.e("Rr2Point.newStart(i): reordering a polygon with its extrude or valve ending set.");		
+	
 		if(i < 0 || i >= size())
 		{
 			Debug.e("RrPolygon.newStart(i): dud index: " + i);
@@ -635,7 +658,9 @@ public class RrPolygon
 			if(i >= size())
 				i = 0;
 		}
-		
+		result.setExtrudeEnd(extrudeEnd, extrudeEndDistance2);
+		result.setValveEnd(valveEnd, valveEndDistance2);
+		result.updateExtrudeValveEnd();
 		return result;
 	}
 	
@@ -646,8 +671,6 @@ public class RrPolygon
 	{
 		if(size() == 0 || lc.getModelLayer() < 0)
 			return this;
-		if(extrudeEnd >= 0 || valveEnd >= 0)
-			Debug.e("Rr2Point.incrementedStart(): incrementing a polygon with its extrude or valve ending set.");	
 		int i = lc.getModelLayer() % size();
 		return newStart(i);
 	}
@@ -690,8 +713,7 @@ public class RrPolygon
 	{
 		if(!p.isClosed())
 			Debug.e("RrPolygon.nearestVertexReorder(): called for non-closed polygon.");
-		if(extrudeEnd >= 0 || p.extrudeEnd >= 0 || valveEnd >= 0 || p.valveEnd >= 0)
-			Debug.e("Rr2Point.nearestVertexReorderMerge(): merging polygons with a extrude or valve ending set.");
+
 		double d = Double.POSITIVE_INFINITY;
 		int myPoint = -1;
 		int itsPoint = -1;
@@ -711,6 +733,7 @@ public class RrPolygon
 			RrPolygon ro = p.newStart(itsPoint);
 			ro.add(0, point(myPoint));
 			add(myPoint, ro);
+			updateExtrudeValveEnd();
 			return true;
 		} else
 			return false;
@@ -809,7 +832,7 @@ public class RrPolygon
 	
 	/**
 	 * Backtrack a given distance, inserting a new point there and set extrudeEnd to it.
-	 * If drawEnd is already set, backtrack from that.
+	 * If extrudeEnd is already set, backtrack from that.
 	 * @param distance to backtrack
 	 * @return index of the inserted point
 	 */
@@ -822,9 +845,15 @@ public class RrPolygon
 		int start, last;
 		
 		if(extrudeEnd >= 0)
+		{
 			start = extrudeEnd;
-		else
-			start = size() - 1;					
+			extrudeEndDistance2 = Math.sqrt(extrudeEndDistance2) + d;
+			extrudeEndDistance2 *= extrudeEndDistance2;
+		} else
+		{
+			start = size() - 1;
+			extrudeEndDistance2 = d*d;
+		}
 
 		if(!isClosed() && extrudeEnd < 0)
 				start--;
@@ -872,7 +901,7 @@ public class RrPolygon
 	
 	/**
 	 * Backtrack a given distance, inserting a new point there and set valveEnd to it.
-	 * If drawEnd is already set, backtrack from that.
+	 * If valveEnd is already set, backtrack from that.
 	 * @param distance to backtrack
 	 * @return index of the inserted point
 	 */
@@ -885,9 +914,15 @@ public class RrPolygon
 		int start, last;
 		
 		if(valveEnd >= 0)
+		{
 			start = valveEnd;
-		else
-			start = size() - 1;					
+			valveEndDistance2 = Math.sqrt(valveEndDistance2) + d;
+			valveEndDistance2 *= valveEndDistance2;
+		} else
+		{
+			start = size() - 1;
+			valveEndDistance2 = d*d;
+		}
 
 		if(!isClosed() && valveEnd < 0)
 				start--;

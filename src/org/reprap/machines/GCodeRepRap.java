@@ -95,7 +95,7 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		if(xyFeedrate < feedrate)
 		{
-			Debug.e("GCodeRepRap().qXYMove: feedrate (" + feedrate + ") exceeds maximum (" + xyFeedrate + ").");
+			Debug.d("GCodeRepRap().qXYMove: feedrate (" + feedrate + ") exceeds maximum (" + xyFeedrate + ").");
 			feedrate = xyFeedrate;
 		}
 		
@@ -150,7 +150,7 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		if(zFeedrate < feedrate)
 		{
-			Debug.e("GCodeRepRap().qZMove: feedrate (" + feedrate + ") exceeds maximum (" + zFeedrate + ").");
+			Debug.d("GCodeRepRap().qZMove: feedrate (" + feedrate + ") exceeds maximum (" + zFeedrate + ").");
 			feedrate = zFeedrate;
 		}
 		
@@ -218,7 +218,7 @@ public class GCodeRepRap extends GenericRepRap {
 		boolean xyMove = dx!= 0 || dy != 0;
 		
 		if(zMove && xyMove)
-			Debug.e("GcodeRepRap.moveTo(): attempt to move in X|Y and Z simultaneously: (x, y, z) = (" + x + ", " + y + ", " + z + ")");
+			Debug.d("GcodeRepRap.moveTo(): attempt to move in X|Y and Z simultaneously: (x, y, z) = (" + x + ", " + y + ", " + z + ")");
 
 		double zFeedrate = round(getMaxFeedrateZ(), 1);
 		
@@ -232,11 +232,19 @@ public class GCodeRepRap extends GenericRepRap {
 			qFeedrate(feedrate);
 		}
 		
-		if(xyMove)
-			qXYMove(x, y, feedrate);
-		
-		if(zMove)
-			qZMove(z, feedrate);
+		if(dz > 0)
+		{
+			if(zMove)
+				qZMove(z, feedrate);
+			if(xyMove)
+				qXYMove(x, y, feedrate);
+		} else
+		{
+			if(xyMove)
+				qXYMove(x, y, feedrate);
+			if(zMove)
+				qZMove(z, feedrate);			
+		}
 		
 		if(endUp && !startUp)
 		{
@@ -273,7 +281,7 @@ public class GCodeRepRap extends GenericRepRap {
 		boolean xyMove = dx != 0 || dy != 0;
 		
 		if(zMove && xyMove)
-			Debug.e("GcodeRepRap.singleMove(): attempt to move in X|Y and Z simultaneously: (x, y, z) = (" + x + ", " + y + ", " + z + ")");
+			Debug.d("GcodeRepRap.singleMove(): attempt to move in X|Y and Z simultaneously: (x, y, z) = (" + x + ", " + y + ", " + z + ")");
 		
 		try
 		{

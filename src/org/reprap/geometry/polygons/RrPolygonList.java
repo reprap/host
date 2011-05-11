@@ -703,7 +703,7 @@ public class RrPolygonList
 	 * This is a heuristic - it does not do a full travelling salesman...
 	 * This deals with both open and closed polygons, but it only allows closed ones to
 	 * be re-ordered if reOrder is true.  If any point on a closed polygon is closer to 
-	 * any point on any other than linkUp, the two polygons are merged at their closest
+	 * any point on any other than sqrt(linkUp), the two polygons are merged at their closest
 	 * points.  This is suppressed by setting linkUp negative.
 	 * 
 	 * @param startNearHere
@@ -841,6 +841,174 @@ public class RrPolygonList
 	}
 	
 	/**
+	 * Take all the polygons in a list, both open and closed, and reorder them such that 
+	 * accessible points on any that have a squared distance less than linkUp to accessible
+	 * points on any others are joined to form single polygons.  
+	 * 
+	 * For an open polygon the accessible points are just its ends.  For a closed polygon 
+	 * all its points are accessible.
+	 * 
+	 * This is a fairly radical remove in-air movement strategy.
+	 * 
+	 * All the polygons in the list must be plotted with the same physical extruder (otherwise 
+	 * it would be nonsense to join them).  It is the calling function's responsibility to 
+	 * make sure this is the case.
+	 * 
+	 * @param linkUp
+	 */
+	public void radicalReOrder(double linkUp)
+	{		
+		if(size() < 2)
+			return;
+		
+		// First check that we all have the same physical extruder
+		
+		int physicalExtruder = polygon(0).getAttributes().getExtruder().getPhysicalExtruderNumber();
+		for(int i = 1; i < size(); i++)
+			if(polygon(i).getAttributes().getExtruder().getPhysicalExtruderNumber() != physicalExtruder)
+			{
+				Debug.e("RrPolygonList.radicalReOrder(): more than one physical extruder needed by the list!");
+				return;
+			}
+		
+		// Now go through the polygons pairwise
+		
+		for(int i = 0; i < size() - 1; i++)
+		{
+			RrPolygon myPolygon = polygon(i);
+			for(int j = i+1; j < size(); j++)
+			{
+				double d = Double.POSITIVE_INFINITY;
+				double d2;
+				int myPoint = -1;
+				int itsPoint = -1;
+				int myTempPoint, itsTempPoint;
+				boolean reverseMe, reverseIt;
+				RrPolygon itsPolygon = polygon(j);
+				
+				// Swap the odd half of the asymmetric cases so they're all the same
+				
+				if(!myPolygon.isClosed() && itsPolygon.isClosed())
+				{
+					polygons.set(i, itsPolygon);
+					polygons.set(j, myPolygon);
+					myPolygon = polygon(i);
+					itsPolygon = polygon(j);
+				}
+				
+				// Three possibilities ...
+				
+				if(!myPolygon.isClosed() && !itsPolygon.isClosed())
+				{
+					// ... both open
+					// Just compare the four ends
+					
+					reverseMe = true;
+					reverseIt = false;
+					d = Rr2Point.dSquared(myPolygon.point(0), itsPolygon.point(0));
+					
+					d2 = Rr2Point.dSquared(myPolygon.point(myPolygon.size() - 1), itsPolygon.point(0));
+					if(d2 < d)
+					{
+						reverseMe = false;
+						reverseIt = false;
+						d = d2;
+					}
+					
+					d2 = Rr2Point.dSquared(myPolygon.point(0), itsPolygon.point(itsPolygon.size() - 1));
+					if(d2 < d)
+					{
+						reverseMe = true;
+						reverseIt = true;
+						d = d2;
+					}
+					
+					d2 = Rr2Point.dSquared(myPolygon.point(myPolygon.size() - 1), itsPolygon.point(itsPolygon.size() - 1));
+					if(d2 < d)
+					{
+						reverseMe = false;
+						reverseIt = true;
+						d = d2;
+					}
+					
+					if(d < linkUp)
+					{
+						if(reverseMe)
+							myPolygon = myPolygon.negate();
+						if(reverseIt)
+							itsPolygon = itsPolygon.negate();
+						myPolygon.add(itsPolygon);
+						polygons.set(i, myPolygon);
+						polygons.remove(j);
+					}
+					
+				} else if(myPolygon.isClosed() && !itsPolygon.isClosed())
+				{
+					// ... I'm closed; it's open
+					// Compare all my points with its two ends
+					
+					reverseIt = false;
+					myPoint = myPolygon.nearestVertex(itsPolygon.point(0));
+					d = Rr2Point.dSquared(myPolygon.point(myPoint), itsPolygon.point(0));
+					myTempPoint = myPolygon.nearestVertex(itsPolygon.point(itsPolygon.size() - 1));
+					d2 = Rr2Point.dSquared(myPolygon.point(myTempPoint), itsPolygon.point(itsPolygon.size() -1 ));
+					if(d2 < d)
+					{
+						myPoint = myTempPoint;
+						reverseIt = true;
+						d = d2;
+					}
+					
+					if(d < linkUp)
+					{
+						myPolygon = myPolygon.newStart(myPoint);
+						myPolygon.add(myPolygon.point(0)); // Make sure the first half really is closed
+						if(reverseIt)
+							itsPolygon = itsPolygon.negate();
+						myPolygon.add(itsPolygon);
+						myPolygon.setOpen(); // We were closed, but we must now be open
+						polygons.set(i, myPolygon);
+						polygons.remove(j);
+					}
+					
+				} else if(myPolygon.isClosed() && itsPolygon.isClosed())
+				{
+					// ... both closed
+					// Compare all my points with all its points
+					
+					for(int k = 0; k < itsPolygon.size(); k++)
+					{
+						myTempPoint = myPolygon.nearestVertex(itsPolygon.point(k));
+						d2 = Rr2Point.dSquared(myPolygon.point(myTempPoint), itsPolygon.point(k));
+						if(d2 < d)
+						{
+							myPoint = myTempPoint;
+							itsPoint = k;
+							d = d2;
+						}
+					}
+					
+					if(d < linkUp)
+					{
+						myPolygon = myPolygon.newStart(myPoint);
+						myPolygon.add(myPolygon.point(0)); // Make sure we come back to the start
+						itsPolygon = itsPolygon.newStart(itsPoint);
+						myPolygon.add(itsPolygon);
+						myPolygon.setOpen(); // We were closed, but we must now be open
+						polygons.set(i, myPolygon);
+						polygons.remove(j);
+					}
+					
+				} else
+				{
+					// ... Horrible impossibility
+					Debug.e("RrPolygonList.radicalReOrder(): Polygons are neither closed nor open!");
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Remove polygon pol from the list, replacing it with two polygons, the
 	 * first being pol's vertices from 0 to st inclusive, and the second being
 	 * pol's vertices from en to its end inclusive.  It is permissible for 
@@ -884,11 +1052,13 @@ public class RrPolygonList
 	 * Search a polygon list to find the nearest point on all the polygons within it
 	 * to the point p.  If omit is non-negative, ignore that polygon in the search.
 	 * 
+	 * Only polygons with the same physical extruder are compared.
+	 * 
 	 * @param p
 	 * @param omit
 	 * @return
 	 */
-	private PolPoint ppSearch(Rr2Point p, int omit)
+	private PolPoint ppSearch(Rr2Point p, int omit, int physicalExtruder)
 	{
 		double d = Double.POSITIVE_INFINITY;
 		PolPoint result = null;
@@ -901,28 +1071,31 @@ public class RrPolygonList
 			if(i != omit)
 			{
 				RrPolygon pgon = polygon(i);
-				int n = pgon.nearestVertex(p);
-				double d2 = Rr2Point.dSquared(p, pgon.point(n));
-				if(d2 < d)
+				if(physicalExtruder == pgon.getAttributes().getExtruder().getPhysicalExtruderNumber())
 				{
-					if(result == null)
-						result = new PolPoint(n, i, pgon, d2);
-					else
-						result.set(n, i, pgon, d2);
-					d = d2;
+					int n = pgon.nearestVertex(p);
+					double d2 = Rr2Point.dSquared(p, pgon.point(n));
+					if(d2 < d)
+					{
+						if(result == null)
+							result = new PolPoint(n, i, pgon, d2);
+						else
+							result.set(n, i, pgon, d2);
+						d = d2;
+					}
 				}
 			}
 		}
 		
 		if(result == null)
-			Debug.e("RrPolygonList.ppSearch(): no point found!");
+			Debug.d("RrPolygonList.ppSearch(): no point found!");
 		
 		return result;
 	}
 	
 	
 	/**
-	 * This assumes that the RrPolygonList for which it is called is all the outline
+	 * This assumes that the RrPolygonList for which it is called is all the closed outline
 	 * polygons, and that hatching is their infill hatch.  It goes through the outlines
 	 * and the hatch modifying both so that that outlines actually start and end half-way 
 	 * along a hatch line (that half of the hatch line being deleted).  When the outlines
@@ -930,6 +1103,8 @@ public class RrPolygonList
 	 * 
 	 * The outline polygons are re-ordered before the start so that their first point is
 	 * the most extreme one in the current hatch direction.
+	 * 
+	 * Only hatches and outlines whose physical extruders match are altered.
 	 * 
 	 * @param hatching
 	 * @param lc
@@ -948,7 +1123,7 @@ public class RrPolygonList
 				outline = outline.newStart(outline.maximalVertex(l));
 
 				Rr2Point start = outline.point(0);
-				PolPoint pp = hatching.ppSearch(start, -1);
+				PolPoint pp = hatching.ppSearch(start, -1, outline.getAttributes().getExtruder().getPhysicalExtruderNumber());
 				boolean failed = true;
 				if(pp != null)
 				{
@@ -972,7 +1147,7 @@ public class RrPolygonList
 					if(slice.membership(pq1) & slice.membership(pq2) & slice.membership(pq3))
 					{
 						outline.add(start);
-						outline.setExtrudeEnd(outline.size() - 1);
+						outline.setExtrudeEnd(-1, 0);
 
 						if(en >= st)
 						{
