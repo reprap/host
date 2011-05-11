@@ -888,7 +888,7 @@ public class RrPolygonList
 				
 				// Swap the odd half of the asymmetric cases so they're all the same
 				
-				if(!myPolygon.isClosed() && itsPolygon.isClosed())
+				if(myPolygon.isClosed() && !itsPolygon.isClosed())
 				{
 					polygons.set(i, itsPolygon);
 					polygons.set(j, myPolygon);
@@ -942,29 +942,29 @@ public class RrPolygonList
 						polygons.remove(j);
 					}
 					
-				} else if(myPolygon.isClosed() && !itsPolygon.isClosed())
+				} else if(!myPolygon.isClosed() && itsPolygon.isClosed())
 				{
-					// ... I'm closed; it's open
-					// Compare all my points with its two ends
+					// ... I'm open, it's closed;
+					// Compare my end points with all its points
 					
-					reverseIt = false;
-					myPoint = myPolygon.nearestVertex(itsPolygon.point(0));
-					d = Rr2Point.dSquared(myPolygon.point(myPoint), itsPolygon.point(0));
-					myTempPoint = myPolygon.nearestVertex(itsPolygon.point(itsPolygon.size() - 1));
-					d2 = Rr2Point.dSquared(myPolygon.point(myTempPoint), itsPolygon.point(itsPolygon.size() -1 ));
+					reverseMe = true;
+					itsPoint = itsPolygon.nearestVertex(myPolygon.point(0));
+					d = Rr2Point.dSquared(itsPolygon.point(itsPoint), myPolygon.point(0));
+					itsTempPoint = itsPolygon.nearestVertex(myPolygon.point(myPolygon.size() - 1));
+					d2 = Rr2Point.dSquared(itsPolygon.point(itsTempPoint), myPolygon.point(myPolygon.size() - 1));
 					if(d2 < d)
 					{
-						myPoint = myTempPoint;
-						reverseIt = true;
+						itsPoint = itsTempPoint;
+						reverseMe = false;
 						d = d2;
 					}
 					
 					if(d < linkUp)
 					{
-						myPolygon = myPolygon.newStart(myPoint);
-						myPolygon.add(myPolygon.point(0)); // Make sure the first half really is closed
-						if(reverseIt)
-							itsPolygon = itsPolygon.negate();
+						itsPolygon = itsPolygon.newStart(itsPoint);
+						itsPolygon.add(itsPolygon.point(0)); // Make sure the second half really is closed
+						if(reverseMe)
+							myPolygon = myPolygon.negate();
 						myPolygon.add(itsPolygon);
 						myPolygon.setOpen(); // We were closed, but we must now be open
 						polygons.set(i, myPolygon);
@@ -993,8 +993,9 @@ public class RrPolygonList
 						myPolygon = myPolygon.newStart(myPoint);
 						myPolygon.add(myPolygon.point(0)); // Make sure we come back to the start
 						itsPolygon = itsPolygon.newStart(itsPoint);
+						itsPolygon.add(itsPolygon.point(0)); // Make sure we come back to the start
 						myPolygon.add(itsPolygon);
-						myPolygon.setOpen(); // We were closed, but we must now be open
+						//myPolygon.setOpen(); // We were closed, but we must now be open
 						polygons.set(i, myPolygon);
 						polygons.remove(j);
 					}
