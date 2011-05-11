@@ -115,6 +115,18 @@ public class BooleanGridList
 		}
 		
 		/**
+		 * Reverse the order of the list
+		 * @return
+		 */
+		public BooleanGridList reverse()
+		{
+			BooleanGridList result = new BooleanGridList();
+			for(int i = size() - 1; i >= 0; i--)
+				result.add(get(i));
+			return result;
+		}
+		
+		/**
 		 * Offset all the shapes in the list for this layer
 		 * @param lc
 		 * @param outline
@@ -160,6 +172,7 @@ public class BooleanGridList
 								result.add(thisOne);
 							shell++;
 						}
+						result = result.reverse();  // Best to plot from the inside out
 					} else
 					{
 						// Must be a hatch.  Only do it if the gap is +ve or we're building the foundation
