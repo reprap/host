@@ -6,6 +6,12 @@ REPRAP_DIR=`dirname $0`       # reprap.jar, jni libs and stl file
 
 cd $REPRAP_DIR
 
+MACHINE=`uname -m`
+
+# put the directory with the native RXTX and j3d libs in the library path
+LD_LIBRARY_PATH=`pwd`/lib-${MACHINE}:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH
+
 # build up classpath
 # when we move to OpenJDK/Java-6 these next few can be replaced with wildcard
 # *.jar and we will not need swing-layout any more.
@@ -19,4 +25,4 @@ CLASSPATH=$CLASSPATH:./swing-layout-1.0.3.jar
 CLASSPATH=$CLASSPATH:.
 
 # invoke the code
-java -cp $CLASSPATH -Xmx$REPRAP_RAM_SIZE -Djava.library.path=. org.reprap.Main
+java -cp $CLASSPATH -Xmx$REPRAP_RAM_SIZE org.reprap.Main
