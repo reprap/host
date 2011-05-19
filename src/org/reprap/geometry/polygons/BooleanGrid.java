@@ -2481,8 +2481,11 @@ public class BooleanGrid
 	 */
 	public RrPolygonList hatch(RrHalfPlane hp, double gap, Attributes a) //, Rr2Point startNearHere)
 	{	
-		push("Computing hatching... ");
+		//push("Computing hatching... ");
 		
+		if(gap <= 0) // Means the user has turned infill off for this; return an empty list.
+			return new RrPolygonList();
+			
 		RrRectangle big = box().scale(1.1);
 		double d = Math.sqrt(big.dSquared());
 		
@@ -2565,7 +2568,7 @@ public class BooleanGrid
 		RrPolygonList result = snakes.realPolygons(a).simplify(realResolution);
 		//result = result.nearEnds(startNearHere);
 		
-		pop();
+		//pop();
 		return result;
 	}
 	
