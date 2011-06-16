@@ -840,6 +840,8 @@ public class GCodeReaderAndWriter
 		serialInStream = null;
 		serialOutStream = null;
 		
+		portName = portName.trim();
+		
 		//open our port.
 		Debug.d("GCode opening port " + portName);
 		Main.setRepRapPresent(false);

@@ -6,8 +6,8 @@
 	<classpathentry kind="lib" path="lib/j3dcore.jar"/>
 	<classpathentry kind="lib" path="lib/j3d-org-java3d-all.jar"/>
 	<classpathentry kind="lib" path="lib/j3dutils.jar"/>
-	<classpathentry kind="lib" path="lib/RXTXcomm.jar"/>
-	<classpathentry kind="lib" path="lib/swing-layout-1.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
+	<classpathentry kind="lib" path="lib/swing-layout-1.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/RXTXcomm.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
