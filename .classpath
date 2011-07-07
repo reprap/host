@@ -8,6 +8,5 @@
 	<classpathentry kind="lib" path="lib/j3dutils.jar"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="lib" path="lib/RXTXcomm.jar"/>
-	<classpathentry kind="lib" path="lib/swing-layout-1.0.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

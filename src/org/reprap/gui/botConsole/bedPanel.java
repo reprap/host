@@ -76,14 +76,14 @@
 //        setMinimumSize(new java.awt.Dimension(200, 200));
 //        setPreferredSize(new java.awt.Dimension(200, 200));
 //
-//        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
+//        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
 //        this.setLayout(layout);
 //        layout.setHorizontalGroup(
-//            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+//            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 //            .add(0, 200, Short.MAX_VALUE)
 //        );
 //        layout.setVerticalGroup(
-//            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+//            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 //            .add(0, 200, Short.MAX_VALUE)
 //        );
 //    }// </editor-fold>//GEN-END:initComponents
