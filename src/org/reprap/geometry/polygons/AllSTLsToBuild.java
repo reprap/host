@@ -1,14 +1,8 @@
 package org.reprap.geometry.polygons;
 
-import java.util.List;
 import java.util.ArrayList;
-import org.reprap.geometry.LayerRules;
-import org.reprap.geometry.polygons.PolygonAttributes;
-import org.reprap.gui.STLObject;
-import org.reprap.Attributes;
-import org.reprap.Extruder;
-import org.reprap.Preferences;
-import org.reprap.utilities.Debug;
+import java.util.List;
+
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.GeometryArray;
 import javax.media.j3d.Group;
@@ -17,6 +11,13 @@ import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
 import javax.vecmath.Point3d;
 import javax.vecmath.Tuple3d;
+
+import org.reprap.Attributes;
+import org.reprap.Extruder;
+import org.reprap.Preferences;
+import org.reprap.geometry.LayerRules;
+import org.reprap.gui.STLObject;
+import org.reprap.utilities.Debug;
 
 /**
  * This class holds a list of STLObjects that represents everything that is to be built.
@@ -252,6 +253,7 @@ public class AllSTLsToBuild
 	/**
 	 * The lowest and highest points
 	 */
+	@SuppressWarnings("unused")
 	private RrInterval Zrange;
 	
 	/**

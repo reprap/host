@@ -143,6 +143,7 @@ public class GCodeReaderAndWriter
 	 * The ring buffer that stores the commands for 
 	 * possible resend requests.
 	 */
+	@SuppressWarnings("unused")
 	private int head, tail;
 	private static final int buflen = 10; // No too long, or pause doesn't work well
 	private String[] ringBuffer;
@@ -160,6 +161,7 @@ public class GCodeReaderAndWriter
 	 * Some commands (at the moment just M105 - get temperature and M114 - get coords) generate
 	 * a response.  Return that as a string.
 	 */
+	@SuppressWarnings("unused")
 	private int responsesExpected = 0;
 //	private boolean responseAvailable = false;
 //	private String response;

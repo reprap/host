@@ -775,6 +775,7 @@ public class BooleanGrid
 	 * implied by the neighbour array.  This table is generated interactively by the program 
 	 * org.reprap.utilities.FilterGenerator.
 	 */
+	@SuppressWarnings("unused")
 	private static final boolean[] thinFilter = {
 		true, true, true, false, true, true, false, true, true, true, true, true, false, true, false, false, 
 		true, true, true, true, true, true, true, true, false, true, true, true, true, true, false, false, 

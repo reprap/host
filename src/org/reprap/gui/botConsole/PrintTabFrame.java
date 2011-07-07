@@ -31,6 +31,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
     private Printer printer;
     private boolean paused = false;
     private boolean seenSNAP = false;
+    @SuppressWarnings("unused")
     private boolean seenGCode = false;
     private long startTime = -1;
     private int oldLayer = -1;
@@ -42,6 +43,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
     /** Creates new form PrintTabFrame */
     public PrintTabFrame(boolean pref) {
         initComponents(pref);
+        @SuppressWarnings("unused")
     	String machine = "simulator";
     	
     	//toSNAPRepRapRadioButton.setSelected(false);
@@ -588,10 +590,6 @@ private void pcbButtonActionPerformed(java.awt.event.ActionEvent evt)
 		fileRoot = inputGerber.getAbsolutePath().substring(0, sp);
 	drill = fileRoot+drill;
 	File inputDrill = new File(drill);
-	if(inputDrill == null)
-	{
-		JOptionPane.showMessageDialog(null, "Drill file " + drill + " not found; drill centres will not be marked");
-	}
 	File outputGCode = org.reprap.Main.gui.onOpen("G-Code file for PCB printing", new String[] {"gcode"}, fileRoot);
 	if(outputGCode == null)
 	{
@@ -609,18 +607,18 @@ public void pauseAction()
     paused = !paused;
     if(paused)
     {
-    	pauseButton.setLabel("Pausing...");
+    	pauseButton.setText("Pausing...");
     	org.reprap.Main.gui.pause();
     	//while(!printer.iAmPaused());
         parentBotConsoleFrame.resumePolling();
         parentBotConsoleFrame.getPosition();
         //parentBotConsoleFrame.getXYZTabPanel().recordCurrentPosition();
-        pauseButton.setLabel("Resume");
+        pauseButton.setText("Resume");
     } else
     {
     	org.reprap.Main.gui.resume();
         parentBotConsoleFrame.suspendPolling();
-        pauseButton.setLabel("Pause");
+        pauseButton.setText("Pause");
     }   
 }
 

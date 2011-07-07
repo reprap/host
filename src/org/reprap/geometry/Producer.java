@@ -1,18 +1,18 @@
 package org.reprap.geometry;
 
 import javax.swing.JCheckBoxMenuItem;
+
+import org.reprap.Attributes;
+import org.reprap.Extruder;
 import org.reprap.Preferences;
 import org.reprap.Printer;
-import org.reprap.Extruder;
-import org.reprap.Attributes;
-import org.reprap.geometry.polygons.Rr2Point;
-import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.AllSTLsToBuild;
-import org.reprap.geometry.polygons.RrPolygonList;
-import org.reprap.geometry.polygons.RrPolygon;
-import org.reprap.geometry.polygons.RrCSG;
 import org.reprap.geometry.polygons.BooleanGrid;
-import org.reprap.geometry.polygons.BooleanGridList;
+import org.reprap.geometry.polygons.Rr2Point;
+import org.reprap.geometry.polygons.RrCSG;
+import org.reprap.geometry.polygons.RrPolygon;
+import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;

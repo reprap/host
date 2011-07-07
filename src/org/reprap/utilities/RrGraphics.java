@@ -67,21 +67,21 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
 
-import org.reprap.geometry.polygons.BooleanGrid;
-import org.reprap.geometry.polygons.Rr2Point;
-import org.reprap.geometry.polygons.RrRectangle;
-import org.reprap.geometry.polygons.RrHalfPlane;
-import org.reprap.geometry.polygons.RrInterval;
-import org.reprap.geometry.polygons.RrLine;
-import org.reprap.geometry.polygons.RrPolygon;
-import org.reprap.geometry.polygons.RrPolygonList;
-import org.reprap.gui.StatusMessage;
-import org.reprap.Attributes;
 import javax.media.j3d.Appearance;
+import javax.media.j3d.Material;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.vecmath.Color3f;
-import javax.media.j3d.Material;
+
+import org.reprap.Attributes;
+import org.reprap.geometry.polygons.BooleanGrid;
+import org.reprap.geometry.polygons.Rr2Point;
+import org.reprap.geometry.polygons.RrHalfPlane;
+import org.reprap.geometry.polygons.RrInterval;
+import org.reprap.geometry.polygons.RrPolygon;
+import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.RrRectangle;
+import org.reprap.gui.StatusMessage;
 
 /**
  * Class to plot images of geometrical structures for debugging.
@@ -142,6 +142,7 @@ public class RrGraphics
 	/**
 	 * 
 	 */
+	@SuppressWarnings("unused")
 	private List<RrHalfPlane> hp = null;
 	
 	/**

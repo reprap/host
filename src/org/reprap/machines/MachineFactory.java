@@ -1,6 +1,5 @@
 package org.reprap.machines;
 
-import org.reprap.Preferences;
 import org.reprap.Printer;
 import org.reprap.ReprapException;
 

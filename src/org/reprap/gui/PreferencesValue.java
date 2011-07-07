@@ -1,12 +1,12 @@
 package org.reprap.gui;
+import java.awt.Component;
+import java.awt.GridLayout;
+
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultButtonModel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import java.awt.Component;
-import java.awt.GridLayout;
-import java.awt.GridLayout;
 
 
 public class PreferencesValue {
@@ -16,9 +16,11 @@ public class PreferencesValue {
 	
 	
 	public class BooleanChoice extends JPanel {
+		private static final long serialVersionUID = 1L;
 		private boolean userchoice;
 		private JRadioButton trueButton, falseButton;
 		private ButtonGroup bgroup;
+		@SuppressWarnings("unused")
 		private JTextField valueTextField;
 		
 		public BooleanChoice(Boolean boolvalue)

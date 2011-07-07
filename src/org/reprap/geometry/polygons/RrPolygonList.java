@@ -453,6 +453,7 @@ public class RrPolygonList
 	/**
 	 * Flag to prevent cyclic graphs going round forever
 	 */
+	@SuppressWarnings("unused")
 	private boolean beingDestroyed = false;
 	
 //	/**
