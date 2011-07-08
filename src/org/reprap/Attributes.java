@@ -100,7 +100,7 @@ public class Attributes {
 	{
 		if(e == null)
 		{
-			Printer p = org.reprap.Main.gui.getPrinter();
+			Printer p = org.reprap.Main.getPrinter();
 			if(p == null)
 			{
 				Debug.e("Attributes.getExtruder(): null printer!");

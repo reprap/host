@@ -48,6 +48,14 @@ import org.reprap.utilities.RrDeleteOnExit;
 
 public class Main {
 	
+	// This is a bit of a hack to allow us to user the netbeans form designer.
+	// During form creation the forms have a habit of trying to access things
+	// that haven't
+	// been initialised. If formDesignMode is true then we know we are in form
+	// design mode.
+	// We set formDesignMode to false during the hosts main() method.
+	public static boolean formDesignMode = true;
+	
 	public static RrDeleteOnExit ftd = null;
 
     //private static Communicator communicator = null;
@@ -56,7 +64,8 @@ public class Main {
     
     private Producer producer = null;
     
-    private Printer printer = null;
+	private static Printer printer = null;
+
     
     // Window to walk the file tree
     
@@ -70,6 +79,12 @@ public class Main {
     private JMenuItem cancelMenuItem;
     private JMenuItem produceProduceB;
 
+	// Main is a singleton
+	static public Main getInstance() {
+		return gui;
+	}
+
+	
     public void setSegmentPause(boolean state) {
         segmentPause.setState(state);
     }
@@ -260,7 +275,7 @@ public class Main {
 	/**
 	 * Return the printer being used
 	 */
-	public Printer getPrinter()
+	static public Printer getPrinter()
 	{
 		return printer;
 	}
@@ -465,6 +480,8 @@ public class Main {
 	
 	public static void main(String[] args) {
             
+			formDesignMode = false;
+
             Thread.currentThread().setName("Main");
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
             
@@ -492,7 +509,7 @@ public class Main {
 	}
         
         
-        public static Main gui;
+        private static Main gui;
         
 
         
@@ -513,4 +530,10 @@ public class Main {
 
         @SuppressWarnings("unused")
         private static final int localNodeNumber = 0;
+        
+        public static boolean inFormDesignMode()
+    	{
+    		return formDesignMode;
+    	}
+
     }
