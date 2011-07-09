@@ -1,7 +1,26 @@
 #!/bin/bash
 # reprap-host -- runs RepRap Java host with an appropriate classpath
+#
+# Usage: ./reprap
+#
+# or
+# 
+# ./reprap <installdir>
+#
+# where <installdir> is the directory path where reprap host has been installed.
+#
 
-REPRAP_RAM_SIZE=1024M                # Amount of RAM to allow Java VM to use
+# check we are running the correct version of java
+java -version 2>&1 | awk 'NR==1 {if (index($3, "1.6") >0) exit 0 ;exit 1}'
+
+if [ "$?" -ne "0" ]; then
+  echo "Sorry you need to be running Java 6 for reprap to run"
+  exit 1
+fi
+
+# Amount of RAM to allow Java VM to use
+# You may need to increase this to load in really large jobs.
+REPRAP_RAM_SIZE=1024M
 REPRAP_DIR=`dirname $0`       # reprap.jar, jni libs and stl file
 
 cd $REPRAP_DIR
@@ -9,20 +28,15 @@ cd $REPRAP_DIR
 MACHINE=`uname -m`
 
 # put the directory with the native RXTX and j3d libs in the library path
-LD_LIBRARY_PATH=`pwd`/lib-${MACHINE}:${LD_LIBRARY_PATH}
+LD_LIBRARY_PATH=/usr/lib/jni:`pwd`/lib-${MACHINE}:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
 
-# build up classpath
-# when we move to OpenJDK/Java-6 these next few can be replaced with wildcard
-# *.jar and we will not need swing-layout any more.
-CLASSPATH=./reprap.jar
-CLASSPATH=$CLASSPATH:./j3dcore.jar
-CLASSPATH=$CLASSPATH:./j3d-org-java3d-all.jar
-CLASSPATH=$CLASSPATH:./j3dutils.jar
-CLASSPATH=$CLASSPATH:./vecmath.jar
-CLASSPATH=$CLASSPATH:./RXTXcomm.jar
-CLASSPATH=$CLASSPATH:./swing-layout-1.0.3.jar
-CLASSPATH=$CLASSPATH:.
+CLASSPATH=./jar/reprap.jar
+# we are using java 6 so a wild card will pick all of the jars in the directory
+CLASSPATH=$CLASSPATH:./lib/*
+# the .stl file must be in a directory which is on the the classpath but its not a jar so the wild card won't work
+CLASSPATH=$CLASSPATH:./lib
 
 # invoke the code
 java -cp $CLASSPATH -Xmx$REPRAP_RAM_SIZE org.reprap.Main
+~                                                                
