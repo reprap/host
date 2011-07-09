@@ -759,7 +759,7 @@ public class GCodeReaderAndWriter
 				{
 					goAgain = false;
 					
-                    Debug.d("GCodeWriter.waitForResponse() - received response from RepRap "+ resp);
+                    Debug.c("GCodeWriter.waitForResponse() - received response from RepRap "+ resp);
 
 					if (resp.startsWith("start") || resp.contentEquals("")) // Startup or null string...
 					{
@@ -781,6 +781,7 @@ public class GCodeReaderAndWriter
 						goAgain = true; // but do "go again"
 					} else if (resp.startsWith("rs")) // Re-send request?
 					{
+					    Debug.d("GCodeWriter.waitForResponse(): RepRap resend requested for line " + resp);
                         lns = resp.substring(3);
 						int sp = lns.indexOf(" ");
 						if(sp > 0)
