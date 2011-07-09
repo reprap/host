@@ -37,6 +37,9 @@ import org.reprap.gui.STLObject;
 
 public class RFO 
 {
+    /** The RFO version implemented by this class **/
+    static public final String RFO_VERSION = "0.1";
+    
 	/**
 	 * XML stack top.  If it gets 100 deep we're in trouble...
 	 */
@@ -570,7 +573,7 @@ public class RFO
 	 */
 	private void createLegend()
 	{
-		xml = new XMLOut(rfoDir + legendName, "reprap-fab-at-home-build version=\"0.1\"");
+		xml = new XMLOut(rfoDir + legendName, "reprap-fab-at-home-build version=\"" + RFO_VERSION  + "\"");
 		for(int i = 0; i < astl.size(); i++)
 		{
 			xml.push("object name=\"object-" + i + "\"");
