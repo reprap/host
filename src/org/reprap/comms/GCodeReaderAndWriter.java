@@ -740,7 +740,7 @@ public class GCodeReaderAndWriter
 					e.printStackTrace();
 				}
 			}
-			
+						
 			try
 			{
 				i = serialInStream.read();
@@ -758,6 +758,9 @@ public class GCodeReaderAndWriter
 				if (c == '\n' || c == '\r')
 				{
 					goAgain = false;
+					
+                    Debug.d("GCodeWriter.waitForResponse() - received response from RepRap "+ resp);
+
 					if (resp.startsWith("start") || resp.contentEquals("")) // Startup or null string...
 					{
 						resp = "";
@@ -765,11 +768,10 @@ public class GCodeReaderAndWriter
 					} else if (resp.startsWith("!!")) // Horrible hard fault?
 					{
 						result = shutDown;
-						Debug.e("GCodeWriter.waitForResponse(): RepRap hard fault!  RepRap said: " + resp);
+						Debug.e("GCodeWriter.waitForResponse(): RepRap hard fault!");
 						
 					} else if (resp.startsWith("//")) // immediate DEBUG "comment" from the firmware  ( like C++ )
 					{
-						Debug.d("GCodeWriter.waitForResponse(): " + resp);
 						resp = "";
 						goAgain = true;
 					} else if (resp.endsWith("\\")) // lines ending in a single backslash are considered "continued" to the next line, like "C"
@@ -779,13 +781,16 @@ public class GCodeReaderAndWriter
 						goAgain = true; // but do "go again"
 					} else if (resp.startsWith("rs")) // Re-send request?
 					{
-						lns = resp.substring(3);
+                        lns = resp.substring(3);
 						int sp = lns.indexOf(" ");
 						if(sp > 0)
 							lns = lns.substring(0, sp);
+						
+						// Some firmware (may be all) returns the line with a leading 'N'.
+						if (lns.startsWith("N"))
+						    lns = lns.substring(1);
+						
 						result = Long.parseLong(lns);
-						Debug.e("GCodeWriter.waitForResponse() - request to resend from line " + result +
-								".  RepRap said: " + resp);
 					} else if (!resp.startsWith("ok")) // Must be "ok" if not those - check
 					{
 						Debug.e("GCodeWriter.waitForResponse() - dud response from RepRap:" + resp);
