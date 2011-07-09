@@ -47,6 +47,11 @@ public class Debug {
 		refreshPreferences();	
 	}
 	
+	/**
+	 * Print a debug message to system out if the Debug property
+	 * is set in the preferences file.
+	 * @param s
+	 */
 	static public void d(String s)
 	{
 		initialiseIfNeedBe();
@@ -77,6 +82,11 @@ public class Debug {
 		System.out.flush();
 	}
 	
+	/**
+	 * Used to print a trace of the comms if the 'CommsDebug' flag is 
+	 * set in the preferences file.
+	 * @param s
+	 */
 	static public void c(String s)
 	{
 		initialiseIfNeedBe();
