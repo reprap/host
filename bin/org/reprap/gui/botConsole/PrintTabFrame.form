@@ -39,21 +39,18 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="toSNAPRepRapRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="toGCodeRepRapRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="gCodeToFileRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="layerPauseCheck" min="-2" max="-2" attributes="0"/>
                           <Component id="displayPathsCheck" min="-2" max="-2" attributes="1"/>
-                          <Component id="gCodeToFileRadioButton" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
                           <Group type="102" attributes="1">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-                                  <Component id="preferencesButton" min="-2" max="-2" attributes="1"/>
-                              </Group>
-                              <EmptySpace pref="27" max="32767" attributes="0"/>
+                              <Component id="preferencesButton" min="-2" max="-2" attributes="1"/>
+                              <EmptySpace max="32767" attributes="0"/>
                               <Component id="getWebPage" min="-2" pref="190" max="-2" attributes="0"/>
                           </Group>
-                          <Group type="102" alignment="1" attributes="0">
+                          <Group type="102" attributes="0">
                               <Component id="printButton" min="-2" pref="72" max="-2" attributes="1"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="pauseButton" min="-2" pref="78" max="-2" attributes="1"/>
@@ -102,28 +99,25 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="getWebPage" min="-2" pref="72" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="getWebPage" min="-2" pref="72" max="-2" attributes="0"/>
+                  </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="preferencesButton" min="-2" pref="45" max="-2" attributes="1"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="loadSTL" min="-2" pref="41" max="-2" attributes="1"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+                              <Component id="loadGCode" min="-2" pref="41" max="-2" attributes="1"/>
                           </Group>
-                          <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                              <Group type="102" alignment="0" attributes="1">
-                                  <Component id="toSNAPRepRapRadioButton" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="toGCodeRepRapRadioButton" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
-                                  <Component id="gCodeToFileRadioButton" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="loadSTL" min="-2" pref="41" max="-2" attributes="1"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="loadGCode" min="-2" pref="41" max="-2" attributes="1"/>
-                              </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="toSNAPRepRapRadioButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="toGCodeRepRapRadioButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="gCodeToFileRadioButton" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="preferencesButton" min="-2" pref="45" max="-2" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -170,13 +164,13 @@
                   </Group>
                   <Component id="progressBar" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="24" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="java.awt.Button" name="printButton">
+    <Component class="java.swing.JButton" name="printButton">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="0" green="cc" red="33" type="rgb"/>
@@ -192,7 +186,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="printButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="java.awt.Button" name="pauseButton">
+    <Component class="java.swing.JButton" name="pauseButton">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="0" green="cc" red="ff" type="rgb"/>
@@ -203,7 +197,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pauseButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="java.awt.Button" name="stopButton">
+    <Component class="java.swing.JButton" name="stopButton">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="0" green="0" red="ff" type="rgb"/>
@@ -217,7 +211,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="stopButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="java.awt.Button" name="exitButton">
+    <Component class="java.swing.JButton" name="exitButton">
       <Properties>
         <Property name="label" type="java.lang.String" value="Exit"/>
       </Properties>
@@ -313,7 +307,7 @@
     </Component>
     <Component class="javax.swing.JProgressBar" name="progressBar">
     </Component>
-    <Component class="java.awt.Button" name="loadSTL">
+    <Component class="java.swing.JButton" name="loadSTL">
       <Properties>
         <Property name="actionCommand" type="java.lang.String" value="loadSTL"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -325,7 +319,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadSTL"/>
       </Events>
     </Component>
-    <Component class="java.awt.Button" name="loadGCode">
+    <Component class="java.swing.JButton" name="loadGCode">
       <Properties>
         <Property name="actionCommand" type="java.lang.String" value="loadGCode"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -348,7 +342,7 @@
         <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="selectorRadioButtonMousePressed"/>
       </Events>
     </Component>
-    <Component class="java.awt.Button" name="loadRFO">
+    <Component class="java.swing.JButton" name="loadRFO">
       <Properties>
         <Property name="actionCommand" type="java.lang.String" value="loadRFO"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -379,7 +373,7 @@
         <Property name="text" type="java.lang.String" value=" - "/>
       </Properties>
     </Component>
-    <Component class="java.awt.Button" name="preferencesButton">
+    <Component class="java.swing.JButton" name="preferencesButton">
       <Properties>
         <Property name="actionCommand" type="java.lang.String" value="preferences"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -394,7 +388,7 @@
         <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="PrintTabFrame_preferencesButton"/>
       </AuxValues>
     </Component>
-    <Component class="java.awt.Button" name="saveRFO">
+    <Component class="java.swing.JButton" name="saveRFO">
       <Properties>
         <Property name="actionCommand" type="java.lang.String" value="saveRFO"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -420,20 +414,5 @@
         <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="PrintTabFrame_displayPathsCheck"/>
       </AuxValues>
     </Component>
-    <Container class="javax.swing.JPanel" name="jPanel1">
-
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="100" max="32767" attributes="0"/>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="100" max="32767" attributes="0"/>
-          </Group>
-        </DimensionLayout>
-      </Layout>
-    </Container>
   </SubComponents>
 </Form>

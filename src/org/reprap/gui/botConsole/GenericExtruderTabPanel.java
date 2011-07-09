@@ -20,112 +20,116 @@ import java.awt.Color;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+
 /**
- *
- * @author  en0es
+ * 
+ * @author en0es
  */
 public class GenericExtruderTabPanel extends javax.swing.JPanel {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private int extruderID = 0;
     private boolean heatPushed = false;
     private double startTime = -1;
     private boolean ramping = false;
     private double startTemp = -1;
-	private BotConsoleFrame parentBotConsoleFrame = null;
+    private BotConsoleFrame parentBotConsoleFrame = null;
     private Extruder extruder;
     private String prefix;
- 
+
     /** Creates new form GenericExtruderTabPanel */
     public GenericExtruderTabPanel() {
- 
+
         UIManager.put("ProgressBar.background", Color.WHITE);
         UIManager.put("ProgressBar.foreground", Color.BLUE);
 
-        initComponents(); 
+        initComponents();
         RampRate.setText("0.2"); // Sensible default
-        
+
     }
-    
+
     /**
      * So the BotConsoleFrame can let us know who it is
+     * 
      * @param b
      */
-    public void setConsoleFrame(BotConsoleFrame b)
-    {
-    	parentBotConsoleFrame = b;
+    public void setConsoleFrame(BotConsoleFrame b) {
+        parentBotConsoleFrame = b;
     }
-    
+
     private void deactivatePanel() {
 
-            coolingCheck.setEnabled(false);
-            currentTempLabel.setEnabled(false);
-            extrudeButton.setEnabled(false);
-            //feedstockQtyLabel.setEnabled(false);
-            heatButton.setEnabled(false);
-            homeAllButton.setEnabled(false);
-            jLabel1.setEnabled(false);
-            jLabel11.setEnabled(false);
-            jLabel12.setEnabled(false);
-            //jLabel4.setEnabled(false);
-            //jLabel5.setEnabled(false);
-            jLabel6.setEnabled(false);
-            jLabel7.setEnabled(false);
-            jPanel2.setEnabled(false);
-            jPanel3.setEnabled(false);
-            jPanel4.setEnabled(false);
-            materialLabel.setEnabled(false);
-            motorReverseCheck.setEnabled(false);
-            motorSpeedField.setEnabled(false);
-            moveToDumpButton.setEnabled(false);
-            homeXYbutton.setEnabled(false);
-            targetTempField.setEnabled(false);
-            tempColor.setEnabled(false);
-            tempProgress.setEnabled(false);
-            valveToggleButton.setEnabled(false);
-            RampButton.setEnabled(false);
-            RampRate.setEnabled(false);
+        coolingCheck.setEnabled(false);
+        currentTempLabel.setEnabled(false);
+        extrudeButton.setEnabled(false);
+        // feedstockQtyLabel.setEnabled(false);
+        heatButton.setEnabled(false);
+        homeAllButton.setEnabled(false);
+        jLabel1.setEnabled(false);
+        jLabel11.setEnabled(false);
+        jLabel12.setEnabled(false);
+        // jLabel4.setEnabled(false);
+        // jLabel5.setEnabled(false);
+        jLabel6.setEnabled(false);
+        jLabel7.setEnabled(false);
+        jPanel2.setEnabled(false);
+        jPanel3.setEnabled(false);
+        jPanel4.setEnabled(false);
+        materialLabel.setEnabled(false);
+        motorReverseCheck.setEnabled(false);
+        motorSpeedField.setEnabled(false);
+        moveToDumpButton.setEnabled(false);
+        homeXYbutton.setEnabled(false);
+        targetTempField.setEnabled(false);
+        tempColor.setEnabled(false);
+        tempProgress.setEnabled(false);
+        valveToggleButton.setEnabled(false);
+        RampButton.setEnabled(false);
+        RampRate.setEnabled(false);
 
     }
-    
 
     public void initialiseExtruders(int id) throws Exception {
-           	
         extruderID = id;
-        prefix = "Extruder" + id + "_";        
+        prefix = "Extruder" + id + "_";
 
-        Printer p = org.reprap.Main.gui.getPrinter();
-        Extruder extruders[] = p.getExtruders();
-        extruder = extruders[extruderID];
-        
-        if(!extruder.isAvailable()) 
-        {
-            deactivatePanel();
+        // gui won't normally be null except when we are loading the
+        // BotConsoleFrame in the form designer.
+        // This is a little hack so we can still work with the form designer.
+        if (!org.reprap.Main.inFormDesignMode()) {
+            Printer p = org.reprap.Main.getPrinter();
+            Extruder extruders[] = p.getExtruders();
+            extruder = extruders[extruderID];
+
+            if (!extruder.isAvailable()) {
+                deactivatePanel();
+            }
         }
-            
+
     }
-    
-    public void selectExtruder()
-    {
-    	try {
-			org.reprap.Main.gui.getPrinter().selectExtruder(extruderID);
-		} catch (Exception e) {
-			parentBotConsoleFrame.handleException(e);
-		}
+
+    public void selectExtruder() {
+        try {
+            org.reprap.Main.getPrinter().selectExtruder(extruderID);
+        }
+        catch (Exception e) {
+            parentBotConsoleFrame.handleException(e);
+        }
     }
-    
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed"
+    // desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
         materialLabel = new javax.swing.JLabel();
-        //feedstockQtyLabel = new javax.swing.JLabel();
-        //jLabel4 = new javax.swing.JLabel();
-        //jLabel5 = new javax.swing.JLabel();
+        // feedstockQtyLabel = new javax.swing.JLabel();
+        // jLabel4 = new javax.swing.JLabel();
+        // jLabel5 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         targetTempField = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
@@ -156,19 +160,19 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         materialLabel.setFont(new java.awt.Font("Tahoma", 0, 12));
         materialLabel.setText("materialType");
 
-        //feedstockQtyLabel.setFont(new java.awt.Font("Tahoma", 0, 12));
-        //feedstockQtyLabel.setText("00000");
+        // feedstockQtyLabel.setFont(new java.awt.Font("Tahoma", 0, 12));
+        // feedstockQtyLabel.setText("00000");
 
-        //jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12));
-        //jLabel4.setText("Feedstock remaining:");
+        // jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12));
+        // jLabel4.setText("Feedstock remaining:");
 
-        //jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12));
-        //jLabel5.setText("ml");
+        // jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12));
+        // jLabel5.setText("ml");
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Temperature (degrees Celcius)"));
 
         targetTempField.setColumns(3);
-        targetTempField.setFont(targetTempField.getFont().deriveFont(targetTempField.getFont().getSize()+1f));
+        targetTempField.setFont(targetTempField.getFont().deriveFont(targetTempField.getFont().getSize() + 1f));
         targetTempField.setText("000");
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12));
@@ -186,26 +190,22 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
         javax.swing.GroupLayout tempColorLayout = new javax.swing.GroupLayout(tempColor);
         tempColor.setLayout(tempColorLayout);
-        tempColorLayout.setHorizontalGroup(
-            tempColorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 52, Short.MAX_VALUE)
-        );
-        tempColorLayout.setVerticalGroup(
-            tempColorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 54, Short.MAX_VALUE)
-        );
+        tempColorLayout.setHorizontalGroup(tempColorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 52, Short.MAX_VALUE));
+        tempColorLayout.setVerticalGroup(tempColorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 54, Short.MAX_VALUE));
 
         heatButton.setText("Switch heat on");
         heatButton.setFocusCycleRoot(true);
-        heatButton.addActionListener(new java.awt.event.ActionListener() {
+        heatButton.addActionListener(new java.awt.event.ActionListener()
+        {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 heatButtonActionPerformed(evt);
             }
         });
 
-        coolingCheck.setFont(coolingCheck.getFont().deriveFont(coolingCheck.getFont().getSize()+1f));
+        coolingCheck.setFont(coolingCheck.getFont().deriveFont(coolingCheck.getFont().getSize() + 1f));
         coolingCheck.setText("Cooling");
-        coolingCheck.addActionListener(new java.awt.event.ActionListener() {
+        coolingCheck.addActionListener(new java.awt.event.ActionListener()
+        {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 coolingCheckActionPerformed(evt);
             }
@@ -215,12 +215,13 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         jLabel8.setText("Ramp rate (C/sec):");
 
         RampRate.setColumns(3);
-        RampRate.setFont(RampRate.getFont().deriveFont(RampRate.getFont().getSize()+1f));
+        RampRate.setFont(RampRate.getFont().deriveFont(RampRate.getFont().getSize() + 1f));
         RampRate.setText("000");
 
         RampButton.setText("Ramp");
         RampButton.setFocusCycleRoot(true);
-        RampButton.addActionListener(new java.awt.event.ActionListener() {
+        RampButton.addActionListener(new java.awt.event.ActionListener()
+        {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 RampButtonActionPerformed(evt);
             }
@@ -228,65 +229,79 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel8)
+        jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                javax.swing.GroupLayout.Alignment.TRAILING,
+                jPanel2Layout
+                        .createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(
+                                jPanel2Layout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(
+                                                jPanel2Layout.createSequentialGroup().addComponent(jLabel8).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(RampRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING,
+                                                jPanel2Layout.createSequentialGroup().addComponent(jLabel6).addGap(18, 18, 18).addComponent(currentTempLabel))
+                                        .addGroup(
+                                                javax.swing.GroupLayout.Alignment.LEADING,
+                                                jPanel2Layout
+                                                        .createSequentialGroup()
+                                                        .addGap(6, 6, 6)
+                                                        .addComponent(jLabel7)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(targetTempField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(140, 140, 140)
+                        .addComponent(RampButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(RampRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel6)
-                        .addGap(18, 18, 18)
-                        .addComponent(currentTempLabel))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabel7)
+                        .addComponent(tempProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(targetTempField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(140, 140, 140)
-                .addComponent(RampButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tempProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tempColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(coolingCheck)
-                    .addComponent(heatButton, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(heatButton, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
-                    .addComponent(tempColor, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(RampButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(currentTempLabel))
+                        .addComponent(tempColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(targetTempField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7)))
-                    .addComponent(tempProgress, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(coolingCheck)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(RampRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel8)))
-                .addContainerGap())
-        );
+                        .addGroup(
+                                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING).addComponent(coolingCheck)
+                                        .addComponent(heatButton, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)).addContainerGap()));
+        jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(
+                        javax.swing.GroupLayout.Alignment.TRAILING,
+                        jPanel2Layout
+                                .createSequentialGroup()
+                                .addGroup(
+                                        jPanel2Layout
+                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                .addComponent(heatButton, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
+                                                .addComponent(tempColor, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        Short.MAX_VALUE)
+                                                .addComponent(RampButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
+                                                .addGroup(
+                                                        javax.swing.GroupLayout.Alignment.LEADING,
+                                                        jPanel2Layout
+                                                                .createSequentialGroup()
+                                                                .addGroup(
+                                                                        jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel6)
+                                                                                .addComponent(currentTempLabel))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addGroup(
+                                                                        jPanel2Layout
+                                                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                                .addComponent(targetTempField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabel7)))
+                                                .addComponent(tempProgress, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(
+                                        jPanel2Layout
+                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(coolingCheck)
+                                                .addGroup(
+                                                        jPanel2Layout
+                                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                .addComponent(RampRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabel8))).addContainerGap()));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Extrude"));
 
         motorSpeedField.setColumns(3);
-        motorSpeedField.setFont(motorSpeedField.getFont().deriveFont(motorSpeedField.getFont().getSize()+1f));
+        motorSpeedField.setFont(motorSpeedField.getFont().deriveFont(motorSpeedField.getFont().getSize() + 1f));
         motorSpeedField.setText("000");
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 12));
@@ -296,7 +311,8 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         jLabel11.setText("Extrude speed:");
 
         extrudeButton.setText("Extrude");
-        extrudeButton.addActionListener(new java.awt.event.ActionListener() {
+        extrudeButton.addActionListener(new java.awt.event.ActionListener()
+        {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 extrudeButtonActionPerformed(evt);
             }
@@ -305,15 +321,17 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         valveToggleButton.setSelected(true);
         valveToggleButton.setText("Close valve");
         valveToggleButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        valveToggleButton.addActionListener(new java.awt.event.ActionListener() {
+        valveToggleButton.addActionListener(new java.awt.event.ActionListener()
+        {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 valveToggleButtonActionPerformed(evt);
             }
         });
 
-        motorReverseCheck.setFont(motorReverseCheck.getFont().deriveFont(motorReverseCheck.getFont().getSize()+1f));
+        motorReverseCheck.setFont(motorReverseCheck.getFont().deriveFont(motorReverseCheck.getFont().getSize() + 1f));
         motorReverseCheck.setText("Reverse");
-        motorReverseCheck.addActionListener(new java.awt.event.ActionListener() {
+        motorReverseCheck.addActionListener(new java.awt.event.ActionListener()
+        {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 motorReverseCheckActionPerformed(evt);
             }
@@ -321,52 +339,42 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel11)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(motorSpeedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel12)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 135, Short.MAX_VALUE)
-                .addComponent(valveToggleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(extrudeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(motorReverseCheck)
-                .addGap(13, 13, 13))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jLabel11)
-                .addComponent(motorSpeedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(jLabel12)
-                .addComponent(extrudeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(motorReverseCheck)
-                .addComponent(valveToggleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+        jPanel3Layout.setHorizontalGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                jPanel3Layout.createSequentialGroup().addContainerGap().addComponent(jLabel11).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(motorSpeedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 135, Short.MAX_VALUE)
+                        .addComponent(valveToggleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(extrudeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addComponent(motorReverseCheck).addGap(13, 13, 13)));
+        jPanel3Layout.setVerticalGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel11)
+                        .addComponent(motorSpeedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabel12)
+                        .addComponent(extrudeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(motorReverseCheck)
+                        .addComponent(valveToggleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)));
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Maintenance"));
 
         homeXYbutton.setText("Home X & Y");
-        homeXYbutton.addActionListener(new java.awt.event.ActionListener() {
+        homeXYbutton.addActionListener(new java.awt.event.ActionListener()
+        {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 homeXYbuttonActionPerformed(evt);
             }
         });
 
         homeAllButton.setText("Home all");
-        homeAllButton.addActionListener(new java.awt.event.ActionListener() {
+        homeAllButton.addActionListener(new java.awt.event.ActionListener()
+        {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 homeAllButtonAction(evt);
             }
         });
 
         moveToDumpButton.setText("Move to dump point");
-        moveToDumpButton.addActionListener(new java.awt.event.ActionListener() {
+        moveToDumpButton.addActionListener(new java.awt.event.ActionListener()
+        {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 moveToDumpPointAction(evt);
             }
@@ -374,81 +382,61 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap(275, Short.MAX_VALUE)
-                .addComponent(homeAllButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(homeXYbutton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(moveToDumpButton)
-                .addContainerGap())
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(homeXYbutton)
-                .addComponent(moveToDumpButton)
-                .addComponent(homeAllButton))
-        );
+        jPanel4Layout.setHorizontalGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                javax.swing.GroupLayout.Alignment.TRAILING,
+                jPanel4Layout.createSequentialGroup().addContainerGap(275, Short.MAX_VALUE).addComponent(homeAllButton).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(homeXYbutton).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(moveToDumpButton).addContainerGap()));
+        jPanel4Layout.setVerticalGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(homeXYbutton).addComponent(moveToDumpButton).addComponent(homeAllButton)));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, 
-                    		Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(materialLabel))
-                            .addGroup(layout.createSequentialGroup()
-                                //.add(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                //.add(feedstockQtyLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                //.add(jLabel5)
-                                ))
-                        .addGap(202, 202, 202))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(materialLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    //.add(jLabel4)
-                    //.add(jLabel5)
-                    //.add(feedstockQtyLabel)
-                    )
-                .addGap(18, 18, 18)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
-        );
+        layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(
+                                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(
+                                                layout.createSequentialGroup()
+                                                        .addGroup(
+                                                                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(
+                                                                                layout.createSequentialGroup().addComponent(jLabel1)
+                                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(materialLabel))
+                                                                        .addGroup(layout.createSequentialGroup()
+                                                                        // .add(jLabel4)
+                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                                // .add(feedstockQtyLabel)
+                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                        // .add(jLabel5)
+                                                                        )).addGap(202, 202, 202))
+                                        .addGroup(
+                                                layout.createSequentialGroup().addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addContainerGap())
+                                        .addGroup(
+                                                layout.createSequentialGroup().addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addContainerGap()))));
+        layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+                layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel1).addComponent(materialLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        // .add(jLabel4)
+                        // .add(jLabel5)
+                        // .add(feedstockQtyLabel)
+                        ).addGap(18, 18, 18).addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(24, Short.MAX_VALUE)));
     }// </editor-fold>//GEN-END:initComponents
 
-private void coolingCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_coolingCheckActionPerformed
-    	parentBotConsoleFrame.suspendPolling();
-    	selectExtruder();
+    private void coolingCheckActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_coolingCheckActionPerformed
+        parentBotConsoleFrame.suspendPolling();
+        selectExtruder();
         try {
             extruder.setCooler(coolingCheck.isSelected());
         }
@@ -457,244 +445,246 @@ private void coolingCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
             ex.printStackTrace();
         }
         parentBotConsoleFrame.resumePolling();
-}//GEN-LAST:event_coolingCheckActionPerformed
+    }// GEN-LAST:event_coolingCheckActionPerformed
 
-private void motorReverseCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_motorReverseCheckActionPerformed
-        // TODO add your handling code here:
-}//GEN-LAST:event_motorReverseCheckActionPerformed
+    private void motorReverseCheckActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_motorReverseCheckActionPerformed
+                                                                                   // TODO
+                                                                                   // add
+                                                                                   // your
+                                                                                   // handling
+                                                                                   // code
+                                                                                   // here:
+    }// GEN-LAST:event_motorReverseCheckActionPerformed
 
+    private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_heatButtonActionPerformed
+        parentBotConsoleFrame.suspendPolling();
+        selectExtruder();
+        if (heatPushed) {
+            rampOff();
+            try {
+                extruder.setTemperature(0, false);
+            }
+            catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);
+                ex.printStackTrace();
+            }
+            heatButton.setText("Switch heater on");
+            heatPushed = false;
+        } else {
+            try {
+                extruder.setTemperature(Integer.parseInt(targetTempField.getText()), false);
+            }
+            catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);
+                ex.printStackTrace();
+            }
+            heatButton.setText("Switch heater off");
+            heatPushed = true;
+        }
+        parentBotConsoleFrame.resumePolling();
 
-    
-private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heatButtonActionPerformed
-    	parentBotConsoleFrame.suspendPolling();
-    	selectExtruder();
-    	if (heatPushed) {
-    		rampOff();
-    		try {
-    			extruder.setTemperature(0, false);
-    		}
-    		catch (Exception ex) {
-    			JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);
-    			ex.printStackTrace();
-    		}
-    		heatButton.setText("Switch heater on");
-    		heatPushed = false;
-    	}
-    	else {
-    		try {
-    			extruder.setTemperature(Integer.parseInt(targetTempField.getText()), false);
-    		}
-    		catch (Exception ex) {
-    			JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);
-    			ex.printStackTrace();
-    		}
-    		heatButton.setText("Switch heater off");
-    		heatPushed = true;
-    	}
-    	parentBotConsoleFrame.resumePolling();
-    	
-    }//GEN-LAST:event_heatButtonActionPerformed
+    }// GEN-LAST:event_heatButtonActionPerformed
 
-private void setExtruderSpeed() {
-    try {
-            extruder.setExtrusion(extruding?Double.parseDouble(motorSpeedField.getText()):0, motorReverseCheck.isSelected());
-    } catch (Exception ex) {
+    private void setExtruderSpeed() {
+        try {
+            extruder.setExtrusion(extruding ? Double.parseDouble(motorSpeedField.getText()) : 0, motorReverseCheck.isSelected());
+        }
+        catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Extruder exception: " + ex);
             ex.printStackTrace();
+        }
     }
-}
 
     private boolean extruding = false;
-    
-    private void extrudeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extrudeButtonActionPerformed
+
+    private void extrudeButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_extrudeButtonActionPerformed
         if (extruding) {
-                extruding = false;
-                extrudeButton.setText("Extrude");
+            extruding = false;
+            extrudeButton.setText("Extrude");
 
         } else {
-                extruding = true;
-                extrudeButton.setText("Stop extruding");
+            extruding = true;
+            extrudeButton.setText("Stop extruding");
 
-                //System.out.println("Extruding at speed: " + motorSpeedField.getText());
+            // System.out.println("Extruding at speed: " +
+            // motorSpeedField.getText());
         }
         parentBotConsoleFrame.suspendPolling();
         selectExtruder();
         setExtruderSpeed();
-        if(extruder.get5D() && extruding)
-		{
-			try {
-				extruder.getPrinter().machineWait(5000, false);
-			} catch (Exception e) {
-				parentBotConsoleFrame.handleException(e);
-			}
-			extruding = false;
-			setExtruderSpeed();
+        if (extruder.get5D() && extruding) {
+            try {
+                extruder.getPrinter().machineWait(5000, false);
+            }
+            catch (Exception e) {
+                parentBotConsoleFrame.handleException(e);
+            }
+            extruding = false;
+            setExtruderSpeed();
             extrudeButton.setText("Extrude");
-		}
+        }
         parentBotConsoleFrame.resumePolling();
-    }//GEN-LAST:event_extrudeButtonActionPerformed
+    }// GEN-LAST:event_extrudeButtonActionPerformed
 
-    private void homeXYbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeXYbuttonActionPerformed
-//        Reprap.finishedLayer(1);
-//        Reprap.betweenLayers(layerNumber);
-    	BotConsoleFrame.getXYZTabPanel().homeXY();
-    }//GEN-LAST:event_homeXYbuttonActionPerformed
+    private void homeXYbuttonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_homeXYbuttonActionPerformed
+                                                                              // Reprap.finishedLayer(1);
+                                                                              // Reprap.betweenLayers(layerNumber);
+        BotConsoleFrame.getXYZTabPanel().homeXY();
+    }// GEN-LAST:event_homeXYbuttonActionPerformed
 
-    private void valveToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_valveToggleButtonActionPerformed
-    	parentBotConsoleFrame.suspendPolling();
-    	selectExtruder();
+    private void valveToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_valveToggleButtonActionPerformed
+        parentBotConsoleFrame.suspendPolling();
+        selectExtruder();
         if (valveToggleButton.isSelected()) {
-        	try
-        	{
-        		extruder.setValve(true);
-        		valveToggleButton.setText("Shut valve");
-        	} catch (Exception ex) {}
-        }
-        else {
-           	try
-        	{
-           		extruder.setValve(false);
-           		valveToggleButton.setText("Open valve");
-        	} catch (Exception ex) {}
+            try {
+                extruder.setValve(true);
+                valveToggleButton.setText("Shut valve");
+            }
+            catch (Exception ex) {
+            }
+        } else {
+            try {
+                extruder.setValve(false);
+                valveToggleButton.setText("Open valve");
+            }
+            catch (Exception ex) {
+            }
         }
         parentBotConsoleFrame.resumePolling();
-}//GEN-LAST:event_valveToggleButtonActionPerformed
+    }// GEN-LAST:event_valveToggleButtonActionPerformed
 
-private void rampOff()
-{
-    RampButton.setText("Ramp");
-    startTime = -1;
-    ramping = false;	
-}
-
-private void RampButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RampButtonActionPerformed
-    if (ramping)
-    	rampOff();
-    else 
-    {
-    	heatButton.setText("Switch heat off");
-    	//GregorianCalendar cal = new GregorianCalendar();
-    	//Date d = cal.getTime();
-		startTime = Timer.elapsed();//d.getTime() + cal.getTimeZone().getOffset(d.getTime());
-		try {
-			startTemp = extruder.getTemperature() - 1;
-		} catch (Exception e) {
-			parentBotConsoleFrame.handleException(e);
-		} // Start a bit below where we are for safety
-    	RampButton.setText("Ramping");
-        ramping = true;
+    private void rampOff() {
+        RampButton.setText("Ramp");
+        startTime = -1;
+        ramping = false;
     }
-}//GEN-LAST:event_RampButtonActionPerformed
 
-private void homeAllButtonAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeAllButtonAction
-	BotConsoleFrame.getXYZTabPanel().homeAll();
-}//GEN-LAST:event_homeAllButtonAction
+    private void RampButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_RampButtonActionPerformed
+        if (ramping)
+            rampOff();
+        else {
+            heatButton.setText("Switch heat off");
+            // GregorianCalendar cal = new GregorianCalendar();
+            // Date d = cal.getTime();
+            startTime = Timer.elapsed();// d.getTime() +
+                                        // cal.getTimeZone().getOffset(d.getTime());
+            try {
+                startTemp = extruder.getTemperature() - 1;
+            }
+            catch (Exception e) {
+                parentBotConsoleFrame.handleException(e);
+            } // Start a bit below where we are for safety
+            RampButton.setText("Ramping");
+            ramping = true;
+        }
+    }// GEN-LAST:event_RampButtonActionPerformed
 
-private void moveToDumpPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveToSwapPointAction
-	double z = BotConsoleFrame.getXYZTabPanel().getPrinter().getZ();
-	if(z < 0.1)
-	{
-		z = 1.0;
-		BotConsoleFrame.getXYZTabPanel().goTo(BotConsoleFrame.getXYZTabPanel().getPrinter().getX(),
-				BotConsoleFrame.getXYZTabPanel().getPrinter().getY(), z);
-	}
-	BotConsoleFrame.getXYZTabPanel().goTo(BotConsoleFrame.getXYZTabPanel().getPrinter().getDumpX(),
-			BotConsoleFrame.getXYZTabPanel().getPrinter().getDumpY(), z);
-}//GEN-LAST:event_moveToSwapPointAction
+    private void homeAllButtonAction(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_homeAllButtonAction
+        BotConsoleFrame.getXYZTabPanel().homeAll();
+    }// GEN-LAST:event_homeAllButtonAction
 
+    private void moveToDumpPointAction(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_moveToSwapPointAction
+        double z = BotConsoleFrame.getXYZTabPanel().getPrinter().getZ();
+        if (z < 0.1) {
+            z = 1.0;
+            BotConsoleFrame.getXYZTabPanel().goTo(BotConsoleFrame.getXYZTabPanel().getPrinter().getX(), BotConsoleFrame.getXYZTabPanel().getPrinter().getY(), z);
+        }
+        BotConsoleFrame.getXYZTabPanel().goTo(BotConsoleFrame.getXYZTabPanel().getPrinter().getDumpX(), BotConsoleFrame.getXYZTabPanel().getPrinter().getDumpY(), z);
+    }// GEN-LAST:event_moveToSwapPointAction
 
-    
-    public double getExtruderSpeed()
-    {
-    	return Double.parseDouble(motorSpeedField.getText());
+    public double getExtruderSpeed() {
+        return Double.parseDouble(motorSpeedField.getText());
     }
-    
+
     public void setPrefs() throws Exception {
-                
+
         setMaterialLabel(Preferences.loadGlobalString(prefix + "MaterialType(name)"));
         setMotorSpeedField(Preferences.loadGlobalInt(prefix + "ExtrusionSpeed(mm/minute)"));
         setTargetTempField(Preferences.loadGlobalInt(prefix + "ExtrusionTemp(C)"));
-    } 
-    
+    }
+
     private void setMaterialLabel(String materialType) {
         materialLabel.setText(materialType);
     }
-    
+
     private void setMotorSpeedField(int speed) {
-        motorSpeedField.setText(""+speed);
+        motorSpeedField.setText("" + speed);
     }
-    
+
     private void setTargetTempField(int temp) {
-        targetTempField.setText(""+temp);
+        targetTempField.setText("" + temp);
     }
-    
+
     private int currentTemp;
     private final int BURNING_TEMP = 70;
     private double colorFactor = 0;
     private Color c;
-    
+
     public void refreshTemperature() {
         try {
-			currentTemp = (int)Math.round(extruder.getTemperature());
-		} catch (Exception e) {
-			parentBotConsoleFrame.handleException(e);
-		}
+            currentTemp = (int) Math.round(extruder.getTemperature());
+        }
+        catch (Exception e) {
+            parentBotConsoleFrame.handleException(e);
+        }
         currentTempLabel.setText("" + currentTemp);
         tempProgress.setMinimum(0);
         tempProgress.setMaximum(Integer.parseInt(targetTempField.getText()));
         tempProgress.setValue(currentTemp);
-        
-        colorFactor = currentTemp/(BURNING_TEMP*1.0);
-        if (colorFactor > 1) colorFactor = 1;
-        if (colorFactor < 0) colorFactor = 0;
 
-        int red = (int)(colorFactor * 255.0);
-        int blue = 255-(int)(colorFactor * 255.0);
+        colorFactor = currentTemp / (BURNING_TEMP * 1.0);
+        if (colorFactor > 1)
+            colorFactor = 1;
+        if (colorFactor < 0)
+            colorFactor = 0;
+
+        int red = (int) (colorFactor * 255.0);
+        int blue = 255 - (int) (colorFactor * 255.0);
 
         c = new Color(red, 0, blue);
-        
+
         tempColor.setBackground(c);
-        
-        if(!ramping)
-        	return;
-        if(currentTemp >= Integer.parseInt(targetTempField.getText()))
-        {
-        	rampOff();
-        	return;
+
+        if (!ramping)
+            return;
+        if (currentTemp >= Integer.parseInt(targetTempField.getText())) {
+            rampOff();
+            return;
         }
-        
-    	//GregorianCalendar cal = new GregorianCalendar();
-    	//Date d = cal.getTime();
-		double elapsed = Timer.elapsed() - startTime; //d.getTime() + cal.getTimeZone().getOffset(d.getTime()) - startTime;
-		double newTarget = elapsed*Double.parseDouble(RampRate.getText()) + startTemp;
-        if(newTarget >= Integer.parseInt(targetTempField.getText()))
-        {
-        	rampOff();
-        	return;
+
+        // GregorianCalendar cal = new GregorianCalendar();
+        // Date d = cal.getTime();
+        double elapsed = Timer.elapsed() - startTime; // d.getTime() +
+                                                      // cal.getTimeZone().getOffset(d.getTime())
+                                                      // - startTime;
+        double newTarget = elapsed * Double.parseDouble(RampRate.getText()) + startTemp;
+        if (newTarget >= Integer.parseInt(targetTempField.getText())) {
+            rampOff();
+            return;
         }
-        try
-        {
-        	//System.out.println("elapsed: " + elapsed*0.001 + " target: " + newTarget);
-        	extruder.setTemperature(newTarget, false);
-        } catch (Exception ex)
-        {}
+        try {
+            // System.out.println("elapsed: " + elapsed*0.001 + " target: " +
+            // newTarget);
+            extruder.setTemperature(newTarget, false);
+        }
+        catch (Exception ex) {
+        }
     }
-                               
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton RampButton;
     private javax.swing.JTextField RampRate;
     private javax.swing.JCheckBox coolingCheck;
     private javax.swing.JLabel currentTempLabel;
     private javax.swing.JToggleButton extrudeButton;
-    //private javax.swing.JLabel feedstockQtyLabel;
+    // private javax.swing.JLabel feedstockQtyLabel;
     private javax.swing.JToggleButton heatButton;
     private javax.swing.JToggleButton homeAllButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    //private javax.swing.JLabel jLabel4;
-    //private javax.swing.JLabel jLabel5;
+    // private javax.swing.JLabel jLabel4;
+    // private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -711,5 +701,5 @@ private void moveToDumpPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:
     private javax.swing.JProgressBar tempProgress;
     private javax.swing.JToggleButton valveToggleButton;
     // End of variables declaration//GEN-END:variables
-    
+
 }
