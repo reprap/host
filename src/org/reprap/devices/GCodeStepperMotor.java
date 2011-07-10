@@ -286,4 +286,4 @@
 //		Debug.d("GCodeStepperMotor! " + axis + " axis - setting maximum torque to: " + maxTorque);
 //	}
 //	
-//}
+// }

@@ -39,4 +39,4 @@
 //		return packetType == VersionRequestMessage.MSG_GetVersion;
 //	}
 //
-//}
+// }

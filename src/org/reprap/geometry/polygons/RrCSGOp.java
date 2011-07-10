@@ -45,7 +45,7 @@ or see
 http://www.gnu.org/
 
 =====================================================================
-*/
+ */
 
 /**
  * CSG operators; Null and Universal sets, and leaf nodes
@@ -53,38 +53,34 @@ http://www.gnu.org/
  */
 package org.reprap.geometry.polygons;
 
-
 /**
  * Set operators, operands, and the universal and null sets
+ * 
  * @author ensab
- *
+ * 
  */
- 
-public enum RrCSGOp 
-{
-    LEAF("LEAF SET"), 
-    NULL("NULL SET"), 
-    UNIVERSE("UNIVERSAL SET"), 
-    UNION("UNION"), 
-    INTERSECTION("INTERSECTION");
-    
+
+public enum RrCSGOp {
+    LEAF("LEAF SET"), NULL("NULL SET"), UNIVERSE("UNIVERSAL SET"), UNION("UNION"), INTERSECTION("INTERSECTION");
+
     /**
      * 
      */
     private String name;
-    
+
     /**
      * @param name
      */
-    RrCSGOp(String name)
-    {
+    RrCSGOp(String name) {
         this.name = name;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Enum#toString()
      */
-    public String toString() { return name; }
+    public String toString() {
+        return name;
+    }
 }
-
-
