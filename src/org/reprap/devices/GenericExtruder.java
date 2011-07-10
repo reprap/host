@@ -1042,7 +1042,7 @@ public abstract class GenericExtruder implements Extruder {
     }
 
     public Extruder getSupportExtruder() {
-        return org.reprap.Main.gui.getPrinter().getExtruder(supportMaterial);
+        return org.reprap.Main.getPrinter().getExtruder(supportMaterial);
     }
 
     /**
@@ -1059,7 +1059,7 @@ public abstract class GenericExtruder implements Extruder {
     }
 
     public Extruder getInfillExtruder() {
-        return org.reprap.Main.gui.getPrinter().getExtruder(inFillMaterial);
+        return org.reprap.Main.getPrinter().getExtruder(inFillMaterial);
     }
 
     /**
