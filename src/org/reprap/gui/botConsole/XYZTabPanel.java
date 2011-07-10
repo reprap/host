@@ -7,8 +7,8 @@
 package org.reprap.gui.botConsole;
 
 import java.io.IOException;
+
 import org.reprap.Printer;
-import org.reprap.ReprapException;
 import org.reprap.utilities.Debug;
 
 /**
@@ -589,6 +589,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
     // private javax.swing.JToggleButton agitateButton;
     // private boolean agitate;
 
+    @SuppressWarnings("unused")
     private void agitate(double a, double p) {
 
     }

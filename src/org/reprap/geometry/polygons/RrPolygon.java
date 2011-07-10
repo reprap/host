@@ -119,6 +119,7 @@ public class RrPolygon {
     /**
      * Flag to prevent cyclic graphs going round forever
      */
+    @SuppressWarnings("unused")
     private boolean beingDestroyed = false;
 
     /**
@@ -247,7 +248,6 @@ public class RrPolygon {
                 extrudeEndDistance2 = 0;
                 return;
             }
-            double d2 = 0;
             System.out.println("Updating e...");
         }
         if (valveEnd >= 0) {

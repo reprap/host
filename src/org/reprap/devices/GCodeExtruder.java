@@ -1,10 +1,8 @@
 package org.reprap.devices;
 
-import java.io.IOException;
-
-import org.reprap.comms.GCodeReaderAndWriter;
-import org.reprap.Printer;
 import org.reprap.Preferences;
+import org.reprap.Printer;
+import org.reprap.comms.GCodeReaderAndWriter;
 
 public class GCodeExtruder extends GenericExtruder {
     GCodeReaderAndWriter gcode;

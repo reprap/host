@@ -1,17 +1,15 @@
 package org.reprap.pcb;
 
-import javax.media.j3d.Appearance;
-import javax.media.j3d.Material;
-import javax.vecmath.Color3f;
-//import org.reprap.pcb.Coords;
-import org.reprap.geometry.polygons.*;
-//import org.reprap.Attributes;
-import org.reprap.utilities.RrGraphics;
-import org.reprap.Preferences;
-import org.reprap.Extruder;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import org.reprap.Extruder;
+import org.reprap.Preferences;
+import org.reprap.geometry.polygons.BooleanGrid;
+import org.reprap.geometry.polygons.Rr2Point;
+import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.RrRectangle;
+import org.reprap.utilities.RrGraphics;
 
 //import GerberGCode.Aperture;
 
@@ -186,6 +184,7 @@ public class GerberGCode {
         return result;
     }
 
+    @SuppressWarnings("unused")
     private void enableDrawing() {
         dawingOn = true;
     }

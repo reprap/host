@@ -10,18 +10,16 @@ package org.reprap.machines;
  * TODO: make GCodeWriter a subclass of NullCartesian, so I don't have to fix code all over the place.
  */
 
-import org.reprap.ReprapException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.reprap.Extruder;
 import org.reprap.Preferences;
 import org.reprap.comms.GCodeReaderAndWriter;
-import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
-//import org.reprap.devices.GCodeStepperMotor;
 import org.reprap.geometry.LayerRules;
-
-import java.io.IOException;
-import java.util.Date;
-import java.text.SimpleDateFormat;
+import org.reprap.utilities.Debug;
 
 /**
  *

@@ -112,11 +112,13 @@ public class LayerRules {
     /**
      * The machineLayer value for each entry in layerRecord
      */
+    @SuppressWarnings("unused")
     private int[] recordNumber;
 
     /**
      * index into layerRecord
      */
+    @SuppressWarnings("unused")
     private int layerPointer;
 
     /**

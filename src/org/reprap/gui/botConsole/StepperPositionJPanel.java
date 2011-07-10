@@ -7,15 +7,12 @@
 package org.reprap.gui.botConsole;
 
 import java.io.IOException;
+
 import javax.swing.JOptionPane;
+
 import org.reprap.Preferences;
 import org.reprap.Printer;
 import org.reprap.utilities.Debug;
-
-//import org.reprap.AxisMotor;
-//import org.reprap.comms.Communicator;
-//import org.reprap.comms.snap.SNAPAddress;
-//import org.reprap.devices.GenericStepperMotor;
 
 /**
  * 
@@ -23,15 +20,11 @@ import org.reprap.utilities.Debug;
  */
 public class StepperPositionJPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
-    // private Communicator communicator;
     private int motorID;
     private String axis;
-    // private GenericStepperMotor motor;
     private Printer printer;
 
     private double currentSpeed;
-    @SuppressWarnings("unused")
-    // private double motorStepsPerMM;
     private double axisLength;
     private double nudgeSize;
     private double newTargetAfterNudge;

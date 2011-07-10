@@ -5,13 +5,12 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.FileReader;
 import java.io.File;
-import java.util.Date;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -23,13 +22,18 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import org.reprap.Extruder;
 import org.reprap.Attributes;
+import org.reprap.Extruder;
 import org.reprap.Preferences;
-import org.reprap.geometry.polygons.*;
-import org.reprap.utilities.RrGraphics;
-import org.reprap.utilities.Debug;
 import org.reprap.comms.GCodeReaderAndWriter;
+import org.reprap.geometry.polygons.BooleanGrid;
+import org.reprap.geometry.polygons.Rr2Point;
+import org.reprap.geometry.polygons.RrCSG;
+import org.reprap.geometry.polygons.RrPolygon;
+import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.RrRectangle;
+import org.reprap.utilities.Debug;
+import org.reprap.utilities.RrGraphics;
 
 //import java.io.IOException;
 

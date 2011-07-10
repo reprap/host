@@ -14,28 +14,26 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileFilter;
 
 import org.reprap.geometry.Producer;
-import org.reprap.machines.MachineFactory;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.gui.Utility;
 import org.reprap.gui.botConsole.BotConsoleFrame;
-//import org.reprap.comms.Communicator;
+import org.reprap.machines.MachineFactory;
+import org.reprap.utilities.Debug;
 import org.reprap.utilities.ExtensionFileFilter;
 import org.reprap.utilities.RrDeleteOnExit;
-import org.reprap.utilities.Debug;
 
 /**
  * 
@@ -307,6 +305,7 @@ public class Main {
                     producer.setSegmentPause(segmentPause);
                     producer.setLayerPause(layerPause);
                     producer.produce();
+                    @SuppressWarnings("unused")
                     String usage = getResourceMessage(producer);
                     producer.dispose();
                     producer = null;
@@ -468,5 +467,6 @@ public class Main {
     // return communicator;
     // }
 
+    @SuppressWarnings("unused")
     private static final int localNodeNumber = 0;
 }

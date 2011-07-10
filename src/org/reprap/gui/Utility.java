@@ -7,8 +7,6 @@ import java.awt.Window;
 
 import javax.swing.JFrame;
 
-import org.reprap.Preferences;
-
 public class Utility {
 
     public static void centerWindowOnScreen(Window w) {
