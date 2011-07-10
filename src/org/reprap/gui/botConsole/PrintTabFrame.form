@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.5" type="org.netbeans.modules.form.forminfo.JInternalFrameFormInfo">
   <NonVisualComponents>
@@ -11,9 +11,10 @@
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
-    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
@@ -169,7 +170,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="java.awt.Button" name="printButton">
+    <Component class="java.swing.JButton" name="printButton">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="0" green="cc" red="33" type="rgb"/>
@@ -185,7 +186,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="printButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="java.awt.Button" name="pauseButton">
+    <Component class="java.swing.JButton" name="pauseButton">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="0" green="cc" red="ff" type="rgb"/>
@@ -196,7 +197,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pauseButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="java.awt.Button" name="stopButton">
+    <Component class="java.swing.JButton" name="stopButton">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="0" green="0" red="ff" type="rgb"/>
@@ -210,7 +211,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="stopButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="java.awt.Button" name="exitButton">
+    <Component class="java.swing.JButton" name="exitButton">
       <Properties>
         <Property name="label" type="java.lang.String" value="Exit"/>
       </Properties>
@@ -306,7 +307,7 @@
     </Component>
     <Component class="javax.swing.JProgressBar" name="progressBar">
     </Component>
-    <Component class="java.awt.Button" name="loadSTL">
+    <Component class="java.swing.JButton" name="loadSTL">
       <Properties>
         <Property name="actionCommand" type="java.lang.String" value="loadSTL"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -318,7 +319,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadSTL"/>
       </Events>
     </Component>
-    <Component class="java.awt.Button" name="loadGCode">
+    <Component class="java.swing.JButton" name="loadGCode">
       <Properties>
         <Property name="actionCommand" type="java.lang.String" value="loadGCode"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -341,7 +342,7 @@
         <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="selectorRadioButtonMousePressed"/>
       </Events>
     </Component>
-    <Component class="java.awt.Button" name="loadRFO">
+    <Component class="java.swing.JButton" name="loadRFO">
       <Properties>
         <Property name="actionCommand" type="java.lang.String" value="loadRFO"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -372,7 +373,7 @@
         <Property name="text" type="java.lang.String" value=" - "/>
       </Properties>
     </Component>
-    <Component class="java.awt.Button" name="preferencesButton">
+    <Component class="java.swing.JButton" name="preferencesButton">
       <Properties>
         <Property name="actionCommand" type="java.lang.String" value="preferences"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -387,7 +388,7 @@
         <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="PrintTabFrame_preferencesButton"/>
       </AuxValues>
     </Component>
-    <Component class="java.awt.Button" name="saveRFO">
+    <Component class="java.swing.JButton" name="saveRFO">
       <Properties>
         <Property name="actionCommand" type="java.lang.String" value="saveRFO"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">

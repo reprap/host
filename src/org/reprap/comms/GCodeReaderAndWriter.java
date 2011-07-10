@@ -689,7 +689,7 @@ public class GCodeReaderAndWriter {
 
                 // is it at the end of the line?
                 if (c == '\n' || c == '\r') {
-                    Debug.d("GCodeWriter.waitForResponse() - received response from RepRap " + resp);
+                    Debug.c("GCodeWriter.waitForResponse() - received response from RepRap " + resp);
                     goAgain = false;
                     if (resp.startsWith("start") || resp.contentEquals("")) // Startup or null string...
                     {
@@ -723,8 +723,7 @@ public class GCodeReaderAndWriter {
                             lns = lns.substring(1);
                         
                         result = Long.parseLong(lns);
-                        Debug.e("GCodeWriter.waitForResponse() - request to resend from line " + result
-                            + ".  RepRap said: " + resp);
+                        Debug.e("GCodeWriter.waitForResponse() - RepRap resend requested for line " + result);
                         
                     } else if (!resp.startsWith("ok")) // Must be "ok" if not those - check
                     {
