@@ -47,6 +47,17 @@ import org.reprap.utilities.RrDeleteOnExit;
 
 public class Main {
 
+    // The version number of the host application.
+    public static final String HOST_VERSION = "1.0";
+
+    // This is a bit of a hack to allow us to user the netbeans form designer.
+    // During form creation the forms have a habit of trying to access things
+    // that haven't
+    // been initialised. If formDesignMode is true then we know we are in form
+    // design mode.
+    // We set formDesignMode to false during the hosts main() method.
+    public static boolean formDesignMode = true;
+
     public static RrDeleteOnExit ftd = null;
 
     // private static Communicator communicator = null;
@@ -55,7 +66,7 @@ public class Main {
 
     private Producer producer = null;
 
-    private Printer printer = null;
+    private static Printer printer = null;
 
     // Window to walk the file tree
 
@@ -68,6 +79,11 @@ public class Main {
 
     private JMenuItem cancelMenuItem;
     private JMenuItem produceProduceB;
+
+    // Main is a singleton
+    static public Main getInstance() {
+        return gui;
+    }
 
     public void setSegmentPause(boolean state) {
         segmentPause.setState(state);
@@ -250,7 +266,7 @@ public class Main {
     /**
      * Return the printer being used
      */
-    public Printer getPrinter() {
+    static public Printer getPrinter() {
         return printer;
     }
 
@@ -298,7 +314,6 @@ public class Main {
             public void run() {
                 Thread.currentThread().setName("Producer");
                 try {
-
                     if (printer == null)
                         Debug.e("Production attempted with null printer.");
                     producer = new Producer(printer, builder);
@@ -430,6 +445,8 @@ public class Main {
 
     public static void main(String[] args) {
 
+        formDesignMode = false;
+
         Thread.currentThread().setName("Main");
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
@@ -453,7 +470,7 @@ public class Main {
 
     }
 
-    public static Main gui;
+    private static Main gui;
 
     public static void setRepRapPresent(boolean a) {
         repRapAttached = a;
@@ -469,4 +486,9 @@ public class Main {
 
     @SuppressWarnings("unused")
     private static final int localNodeNumber = 0;
+
+    public static boolean inFormDesignMode() {
+        return formDesignMode;
+    }
+
 }

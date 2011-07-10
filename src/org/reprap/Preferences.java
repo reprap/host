@@ -242,7 +242,7 @@ public class Preferences {
             "RepRap machine parameters. See http://objects.reprap.org/wiki/Java_Software_Preferences_File");
 
         if (!startUp)
-            org.reprap.Main.gui.getPrinter().refreshPreferences();
+            org.reprap.Main.getPrinter().refreshPreferences();
     }
 
     public String loadString(String name) {
