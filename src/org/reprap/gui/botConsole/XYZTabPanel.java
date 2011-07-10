@@ -74,7 +74,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
     /** Creates new form XYZTabPanel */
     public XYZTabPanel() {
         firstZero = true;
-        printer = org.reprap.Main.gui.getPrinter();
+        printer = org.reprap.Main.getPrinter();
         initComponents();
         try {
             setPrefs();
