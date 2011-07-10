@@ -14,8 +14,10 @@ Vcs-Browser: https://reprap.svn.sourceforge.net/svnroot/reprap/trunk/reprap/host
 
 Package: reprap-host
 Architecture: all
-Depends: java-gcj-compat | java-runtime | sun-java6-jre
-# old Depends: java-gcj-compat | java-runtime | sun-java6-jre, librxtx-java, libjava3d-java | java3d
+Depends: java-gcj-compat | java-runtime | sun-java6-jre, libjava3d-java, libjava3d-jni, librxtx-jav
+# old Depends: java-gcj-compat | java-runtime | sun-java6-jre, librxtx-java, libjava3d-java
 # libj3d-org-java
+
+
 Description: Controls a Reprap 3D printer to create custom 3D objects
  by extruding materials such as CAPA or HDPE plastics.

@@ -7,28 +7,28 @@
 package org.reprap.gui.botConsole;
 
 import java.io.IOException;
-
 import org.reprap.Printer;
+import org.reprap.ReprapException;
 import org.reprap.utilities.Debug;
 /**
  *
  * @author  ensab
  */
 public class XYZTabPanel extends javax.swing.JPanel {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private double XYfastSpeed;
     private double ZfastSpeed;
     private boolean firstZero = true;
     private Printer printer;
     private static double nudgeSize = 0;
-	private BotConsoleFrame parentBotConsoleFrame = null;
-	private Thread agitateThread = null;
-	
+    private BotConsoleFrame parentBotConsoleFrame = null;
+    private Thread agitateThread = null;
+    
     private void setPrefs() throws IOException {
-    	
-    	XYfastSpeed = printer.getExtruder().getFastXYFeedrate();
-    	ZfastSpeed = printer.getFastFeedrateZ();
+        
+        XYfastSpeed = printer.getExtruder().getFastXYFeedrate();
+        ZfastSpeed = printer.getFastFeedrateZ();
         
         xySpeedField.setText(String.valueOf(XYfastSpeed));
         zSpeedField.setText(String.valueOf(ZfastSpeed));
@@ -40,10 +40,10 @@ public class XYZTabPanel extends javax.swing.JPanel {
      */
     public void setConsoleFrame(BotConsoleFrame b)
     {
-    	parentBotConsoleFrame = b;
-    	xStepperPositionJPanel.setConsoleFrame(b);
-    	yStepperPositionJPanel.setConsoleFrame(b);
-    	zStepperPositionJPanel.setConsoleFrame(b);
+        parentBotConsoleFrame = b;
+        xStepperPositionJPanel.setConsoleFrame(b);
+        yStepperPositionJPanel.setConsoleFrame(b);
+        zStepperPositionJPanel.setConsoleFrame(b);
     }
     
     public void setMotorSpeeds() {
@@ -72,8 +72,8 @@ public class XYZTabPanel extends javax.swing.JPanel {
     
     /** Creates new form XYZTabPanel */
     public XYZTabPanel() {
-    	firstZero = true;
-        printer = org.reprap.Main.getPrinter();
+        firstZero = true;
+        printer = org.reprap.Main.gui.getPrinter();
         initComponents();
         try
         {
@@ -94,7 +94,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-    	
+        
         targetTempField = new javax.swing.JTextField();
         currentTempLabel = new javax.swing.JLabel();
         heatButton = new javax.swing.JToggleButton();
@@ -150,7 +150,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
         agitateButton.setFocusCycleRoot(true);
         agitateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	agitateButtonActionPerformed(evt);
+                agitateButtonActionPerformed(evt);
             }
         });        
         agitatePanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Agitate Y axis"));
@@ -204,27 +204,27 @@ public class XYZTabPanel extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout nudgePanelLayout = new javax.swing.GroupLayout(nudgePanel);
+        org.jdesktop.layout.GroupLayout nudgePanelLayout = new org.jdesktop.layout.GroupLayout(nudgePanel);
         nudgePanel.setLayout(nudgePanelLayout);
         nudgePanelLayout.setHorizontalGroup(
-            nudgePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(nudgePanelLayout.createSequentialGroup()
+            nudgePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(nudgePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(nudgeSizeRB1)
-                .addGap(18, 18, 18)
-                .addComponent(nudgeSizeRB2)
-                .addGap(18, 18, 18)
-                .addComponent(nudgeSizeRB3)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(nudgeSizeRB1)
+                .add(18, 18, 18)
+                .add(nudgeSizeRB2)
+                .add(18, 18, 18)
+                .add(nudgeSizeRB3)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         nudgePanelLayout.setVerticalGroup(
-            nudgePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, nudgePanelLayout.createSequentialGroup()
+            nudgePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, nudgePanelLayout.createSequentialGroup()
                 .addContainerGap(14, Short.MAX_VALUE)
-                .addGroup(nudgePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(nudgeSizeRB1)
-                    .addComponent(nudgeSizeRB2)
-                    .addComponent(nudgeSizeRB3)))
+                .add(nudgePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(nudgeSizeRB1)
+                    .add(nudgeSizeRB2)
+                    .add(nudgeSizeRB3)))
         );
 
         motorsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Axis positions"));
@@ -257,41 +257,41 @@ public class XYZTabPanel extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout motorsPanelLayout = new javax.swing.GroupLayout(motorsPanel);
+        org.jdesktop.layout.GroupLayout motorsPanelLayout = new org.jdesktop.layout.GroupLayout(motorsPanel);
         motorsPanel.setLayout(motorsPanelLayout);
         motorsPanelLayout.setHorizontalGroup(
-            motorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(motorsPanelLayout.createSequentialGroup()
-                .addGroup(motorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(motorsPanelLayout.createSequentialGroup()
-                        .addGap(23, 23, 23)
-                        .addComponent(goButton)
-                        .addGap(121, 121, 121)
-                        .addComponent(homeAllButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(storeAllButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(recallAllButton))
-                    .addComponent(xStepperPositionJPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(yStepperPositionJPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(zStepperPositionJPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            motorsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(motorsPanelLayout.createSequentialGroup()
+                .add(motorsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(motorsPanelLayout.createSequentialGroup()
+                        .add(23, 23, 23)
+                        .add(goButton)
+                        .add(121, 121, 121)
+                        .add(homeAllButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(storeAllButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(recallAllButton))
+                    .add(xStepperPositionJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(yStepperPositionJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(zStepperPositionJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 //.addContainerGap(24, Short.MAX_VALUE)
                 )
         );
         motorsPanelLayout.setVerticalGroup(
-            motorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, motorsPanelLayout.createSequentialGroup()
-                .addComponent(xStepperPositionJPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(yStepperPositionJPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(zStepperPositionJPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(motorsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(goButton)
-                    .addComponent(recallAllButton)
-                    .addComponent(storeAllButton)
-                    .addComponent(homeAllButton))
+            motorsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, motorsPanelLayout.createSequentialGroup()
+                .add(xStepperPositionJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(yStepperPositionJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(zStepperPositionJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(motorsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(goButton)
+                    .add(recallAllButton)
+                    .add(storeAllButton)
+                    .add(homeAllButton))
                 .addContainerGap())
         );
 
@@ -311,26 +311,26 @@ public class XYZTabPanel extends javax.swing.JPanel {
         zSpeedField.setFont(new java.awt.Font("Tahoma", 0, 12));
         zSpeedField.setText("0000");
 
-        javax.swing.GroupLayout speedsPanelLayout = new javax.swing.GroupLayout(speedsPanel);
+        org.jdesktop.layout.GroupLayout speedsPanelLayout = new org.jdesktop.layout.GroupLayout(speedsPanel);
         speedsPanel.setLayout(speedsPanelLayout);
         speedsPanelLayout.setHorizontalGroup(
-            speedsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(speedsPanelLayout.createSequentialGroup()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(xySpeedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(zSpeedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            speedsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(speedsPanelLayout.createSequentialGroup()
+                .add(jLabel2)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(xySpeedField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(18, 18, 18)
+                .add(jLabel3)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(zSpeedField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         speedsPanelLayout.setVerticalGroup(
-            speedsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(speedsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jLabel2)
-                .addComponent(jLabel3)
-                .addComponent(zSpeedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(xySpeedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            speedsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(speedsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(jLabel2)
+                .add(jLabel3)
+                .add(zSpeedField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(xySpeedField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         plotExtruderCheck.setText("Plot using Extruder #");
@@ -346,90 +346,90 @@ public class XYZTabPanel extends javax.swing.JPanel {
         
         
         
-        javax.swing.GroupLayout bedTempPanelLayout = new javax.swing.GroupLayout(bedTempPanel);
+        org.jdesktop.layout.GroupLayout bedTempPanelLayout = new org.jdesktop.layout.GroupLayout(bedTempPanel);
         bedTempPanel.setLayout(bedTempPanelLayout);
         bedTempPanelLayout.setHorizontalGroup(
-            bedTempPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, bedTempPanelLayout.createSequentialGroup()
+            bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.LEADING, bedTempPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(bedTempPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, bedTempPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel6)
-                        .addGap(18, 18, 18)
-                        .addComponent(currentTempLabel))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, bedTempPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(targetTempField, javax.swing.GroupLayout.PREFERRED_SIZE, 
-                        		javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                //.add(bedTempPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                //    .add(heatButton, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
+                .add(bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, bedTempPanelLayout.createSequentialGroup()
+                        .add(jLabel6)
+                        .add(18, 18, 18)
+                        .add(currentTempLabel))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, bedTempPanelLayout.createSequentialGroup()
+                        .add(6, 6, 6)
+                        .add(jLabel7)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(targetTempField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 
+                                org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                //.add(bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                //    .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
                 //.addContainerGap()
                 )
-                .addComponent(heatButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE) 
+                .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE) 
         );
         bedTempPanelLayout.setVerticalGroup(
-            bedTempPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bedTempPanelLayout.createSequentialGroup()
-                .addGroup(bedTempPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    //.add(heatButton, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, bedTempPanelLayout.createSequentialGroup()
-                        .addGroup(bedTempPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(currentTempLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(bedTempPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(targetTempField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7)))
+            bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, bedTempPanelLayout.createSequentialGroup()
+                .add(bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    //.add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, bedTempPanelLayout.createSequentialGroup()
+                        .add(bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(jLabel6)
+                            .add(currentTempLabel))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(targetTempField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jLabel7)))
                     )
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(heatButton, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
                 .addContainerGap()
                 )
         );
             
         
-        javax.swing.GroupLayout agitatePanelLayout = new javax.swing.GroupLayout(agitatePanel);
+        org.jdesktop.layout.GroupLayout agitatePanelLayout = new org.jdesktop.layout.GroupLayout(agitatePanel);
         agitatePanel.setLayout(agitatePanelLayout);
         agitatePanelLayout.setHorizontalGroup(
-        		agitatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, agitatePanelLayout.createSequentialGroup()
+                agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.LEADING, agitatePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(agitatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, agitatePanelLayout.createSequentialGroup()
-                        .addComponent(jLabel8)
-                        .addGap(18, 18, 18)
-                        .addComponent(agitateAmplitude, javax.swing.GroupLayout.PREFERRED_SIZE, 
-                        		javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, agitatePanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabel9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(agitatePeriod, javax.swing.GroupLayout.PREFERRED_SIZE, 
-                        		javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                //.add(agitatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                //    .add(agitateButton, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
+                .add(agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, agitatePanelLayout.createSequentialGroup()
+                        .add(jLabel8)
+                        .add(18, 18, 18)
+                        .add(agitateAmplitude, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 
+                                org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, agitatePanelLayout.createSequentialGroup()
+                        .add(6, 6, 6)
+                        .add(jLabel9)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(agitatePeriod, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 
+                                org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                //.add(agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                //    .add(agitateButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
                 //.addContainerGap()
                 )
-                .addComponent(agitateButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE) 
+                .add(agitateButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE) 
         );
         agitatePanelLayout.setVerticalGroup(
-        		agitatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, agitatePanelLayout.createSequentialGroup()
-                .addGroup(agitatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    //.add(agitateButton, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, agitatePanelLayout.createSequentialGroup()
-                        .addGroup(agitatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel8)
-                            .addComponent(agitateAmplitude))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(agitatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(agitatePeriod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel9)))
+                agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, agitatePanelLayout.createSequentialGroup()
+                .add(agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    //.add(agitateButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, agitatePanelLayout.createSequentialGroup()
+                        .add(agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(jLabel8)
+                            .add(agitateAmplitude))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(agitatePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(agitatePeriod, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jLabel9)))
                     )
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(agitateButton, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(agitateButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
                 .addContainerGap()
                 )
         );
@@ -437,65 +437,65 @@ public class XYZTabPanel extends javax.swing.JPanel {
         
         
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(nudgePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(2, 2, 2)
-                        .addComponent(speedsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(plotExtruderCheck)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(extruderToPlotWith, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .add(nudgePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(2, 2, 2)
+                        .add(speedsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(plotExtruderCheck)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(extruderToPlotWith, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         //.add(235, 235, 235)
                         )
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup() 
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup() 
              
-                    .addComponent(motorsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 
-                    		javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(bedTempPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, 
-                    		Short.MAX_VALUE)
-                    .addComponent(agitatePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, 
-                    		Short.MAX_VALUE) 
-                    		)
+                    .add(motorsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                            org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+.add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(bedTempPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                            Short.MAX_VALUE)
+                    .add(agitatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                            Short.MAX_VALUE) 
+                            )
                     )
-                    //.add(agitatePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, 
-                    //		Short.MAX_VALUE)   
+                    //.add(agitatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                    //      Short.MAX_VALUE)   
                     //.addContainerGap()
                 )
         ));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
                    
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                		.addGroup(layout.createSequentialGroup()	
-                   .addComponent(bedTempPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, 
-                		   javax.swing.GroupLayout.PREFERRED_SIZE)
-                   .addComponent(agitatePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, 
-                     		   javax.swing.GroupLayout.PREFERRED_SIZE)
-                     		   )
-                   .addComponent(motorsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(layout.createSequentialGroup() 
+                   .add(bedTempPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                           org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                   .add(agitatePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                               org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                               )
+                   .add(motorsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 226, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 )
-                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(nudgePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(14, 14, 14)
-                        .addComponent(speedsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(extruderToPlotWith, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(plotExtruderCheck))))
+                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(nudgePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(14, 14, 14)
+                        .add(speedsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(18, 18, 18)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(extruderToPlotWith, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(plotExtruderCheck))))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -503,41 +503,41 @@ public class XYZTabPanel extends javax.swing.JPanel {
 
 public void refreshTemperature()
 {
-	double t = 0;
-	try {
-		t = printer.getBedTemperature();
-	} catch (Exception e) {
-		parentBotConsoleFrame.handleException(e);
-	}
-	currentTempLabel.setText("" + t);
+    double t = 0;
+    try {
+        t = printer.getBedTemperature();
+    } catch (Exception e) {
+        parentBotConsoleFrame.handleException(e);
+    }
+    currentTempLabel.setText("" + t);
 }
 
 private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heatButtonActionPerformed
-    	parentBotConsoleFrame.suspendPolling();
-    	if (heatPushed) 
-    	{
-    		try {
-				printer.setBedTemperature(0);
-			} catch (Exception e) {
-				parentBotConsoleFrame.handleException(e);
-			}
-    		heatButton.setText("Switch bed heat on");
-    		heatPushed = false;
-    	} else 
-    	{
-    		try {
-				printer.setBedTemperature(Double.parseDouble(targetTempField.getText()));
-			} catch (NumberFormatException e) {
-				parentBotConsoleFrame.handleException(e);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		heatButton.setText("Switch bed heat off");
-    		heatPushed = true;
-    	}
-    	parentBotConsoleFrame.resumePolling();
-    	
+        parentBotConsoleFrame.suspendPolling();
+        if (heatPushed) 
+        {
+            try {
+                printer.setBedTemperature(0);
+            } catch (Exception e) {
+                parentBotConsoleFrame.handleException(e);
+            }
+            heatButton.setText("Switch bed heat on");
+            heatPushed = false;
+        } else 
+        {
+            try {
+                printer.setBedTemperature(Double.parseDouble(targetTempField.getText()));
+            } catch (NumberFormatException e) {
+                parentBotConsoleFrame.handleException(e);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            heatButton.setText("Switch bed heat off");
+            heatPushed = true;
+        }
+        parentBotConsoleFrame.resumePolling();
+        
 }//GEN-LAST:event_heatButtonActionPerformed
 
 //private javax.swing.JTextField agitateAmplitude;
@@ -548,66 +548,65 @@ private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 //private javax.swing.JToggleButton agitateButton;
 //private boolean agitate; 
 
-@SuppressWarnings("unused")
 private void agitate(double a, double p)
 {
-	
+    
 }
 
 private void agitateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heatButtonActionPerformed
-	parentBotConsoleFrame.suspendPolling();
-	if (agitate) 
-	{
-		agitate = false;
-		agitateButton.setText("Agitate");
-		parentBotConsoleFrame.resumePolling();
-	} else 
-	{
-		agitate = true;
-		agitateButton.setText("Stop Agitating");
-		try {
-			agitateThread = new Thread() 
-			{
-				public void run() 
-				{
-					double amp = 0.5*Double.parseDouble(agitateAmplitude.getText());
-					double per = Double.parseDouble(agitatePeriod.getText());
-					double y0 = printer.getY() + amp;
-					double inc = 0.1/per;
-					double t = 0.75*per;
-					double y;
-					Thread.currentThread().setName("Agitate");
-					try {
-						printer.moveTo(printer.getX(), printer.getY(), printer.getZ(), 1, false, false);
-						while(agitate)
-						{
-							y = y0 + amp*Math.cos(2*Math.PI*t/per);
-							double speed = Math.abs(-amp*2*Math.PI*Math.sin(2*Math.PI*t/per)*60/per);
-							if(speed < 1)
-								speed = 1;
-							//System.out.println("" + t + "," + y + "," + speed/60);
+    parentBotConsoleFrame.suspendPolling();
+    if (agitate) 
+    {
+        agitate = false;
+        agitateButton.setText("Agitate");
+        parentBotConsoleFrame.resumePolling();
+    } else 
+    {
+        agitate = true;
+        agitateButton.setText("Stop Agitating");
+        try {
+            agitateThread = new Thread() 
+            {
+                public void run() 
+                {
+                    double amp = 0.5*Double.parseDouble(agitateAmplitude.getText());
+                    double per = Double.parseDouble(agitatePeriod.getText());
+                    double y0 = printer.getY() + amp;
+                    double inc = 0.1/per;
+                    double t = 0.75*per;
+                    double y;
+                    Thread.currentThread().setName("Agitate");
+                    try {
+                        printer.moveTo(printer.getX(), printer.getY(), printer.getZ(), 1, false, false);
+                        while(agitate)
+                        {
+                            y = y0 + amp*Math.cos(2*Math.PI*t/per);
+                            double speed = Math.abs(-amp*2*Math.PI*Math.sin(2*Math.PI*t/per)*60/per);
+                            if(speed < 1)
+                                speed = 1;
+                            //System.out.println("" + t + "," + y + "," + speed/60);
 
-							printer.moveTo(printer.getX(), y, printer.getZ(), speed, false, false);
+                            printer.moveTo(printer.getX(), y, printer.getZ(), speed, false, false);
 
-							t += inc;
-							if(t >= per)
-								t = 0;
-						}
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			};
+                            t += inc;
+                            if(t >= per)
+                                t = 0;
+                        }
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            };
 
-			agitateThread.start();
-		} catch (NumberFormatException e) {
-			parentBotConsoleFrame.handleException(e);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}	
+            agitateThread.start();
+        } catch (NumberFormatException e) {
+            parentBotConsoleFrame.handleException(e);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }   
 }//GEN-LAST:event_heatButtonActionPerformed
     
     
@@ -625,130 +624,130 @@ private void nudgeSizeRB3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 public void homeAll()
 {
-	double ze[] = new double[4];
-	parentBotConsoleFrame.suspendPolling();
-	try {
-		printer.home();
-		if(!firstZero)
-			ze = printer.getZeroError();
-	} catch (Exception e) {
-		parentBotConsoleFrame.handleException(e);
-	}
-	if(!firstZero)
-		Debug.d("Zero errors (steps).  X:" + ze[0] + " Y:" + ze[1] + " Z:" + ze[2]);
-	xStepperPositionJPanel.zeroBox();
-	yStepperPositionJPanel.zeroBox();
-	zStepperPositionJPanel.zeroBox();
+    double ze[] = new double[4];
+    parentBotConsoleFrame.suspendPolling();
+    try {
+        printer.home();
+        if(!firstZero)
+            ze = printer.getZeroError();
+    } catch (Exception e) {
+        parentBotConsoleFrame.handleException(e);
+    }
+    if(!firstZero)
+        Debug.d("Zero errors (steps).  X:" + ze[0] + " Y:" + ze[1] + " Z:" + ze[2]);
+    xStepperPositionJPanel.zeroBox();
+    yStepperPositionJPanel.zeroBox();
+    zStepperPositionJPanel.zeroBox();
 //    xStepperPositionJPanel.homeAxis();
 //    yStepperPositionJPanel.homeAxis();
 //    zStepperPositionJPanel.homeAxis();
-	firstZero = false;
+    firstZero = false;
     parentBotConsoleFrame.resumePolling();
 }
 
 public void homeXY()
 {
-	parentBotConsoleFrame.suspendPolling();
-	try
-	{
-		printer.homeToZeroX();
-		printer.homeToZeroY();
-	} catch (Exception e)
-	{}
-	xStepperPositionJPanel.zeroBox();
-	yStepperPositionJPanel.zeroBox();
-	parentBotConsoleFrame.resumePolling();
+    parentBotConsoleFrame.suspendPolling();
+    try
+    {
+        printer.homeToZeroX();
+        printer.homeToZeroY();
+    } catch (Exception e)
+    {}
+    xStepperPositionJPanel.zeroBox();
+    yStepperPositionJPanel.zeroBox();
+    parentBotConsoleFrame.resumePolling();
 }
 
 private void homeAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeAllButtonActionPerformed
-	homeAll();
+    homeAll();
 }//GEN-LAST:event_homeAllButtonActionPerformed
 
 public void storeAll()
 {
     xStepperPositionJPanel.store();
     yStepperPositionJPanel.store();
-    zStepperPositionJPanel.store();	
+    zStepperPositionJPanel.store(); 
 }
 
 private void storeAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_storeAllButtonActionPerformed
-	storeAll();
+    storeAll();
 }//GEN-LAST:event_storeAllButtonActionPerformed
 
 public void recallAll()
 {
     xStepperPositionJPanel.recall();
     yStepperPositionJPanel.recall();
-    zStepperPositionJPanel.recall(); 	
+    zStepperPositionJPanel.recall();    
 }
 
 private void recallAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recallAllButtonActionPerformed
-	recallAll();
+    recallAll();
 }//GEN-LAST:event_recallAllButtonActionPerformed
 
 public Printer getPrinter()
 {
-	return printer;
+    return printer;
 }
 
 public void recordCurrentPosition()
 {
-	//parentBotConsoleFrame.suspendPolling();
-	double cp[];
-	try {
-		cp = printer.getCoordinates();
-		xStepperPositionJPanel.setTargetPositionField(cp[0]);
-		yStepperPositionJPanel.setTargetPositionField(cp[1]);
-		zStepperPositionJPanel.setTargetPositionField(cp[2]);
-	} catch (Exception e) {
-		parentBotConsoleFrame.handleException(e);
-	}
-	//parentBotConsoleFrame.resumePolling();
+    //parentBotConsoleFrame.suspendPolling();
+    double cp[];
+    try {
+        cp = printer.getCoordinates();
+        xStepperPositionJPanel.setTargetPositionField(cp[0]);
+        yStepperPositionJPanel.setTargetPositionField(cp[1]);
+        zStepperPositionJPanel.setTargetPositionField(cp[2]);
+    } catch (Exception e) {
+        parentBotConsoleFrame.handleException(e);
+    }
+    //parentBotConsoleFrame.resumePolling();
 }
 
 public void goTo(double xTo, double yTo, double zTo)
 {
-	parentBotConsoleFrame.suspendPolling();
-	double x = printer.getX();
-	double y = printer.getY();
-	double z = printer.getZ();
+    parentBotConsoleFrame.suspendPolling();
+    double x = printer.getX();
+    double y = printer.getY();
+    double z = printer.getZ();
 
-	try
-	{
-		if(plotExtruderCheck.isSelected())
-		{
-			int eNum = Integer.parseInt(extruderToPlotWith.getText());
-			GenericExtruderTabPanel etp = BotConsoleFrame.getGenericExtruderTabPanel(eNum);
-			printer.selectExtruder(eNum);
-			printer.getExtruder().setExtrusion(etp.getExtruderSpeed(), false);
-			printer.machineWait(printer.getExtruder().getExtrusionDelayForLayer(), false);
-		}
-		if(z >= zTo)
-		{
-			//printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
-			printer.singleMove(xTo, yTo, z, Double.parseDouble(xySpeedField.getText()));
-			//printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
-			printer.singleMove(xTo, yTo, zTo, Double.parseDouble(zSpeedField.getText()));
-		} else
-		{
-			//printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
-			printer.singleMove(x, y, zTo, Double.parseDouble(zSpeedField.getText()));
-			//printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
-			printer.singleMove(xTo, yTo, zTo, Double.parseDouble(xySpeedField.getText()));	
-		}
-		if(plotExtruderCheck.isSelected())
-			printer.getExtruder().setExtrusion(0, false);
-	} catch (Exception e)
-	{}
-	recordCurrentPosition();
-	parentBotConsoleFrame.resumePolling();
+    try
+    {
+        if(plotExtruderCheck.isSelected())
+        {
+            int eNum = Integer.parseInt(extruderToPlotWith.getText());
+            GenericExtruderTabPanel etp = BotConsoleFrame.getGenericExtruderTabPanel(eNum);
+            printer.selectExtruder(eNum);
+            printer.getExtruder().setExtrusion(etp.getExtruderSpeed(), false);
+            printer.machineWait(printer.getExtruder().getExtrusionDelayForLayer(), false);
+        }
+        if(z >= zTo)
+        {
+            //printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
+            printer.singleMove(xTo, yTo, z, Double.parseDouble(xySpeedField.getText()));
+            //printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
+            printer.singleMove(xTo, yTo, zTo, Double.parseDouble(zSpeedField.getText()));
+        } else
+        {
+            //printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
+            printer.singleMove(x, y, zTo, Double.parseDouble(zSpeedField.getText()));
+            //printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
+            printer.singleMove(xTo, yTo, zTo, Double.parseDouble(xySpeedField.getText()));  
+        }
+        if(plotExtruderCheck.isSelected())
+            printer.getExtruder().setExtrusion(0, false);
+    } catch (Exception e)
+    {}
+    recordCurrentPosition();
+    parentBotConsoleFrame.resumePolling();
 }
 
 private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goButtonActionPerformed
-	double xTo = xStepperPositionJPanel.getTargetPositionInMM();
-	double yTo = yStepperPositionJPanel.getTargetPositionInMM();
-	double zTo = zStepperPositionJPanel.getTargetPositionInMM();
-	goTo(xTo, yTo, zTo);
+    double xTo = xStepperPositionJPanel.getTargetPositionInMM();
+    double yTo = yStepperPositionJPanel.getTargetPositionInMM();
+    double zTo = zStepperPositionJPanel.getTargetPositionInMM();
+    goTo(xTo, yTo, zTo);
 }//GEN-LAST:event_goButtonActionPerformed
 
 
@@ -789,5 +788,5 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel agitatePanel;
     private javax.swing.JToggleButton agitateButton;
-	private boolean agitate;
+    private boolean agitate;
 }

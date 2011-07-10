@@ -47,6 +47,9 @@ import org.reprap.utilities.RrDeleteOnExit;
 
 
 public class Main {
+    
+    // The version number of the host application.
+    public static final String HOST_VERSION = "1.0";
 	
 	// This is a bit of a hack to allow us to user the netbeans form designer.
 	// During form creation the forms have a habit of trying to access things
