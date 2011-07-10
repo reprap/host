@@ -689,6 +689,7 @@ public class GCodeReaderAndWriter {
 
                 // is it at the end of the line?
                 if (c == '\n' || c == '\r') {
+                    Debug.d("GCodeWriter.waitForResponse() - received response from RepRap " + resp);
                     goAgain = false;
                     if (resp.startsWith("start") || resp.contentEquals("")) // Startup or null string...
                     {
@@ -697,7 +698,7 @@ public class GCodeReaderAndWriter {
                     } else if (resp.startsWith("!!")) // Horrible hard fault?
                     {
                         result = shutDown;
-                        Debug.e("GCodeWriter.waitForResponse(): RepRap hard fault!  RepRap said: " + resp);
+                        Debug.e("GCodeWriter.waitForResponse(): RepRap hard fault!");
 
                     } else if (resp.startsWith("//")) // immediate DEBUG "comment" from the firmware ( like C++ )
                     {
@@ -716,9 +717,15 @@ public class GCodeReaderAndWriter {
                         int sp = lns.indexOf(" ");
                         if (sp > 0)
                             lns = lns.substring(0, sp);
+
+                        // Some firmware (may be all) returns the line with a leading 'N'.
+                        if (lns.startsWith("N"))
+                            lns = lns.substring(1);
+                        
                         result = Long.parseLong(lns);
                         Debug.e("GCodeWriter.waitForResponse() - request to resend from line " + result
                             + ".  RepRap said: " + resp);
+                        
                     } else if (!resp.startsWith("ok")) // Must be "ok" if not those - check
                     {
                         Debug.e("GCodeWriter.waitForResponse() - dud response from RepRap:" + resp);
