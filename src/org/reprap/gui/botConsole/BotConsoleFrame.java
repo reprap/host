@@ -179,7 +179,40 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         if (extruderCount < 1)
             throw new Exception("A Reprap printer must contain at least one extruder");
     }
+    private void initialiseExtruderPanels() {
+
+        extruderPanels = new GenericExtruderTabPanel[extruderCount];
+        for (int i = 0; i < extruderCount; i++) {
+            extruderPanels[i] = new GenericExtruderTabPanel();
+            try {
+                extruderPanels[i].initialiseExtruders(i);
+            }
+            catch (Exception e) {
+                System.out.println("Failure trying to initialise extruders in botConsole: " + e);
+                JOptionPane.showMessageDialog(null, e.getMessage());
+                return;
+            }            
+            try {
+                extruderPanels[i].setPrefs();
+            }
+            catch (Exception e) {
+                System.out.println("Problem loading prefs for Extruder " + i);
+                JOptionPane.showMessageDialog(null, "Problem loading prefs for Extruder " + i);
+            }
+        }
+    }
     
+    private void addExtruderPanels() {
+        
+        xYZTabPanel = new org.reprap.gui.botConsole.XYZTabPanel();
+
+        jTabbedPane1.addTab("XYZ", xYZTabPanel);
+        for (int i = 0; i < extruderCount; i++) {
+            jTabbedPane1.addTab("Extruder " + i, extruderPanels[i]);
+        }
+        pack();
+    }
+       
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -191,7 +224,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
         initialiseExtruderPanels();
-        printTabFrame1 = new org.reprap.gui.botConsole.PrintTabFrame();
+        printTabFrame1 = new org.reprap.gui.botConsole.PrintTabFrame(false);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -214,7 +247,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
                 .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(5, Short.MAX_VALUE))
         );
-
+        
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
@@ -278,40 +311,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     	return bcf.extruderPanels[0];
     }
     
-    private void initialiseExtruderPanels() {
-
-        extruderPanels = new GenericExtruderTabPanel[extruderCount];
-        for (int i = 0; i < extruderCount; i++) {
-            extruderPanels[i] = new GenericExtruderTabPanel();
-            try {
-                extruderPanels[i].initialiseExtruders(i);
-            }
-            catch (Exception e) {
-                System.out.println("Failure trying to initialise extruders in botConsole: " + e);
-                JOptionPane.showMessageDialog(null, e.getMessage());
-                return;
-            }            
-            try {
-                extruderPanels[i].setPrefs();
-            }
-            catch (Exception e) {
-                System.out.println("Problem loading prefs for Extruder " + i);
-                JOptionPane.showMessageDialog(null, "Problem loading prefs for Extruder " + i);
-            }
-        }
-    }
-    
-    private void addExtruderPanels() {
-        
-        xYZTabPanel = new org.reprap.gui.botConsole.XYZTabPanel();
-
-        jTabbedPane1.addTab("XYZ", xYZTabPanel);
-        for (int i = 0; i < extruderCount; i++) {
-            jTabbedPane1.addTab("Extruder " + i, extruderPanels[i]);
-        }
-        pack();
-    }
-    
+ 
 
 
 

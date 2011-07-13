@@ -21,7 +21,7 @@ LIBFILES="lib/*"
 
 # Where are all the other non-host-software files we need to include?
 DESIGNFILES=""
-for i in ../../$MACHINE ../../electronics ../firmware
+for i in ../$MACHINE ../electronics ../firmware
 do
   if [ -d "$i" ]
   then
@@ -102,12 +102,12 @@ rm -f "$BASENAME"/firmware/FiveD_GCode/FiveD_GCode_Interpreter/configuration.h
 
 echo "Design files copied."
 
-# Omit all .svn subdirs
+# Omit all .git subdirs
 cd "$BASENAME"
-find . -type d -name .svn |xargs rm -rf
+find . -type d -name .git |xargs rm -rf
 cd ..
 
-echo "Subversion references removed."
+echo "Git references removed."
 
 # Create zip archive
 
