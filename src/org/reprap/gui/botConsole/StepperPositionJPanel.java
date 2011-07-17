@@ -210,7 +210,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     			default:
     				Debug.e("moveToTarget()  Dud motor id: " + motorID);
     			}
-    			printer.singleMove(x, y, z, currentSpeed);
+    			printer.singleMove(x, y, z, currentSpeed, true);
     			//printer.moveTo(x, y, z, currentSpeed, false, false);
     		} catch (Exception ex)
     		{}

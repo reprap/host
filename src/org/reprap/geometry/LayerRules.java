@@ -1,6 +1,11 @@
 
 package org.reprap.geometry;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.PrintStream;
+
 import org.reprap.Printer;
 import org.reprap.Extruder;
 import org.reprap.geometry.polygons.RrHalfPlane;
@@ -19,22 +24,52 @@ public class LayerRules
 	/**
 	 * The coordinates of the first point plotted in a layer
 	 */
-	public Rr2Point[] firstPoint;
+	private Rr2Point[] firstPoint;
 	
 	/**
 	 * The extruder first used in a layer
 	 */	
-	public int[] firstExtruder;
+	private int[] firstExtruder;
 	
 	/**
 	 * The coordinates of the last point plotted in a layer
 	 */
-	public Rr2Point[] lastPoint;
+	private Rr2Point[] lastPoint;
 	
 	/**
 	 * The extruder last used in a layer
 	 */	
-	public int[] lastExtruder;
+	private int[] lastExtruder;
+	
+	/**
+	 * The heights of the layers
+	 */
+	private double[] layerZ;
+	
+	/**
+	 * The name of the first file of output
+	 */
+	private String prologueFileName;
+	
+	/**
+	 * The name of the last file of output
+	 */
+	private String epilogueFileName;
+	
+	/**
+	 * The names of all the files for all the layers
+	 */
+	private String [] layerFileNames;
+	
+	/**
+	 * 
+	 */
+	private boolean reversing;
+	
+	/**
+	 * Flag to remember if we have reversed the layer ot=rder in the output file
+	 */
+	private boolean alreadyReversed;
 	
 	/**
 	 * The machine
@@ -139,7 +174,8 @@ public class LayerRules
 			int modLMax, int macLMax, boolean found, RrRectangle bb)
 	{
 		printer = p;
-		
+		reversing = false;
+		alreadyReversed = false;
 		bBox = new RrRectangle(bb);	
 		notStartedYet = true;
 
@@ -164,10 +200,16 @@ public class LayerRules
 		}
 		addToStep = 0;
 		
-		firstPoint = new Rr2Point[modelLayerMax+1];
-		firstExtruder = new int[modelLayerMax+1];
-		lastPoint = new Rr2Point[modelLayerMax+1];
-		lastExtruder = new int[modelLayerMax+1];
+		firstPoint = new Rr2Point[machineLayerMax+1];
+		firstExtruder = new int[machineLayerMax+1];
+		lastPoint = new Rr2Point[machineLayerMax+1];
+		lastExtruder = new int[machineLayerMax+1];
+		layerZ = new double[machineLayerMax+1];
+		layerFileNames = new String[machineLayerMax+1];
+		for(int i = 0; i < machineLayerMax+1; i++)
+			layerFileNames[i] = null;
+		prologueFileName = null;
+		epilogueFileName = null;
 
 		layingSupport = found;
 		Extruder[] es = printer.getExtruders();
@@ -201,6 +243,8 @@ public class LayerRules
 	
 	public double getModelZ() { return modelZ; }
 	
+	public boolean getReversing() { return reversing; }
+	
 	public double getModelZ(int layer) 
 	{
 		return zStep*layer; 
@@ -212,31 +256,58 @@ public class LayerRules
 	
 	public void setFirstAndLast(RrPolygonList[] pl)
 	{
-		firstPoint[modelLayer] = null;
-		lastPoint[modelLayer] = null;
-		firstExtruder[modelLayer] = -1;
-		lastExtruder[modelLayer] = -1;
+		firstPoint[machineLayer] = null;
+		lastPoint[machineLayer] = null;
+		firstExtruder[machineLayer] = -1;
+		lastExtruder[machineLayer] = -1;
+		layerZ[machineLayer] = machineZ;
 		if(pl == null)
 			return;
 		if(pl.length <= 0)
 			return;
-		if(pl[0] == null)
+		int bottom = -1;
+		int top = -1;
+		for(int i = 0; i < pl.length; i++)
+		{
+			if(pl[i] != null)
+				if(pl[i].size() > 0)
+				{
+					if(bottom < 0)
+						bottom = i;
+					top = i;
+				}
+		}
+		if(bottom < 0)
 			return;
-		if(pl[0].size() <= 0)
-			return;
-		if(pl[0].polygon(0) == null)
-			return;
-		if(pl[0].polygon(0).size() <= 0)
-			return;
-		if(pl[pl.length - 1].size() <= 0)
-			return;
-		if(pl[pl.length - 1].polygon(pl[pl.length - 1].size()-1).size() <= 0)
-			return;
-		firstPoint[modelLayer] = pl[0].polygon(0).point(0);
-		firstExtruder[modelLayer] = pl[0].polygon(0).getAttributes().getExtruder().getID();
-		lastPoint[modelLayer] = pl[pl.length - 1].polygon(pl[pl.length - 1].size()-1).point(pl[pl.length - 1].polygon(pl[pl.length - 1].size()-1).size() - 1);
-		lastExtruder[modelLayer] = pl[pl.length - 1].polygon(pl[pl.length - 1].size()-1).getAttributes().getExtruder().getID();
+		firstPoint[machineLayer] = pl[bottom].polygon(0).point(0);
+		firstExtruder[machineLayer] = pl[bottom].polygon(0).getAttributes().getExtruder().getID();
+		lastPoint[machineLayer] = pl[top].polygon(pl[top].size()-1).point(pl[top].polygon(pl[top].size()-1).size() - 1);
+		lastExtruder[machineLayer] = pl[top].polygon(pl[top].size()-1).getAttributes().getExtruder().getID();
 	}
+	
+	public int realTopLayer()
+	{
+		int rtl = machineLayerMax;
+		while(firstPoint[rtl] == null && rtl > 0)
+		{
+			String s = "LayerRules.realTopLayer(): layer " + rtl + " from " + machineLayerMax + " is empty!";
+			if(machineLayerMax - rtl > 1)
+				Debug.e(s);
+			else
+				Debug.d(s);
+			rtl--;
+		}
+		return rtl;
+	}
+	
+	public String getPrologueFileName() { return prologueFileName; }
+	public String getEpilogueFileName() { return epilogueFileName; }
+	public void setPrologueFileName(String s) { prologueFileName = s; }
+	public void setEpilogueFileName(String s) { epilogueFileName = s; }
+	
+	public String getLayerFileName(int layer) { return layerFileNames[layer]; }
+	public String getLayerFileName() { return layerFileNames[machineLayer]; }
+	public void setLayerFileName(String s) { layerFileNames[machineLayer] = s; }
 	
 	public Rr2Point getFirstPoint(int layer)
 	{
@@ -256,6 +327,11 @@ public class LayerRules
 	public int getLastExtruder(int layer)
 	{
 		return lastExtruder[layer];
+	}
+	
+	public double getLayerZ(int layer)
+	{
+		return layerZ[layer];
 	}
 	
 	public int getModelLayerMax() { return modelLayerMax; }
@@ -386,7 +462,7 @@ public class LayerRules
 		}
 	}
 	
-	public void moveZAtStartOfLayer()
+	public void moveZAtStartOfLayer(boolean really)
 	{
 		double z = getMachineZ();
 
@@ -394,7 +470,7 @@ public class LayerRules
 		{
 			printer.setZ(z - (zStep + addToStep));
 		}
-		printer.singleMove(printer.getX(), printer.getY(), z, printer.getFastFeedrateZ());
+		printer.singleMove(printer.getX(), printer.getY(), z, printer.getFastFeedrateZ(), really);
 	}
 	
 	/**
@@ -424,5 +500,89 @@ public class LayerRules
 		
 		org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().setFractionDone(-1, -1, -1);
 	}
+	
+	private void copyFile(PrintStream ps, String ip)
+	{
+		File f = null;
+		try 
+		{
+			f = new File(ip);
+			FileReader fr = new FileReader(f);
+			int character;
+			while ((character = fr.read()) >= 0)
+			{
+				ps.print((char)character);
+				//System.out.print((char)character);
+			}
+			ps.flush();
+			fr.close();
+		} catch (Exception e) 
+		{  
+			Debug.e("Error copying file: " + e.toString());
+			e.printStackTrace();
+		}
+	}
+	
+	public void reverseLayers()
+	{
+		//if(opFileArray == null || alreadyReversed)
+		//if(getPrologueFileName() == null)
+		//	return;
+		
+		// Stop this being called twice...
+		if(alreadyReversed)
+		{
+			Debug.d("LayerRules.reverseLayers(): called twice.");
+			return;
+		}
+		alreadyReversed = true;
+		reversing = true;
+		
+		String fileName = getPrinter().getOutputFilename();
+		
+		PrintStream fileOutStream = null;
+		try
+		{
+			FileOutputStream fileStream = new FileOutputStream(fileName);
+			fileOutStream = new PrintStream(fileStream);
+		} catch (Exception e)
+		{
+			Debug.e("Can't write to file " + fileName);
+			return;
+		}
+		
+		getPrinter().forceOutputFile(fileOutStream);
+		//copyFile(fileOutStream,getPrologueFileName());
+
+		try
+		{
+			getPrinter().startRun(this);
+			int top = realTopLayer();
+			for(machineLayer = 0; machineLayer <= top; machineLayer++)
+			{
+				machineZ = layerZ[machineLayer];
+				getPrinter().startingLayer(this);
+				getPrinter().singleMove(getFirstPoint(machineLayer).x(), getFirstPoint(machineLayer).y(), machineZ, getPrinter().getFastXYFeedrate(), true);
+				copyFile(fileOutStream, getLayerFileName(machineLayer));
+				//System.out.println("Layer: " + machineLayer + " z: " + machineZ +
+				//		" first point: " + getFirstPoint(machineLayer) + " last point: " + getLastPoint(machineLayer)
+				//		+ " " + getLayerFileName(machineLayer));
+				getPrinter().singleMove(getLastPoint(machineLayer).x(), getLastPoint(machineLayer).y(), machineZ, getPrinter().getSlowXYFeedrate(), false);
+				getPrinter().finishedLayer(this);
+				getPrinter().betweenLayers(this);
+			}
+			getPrinter().terminate(this);
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		fileOutStream.close();
+		reversing = false;
+		//copyFile(fileOutStream, getEpilogueFileName());
+
+		//System.out.println("layerRules.reverseLayers(): exception at layer: " + i + " " + e.toString());
+
+	}
+
 	
 }

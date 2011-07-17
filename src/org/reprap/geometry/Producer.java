@@ -145,7 +145,7 @@ public class Producer {
 //				new Rr2Point(gp.x().high() + 6, gp.y().high() + 6));
 		
 		
-		layerRules.getPrinter().startRun(layerRules);
+		//layerRules.getPrinter().startRun(layerRules);
 		
 		if(Preferences.Subtractive())
 			produceSubtractive();
@@ -258,7 +258,7 @@ public class Producer {
 				{
 					Debug.e("Producer.produceAdditiveTopDown(): Physical extruders out of sequence: " + 
 							lastExtruder + " then " + thisExtruder);
-					Debug.e("(Physical extruder addresses should be sequential (or equal) starting at 0.)");
+					Debug.e("(Extruder addresses should be monotonically increasing starting at 0.)");
 				}
 				lastExtruder = thisExtruder;				
 			}
@@ -355,9 +355,12 @@ public class Producer {
 					}
 			}
 			
+			for(int i = 0; i < allPolygons.length; i++)
+				allPolygons[i] = allPolygons[i].clean();
 			
-			LayerProducer lp = new LayerProducer(allPolygons, layerRules, simulationPlot);
 			layerRules.setFirstAndLast(allPolygons);
+
+			LayerProducer lp = new LayerProducer(allPolygons, layerRules, simulationPlot);
 			lp.plot();
 
 			reprap.finishedLayer(layerRules);
@@ -377,7 +380,7 @@ public class Producer {
 		
 		layFoundationTopDown(layerRules.getBox());
 		
-		reprap.terminate();
+		layerRules.reverseLayers();
 	}
 	
 

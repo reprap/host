@@ -107,7 +107,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     public void selectExtruder()
     {
     	try {
-			org.reprap.Main.gui.getPrinter().selectExtruder(extruderID);
+			org.reprap.Main.gui.getPrinter().selectExtruder(extruderID, true);
 		} catch (Exception e) {
 			parentBotConsoleFrame.handleException(e);
 		}
@@ -450,7 +450,7 @@ private void coolingCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     	parentBotConsoleFrame.suspendPolling();
     	selectExtruder();
         try {
-            extruder.setCooler(coolingCheck.isSelected());
+            extruder.setCooler(coolingCheck.isSelected(), true);
         }
         catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Exception setting cooler: " + ex);
@@ -523,7 +523,7 @@ private void setExtruderSpeed() {
         if(extruder.get5D() && extruding)
 		{
 			try {
-				extruder.getPrinter().machineWait(5000, false);
+				extruder.getPrinter().machineWait(5000, false, true);
 			} catch (Exception e) {
 				parentBotConsoleFrame.handleException(e);
 			}

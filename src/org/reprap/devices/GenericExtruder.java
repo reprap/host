@@ -392,7 +392,7 @@ public abstract class GenericExtruder implements Extruder
 	 * Zero the extruded length
 	 *
 	 */
-	public void zeroExtrudedLength() throws Exception
+	public void zeroExtrudedLength(boolean really) throws Exception
 	{
 		es.zero();
 	}
@@ -1377,10 +1377,10 @@ public abstract class GenericExtruder implements Extruder
 			if(purgeTime > 0)
 			{
 				setExtrusion(getFastXYFeedrate(), false);
-				getPrinter().machineWait(purgeTime, false);
+				getPrinter().machineWait(purgeTime, false, true);
 				setExtrusion(0, false);
 				getPrinter().printEndReverse();
-				zeroExtrudedLength();
+				zeroExtrudedLength(true);
 			}
 		} catch (Exception e)
 		{}

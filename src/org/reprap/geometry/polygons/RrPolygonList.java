@@ -601,6 +601,22 @@ public class RrPolygonList
 		return result;
 	}
 	
+	/**
+	 * Remove empty entries (if any)
+	 * @return
+	 */
+	public RrPolygonList clean()
+	{
+		RrPolygonList result = new RrPolygonList();
+		for(int i = 0; i < size(); i++)
+		{
+			if(polygon(i) != null)
+				if(polygon(i).size() > 0)
+					result.add(polygon(i));
+		}
+		return result;
+	}
+	
 //	/**
 //	 * Set whether we loop back on ourself.
 //	 * @param c

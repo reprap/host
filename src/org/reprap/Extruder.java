@@ -170,7 +170,7 @@ public interface Extruder
 	 * @throws IOException
 	 * @throws Exception 
 	 */
-	public void setCooler(boolean f) throws IOException, Exception ;
+	public void setCooler(boolean f, boolean really) throws IOException, Exception ;
 	
 	/**
 	 * Check if the extruder is available, which is determined by ???
@@ -289,7 +289,7 @@ public interface Extruder
 	 * @throws Exception 
 	 *
 	 */
-	public void zeroExtrudedLength() throws Exception;
+	public void zeroExtrudedLength(boolean really) throws Exception;
     
     /**
      * @return the X offset in millimeters

@@ -1,6 +1,7 @@
 package org.reprap;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
 import javax.swing.JCheckBoxMenuItem;
 import org.reprap.geometry.LayerRules;
@@ -47,7 +48,7 @@ public interface Printer {
 	 * @param z
 	 * @param feedrate
 	 */
-	public void singleMove(double x, double y, double z, double feedrate);
+	public void singleMove(double x, double y, double z, double feedrate, boolean really);
 	
 	/**
 	 * Move the printer carriage to the give x, y and z position <b>while extruding material<b>
@@ -112,7 +113,7 @@ public interface Printer {
 	 * @throws IOException
 	 * @throws Exception 
 	 */
-	public void homeToZeroXYE() throws ReprapException, IOException, Exception; 
+	public void homeToZeroXYE(boolean really) throws ReprapException, IOException, Exception; 
 	
 	/**
 	 * Sync to zero Z location.
@@ -134,7 +135,7 @@ public interface Printer {
 	 * @param extr identifier of the material
 	 * @throws Exception 
 	 */
-	public void selectExtruder(int extr) throws Exception;
+	public void selectExtruder(int extr, boolean really) throws Exception;
 	
 	/**
 	 * Start a production run (as opposed to moving the machine about
@@ -146,7 +147,7 @@ public interface Printer {
 	 * Indicates end of job, homes extruder, powers down etc
 	 * @throws Exception
 	 */
-	public void terminate() throws Exception;
+	public void terminate(LayerRules layerRules) throws Exception;
 	
 	/**
 	 * Dispose of the printer
@@ -490,7 +491,7 @@ public interface Printer {
 	 * @param milliseconds
 	 * @throws Exception 
 	 */
-	public void machineWait(double milliseconds, boolean fastExtrude) throws Exception;
+	public void machineWait(double milliseconds, boolean fastExtrude, boolean really) throws Exception;
 	
 	/**
 	 * Load a file to be made.
@@ -582,4 +583,16 @@ public interface Printer {
 	 * @throws Exception 
 	 */
 	public void stabilise() throws Exception;
+	
+	/**
+	 * Force the output stream to be some value - use with caution
+	 * @param fos
+	 */
+	public void forceOutputFile(PrintStream fos);
+	
+	/**
+	 * Get the gcode output file name
+	 * @return
+	 */
+	public String getOutputFilename();
 }

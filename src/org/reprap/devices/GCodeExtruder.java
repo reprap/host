@@ -25,12 +25,13 @@ public class GCodeExtruder extends GenericExtruder
 	 * Zero the extruded length
 	 *
 	 */
-	public void zeroExtrudedLength() throws Exception
+	public void zeroExtrudedLength(boolean really) throws Exception
 	{
 		//if(es.length() > 0)
 		//{
-			super.zeroExtrudedLength();
-			gcode.queue("G92 E0 ;zero the extruded length");
+			super.zeroExtrudedLength(really);
+			if(really)
+				gcode.queue("G92 E0 ;zero the extruded length");
 		//}
 	}
 	
@@ -80,12 +81,15 @@ public class GCodeExtruder extends GenericExtruder
 	}
 	
 	//TODO: make these real G codes.
-	public void setCooler(boolean coolerOn) throws Exception
+	public void setCooler(boolean coolerOn, boolean really) throws Exception
 	{
-		if (coolerOn)
-			gcode.queue("M106 ;cooler on");
-		else
-			gcode.queue("M107 ;cooler off");
+		if(really)
+		{	
+			if (coolerOn)
+				gcode.queue("M106 ;cooler on");
+			else
+				gcode.queue("M107 ;cooler off");
+		}
 	}
 	
 

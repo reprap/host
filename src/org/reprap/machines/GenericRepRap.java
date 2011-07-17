@@ -318,10 +318,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		//if (previewer != null)
 			//previewer.reset();
-				
+
 		Debug.d("Selecting material 0");
-		selectExtruder(0);
-		getExtruder().zeroExtrudedLength();
+		selectExtruder(0, true);
+		getExtruder().zeroExtrudedLength(true);
 		
 		Debug.d("Homing machine in X and Y");
 		homeToZeroX();
@@ -335,13 +335,167 @@ public abstract class GenericRepRap implements CartesianPrinter
 	}
 	
 	/**
+	 * Just finished a layer
+	 * @param lc
+	 */
+	public void finishedLayer(LayerRules lc) throws Exception
+	{
+
+		double coolTime = getExtruder().getCoolingPeriod();
+
+		startCooling = -1;
+
+		if(coolTime > 0 && !lc.notStartedYet()) {
+			getExtruder().setCooler(true, lc.getReversing()); //***
+			Debug.d("Start of cooling period");
+			//setFeedrate(getFastXYFeedrate());
+
+			// Go home. Seek (0,0) then callibrate X first
+			homeToZeroXYE(lc.getReversing()); //***
+			startCooling = Timer.elapsed();
+		}
+
+	}
+
+	/**
+	 * Deals with all the actions that need to be done between one layer
+	 * and the next.
+	 * THIS FUNCTION MUST NOT MAKE THE REPRAP MACHINE DO ANYTHING (LIKE MOVE).
+	 * @param lc
+	 */
+	public void betweenLayers(LayerRules lc) throws Exception
+	{
+		// Now is a good time to garbage collect
+
+		System.gc();
+	}
+
+	/**
+	 * Just about to start the next layer
+	 * @param lc
+	 */
+	public void startingLayer(LayerRules lc) throws Exception
+	{
+
+		lc.setFractionDone();
+
+		// Don't home the first layer
+		// The startup procedure has already done that
+
+		if(lc.getMachineLayer() > 0 && Preferences.loadGlobalBool("InterLayerCooling"))
+		{
+			double liftZ = -1;
+			for(int i = 0; i < extruders.length; i++)
+				if(extruders[i].getLift() > liftZ)
+					liftZ = extruders[i].getLift();
+			double currentZ = getZ();
+			if(liftZ > 0)
+				singleMove(getX(), getY(), currentZ + liftZ, getFastFeedrateZ(), lc.getReversing()); //***
+			homeToZeroXYE(lc.getReversing()); //***
+			if(liftZ > 0)
+				singleMove(getX(), getY(), currentZ, getFastFeedrateZ(), lc.getReversing()); //***				
+		} else
+		{
+			int extruderNow = extruder;
+			for(int i = 0; i < extruders.length; i++)
+			{
+				selectExtruder(i, lc.getReversing());
+				extruders[i].zeroExtrudedLength(lc.getReversing()); //***
+			}
+			selectExtruder(extruderNow, lc.getReversing()); //***
+		}
+
+		//		double datumX = getExtruder().getNozzleWipeDatumX();
+		//		double datumY = getExtruder().getNozzleWipeDatumY();
+		//		double strokeY = getExtruder().getNozzleWipeStrokeY();
+		//		double clearTime = getExtruder().getNozzleClearTime();
+		//		double waitTime = getExtruder().getNozzleWaitTime();
+		double coolTime = getExtruder().getCoolingPeriod();
+
+		if (layerPauseCheckbox != null && layerPauseCheckbox.isSelected())
+			layerPause(); //***
+
+		if(isCancelled())
+		{
+			getExtruder().setCooler(false, lc.getReversing());//***
+			getExtruder().stopExtruding(); // Shouldn't be needed, but no harm//***
+			return;
+		}
+		// Cooling period
+
+		// How long has the fan been on?
+
+		double cool = Timer.elapsed();
+		if(startCooling >= 0)
+			cool = cool - startCooling;
+		else
+			cool = 0;
+
+		// Wait the remainder of the cooling period
+
+		if(startCooling >= 0)
+		{	
+			cool = coolTime - cool;
+			// NB - if cool is -ve machineWait will return immediately
+			machineWait(1000*cool, false, lc.getReversing()); //***
+		}
+		// Fan off
+
+		if(coolTime > 0)
+			getExtruder().setCooler(false, lc.getReversing());
+
+		// If we were cooling, wait for warm-up
+
+		//		if(startCooling >= 0)
+		//		{
+		//			machineWait(200 * coolTime, false);			
+		//			Debug.d("End of cooling period");			
+		//		}
+
+		// Do the clearing extrude then
+		// Wipe the nozzle on the doctor blade
+
+		//		if(getExtruder().getNozzleWipeEnabled())
+		//		{
+		//			//setFeedrate(getExtruder().getOutlineFeedrate());
+		//			
+		//			// Now hunt down the wiper.
+		//			singleMove(datumX, datumY, currentZ, getExtruder().getOutlineFeedrate());
+		//			
+		//			if(clearTime > 0)
+		//			{
+		//				getExtruder().setValve(true);
+		//				getExtruder().setMotor(true);
+		//				machineWait(1000*clearTime, false);
+		//				getExtruder().setMotor(false);
+		//				getExtruder().setValve(false);
+		//				machineWait(1000*waitTime, false);
+		//			}
+		//
+		//			singleMove(datumX, datumY + strokeY, currentZ, currentFeedrate);
+		//		}
+
+		lc.moveZAtStartOfLayer(lc.getReversing()); //***
+		//setFeedrate(getFastXYFeedrate());
+
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
 	 * Go to the purge point
 	 */
 	public void moveToPurge(boolean raiseZ)
 	{
 		if(raiseZ)
-			singleMove(currentX, currentY, currentZ + 1, getFastFeedrateZ());
-		singleMove(dumpX, dumpY, currentZ, getExtruder().getFastXYFeedrate());
+			singleMove(currentX, currentY, currentZ + 1, getFastFeedrateZ(), true);
+		singleMove(dumpX, dumpY, currentZ, getExtruder().getFastXYFeedrate(), true);
 	}
 	
 	/* (non-Javadoc)
@@ -370,7 +524,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#selectMaterial(int)
 	 */
-	public void selectExtruder(int materialIndex) throws Exception
+	public void selectExtruder(int materialIndex, boolean really) throws Exception
 	{
 		if (isCancelled())
 			return;
@@ -404,7 +558,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		{
 			if(att.getMaterial().equals(extruders[i].getMaterial()))
 			{
-				selectExtruder(i);
+				selectExtruder(i, true);
 				return;
 			}
 		}
@@ -564,7 +718,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			if(rDelay > 0)
 			{
 				getExtruder().setMotor(true);
-				machineWait(rDelay, true);
+				machineWait(rDelay, true, true);
 			}
 
 			// Extrude motor and valve delays (ms)
@@ -585,15 +739,15 @@ public abstract class GenericRepRap implements CartesianPrinter
 			if(eDelay >= vDelay)
 			{
 				getExtruder().setMotor(true);
-				machineWait(eDelay - vDelay, false);
+				machineWait(eDelay - vDelay, false, true);
 				getExtruder().setValve(true);
-				machineWait(vDelay, false);
+				machineWait(vDelay, false, true);
 			} else
 			{
 				getExtruder().setValve(true);
-				machineWait(vDelay - eDelay, false);
+				machineWait(vDelay - eDelay, false, true);
 				getExtruder().setMotor(true);
-				machineWait(eDelay, false);
+				machineWait(eDelay, false, true);
 			}
 			//getExtruder().setMotor(false);  // What's this for?  - AB
 		} catch(Exception e)
@@ -618,7 +772,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		try
 		{
 			getExtruder().setExtrusion(getExtruder().getExtruderSpeed(), true);
-			machineWait(delay, true);
+			machineWait(delay, true, true);
 			getExtruder().stopExtruding();
 		} catch (Exception e)
 		{}
@@ -676,7 +830,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		XYEAtZero = false;
 	}
 	
-	public void singleMove(double x, double y, double z, double feedrate)
+	public void singleMove(double x, double y, double z, double feedrate, boolean really)
 	{
 		try
 		{
@@ -766,7 +920,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * @throws Exception 
 	 */
 	public void setCooling(boolean enable) throws Exception {
-		getExtruder().setCooler(enable);
+		getExtruder().setCooler(enable, true);
 	}
 		
 //	/* (non-Javadoc)
@@ -847,7 +1001,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		currentZ = 0.0;
 	}
 	
-	public void homeToZeroXYE() throws ReprapException, IOException, Exception
+	public void homeToZeroXYE(boolean really) throws ReprapException, IOException, Exception
 	{}
 	
 	public void home() throws Exception{
@@ -874,149 +1028,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		return maxFeedrateZ;
 	}
 	
-	/**
-	 * Just finished a layer
-	 * @param lc
-	 */
-	public void finishedLayer(LayerRules lc) throws Exception
-	{
-		double coolTime = getExtruder().getCoolingPeriod();
-		
-		startCooling = -1;
-		
-		if(coolTime > 0 && !lc.notStartedYet()) {
-			getExtruder().setCooler(true);
-			Debug.d("Start of cooling period");
-			//setFeedrate(getFastXYFeedrate());
-			
-			// Go home. Seek (0,0) then callibrate X first
-			homeToZeroXYE();
-			startCooling = Timer.elapsed();
-		}
 
-	}
-	
-	/**
-	 * Deals with all the actions that need to be done between one layer
-	 * and the next.
-	 * THIS FUNCTION MUST NOT MAKE THE REPRAP MACHINE DO ANYTHING (LIKE MOVE).
-	 * @param lc
-	 */
-	public void betweenLayers(LayerRules lc) throws Exception
-	{
-		// Now is a good time to garbage collect
-		
-		System.gc();
-	}
-	
-	/**
-	 * Just about to start the next layer
-	 * @param lc
-	 */
-	public void startingLayer(LayerRules lc) throws Exception
-	{
-		lc.setFractionDone();
-		
-		// Don't home the first layer
-		// The startup procedure has already done that
-		
-		if(lc.getMachineLayer() > 0 && Preferences.loadGlobalBool("InterLayerCooling"))
-		{
-			double liftZ = -1;
-			for(int i = 0; i < extruders.length; i++)
-				if(extruders[i].getLift() > liftZ)
-					liftZ = extruders[i].getLift();
-			double currentZ = getZ();
-			if(liftZ > 0)
-				singleMove(getX(), getY(), currentZ + liftZ, getFastFeedrateZ());
-			homeToZeroXYE();
-			if(liftZ > 0)
-				singleMove(getX(), getY(), currentZ, getFastFeedrateZ());				
-		} else
-		{
-			int extruderNow = extruder;
-			for(int i = 0; i < extruders.length; i++)
-			{
-				selectExtruder(i);
-				extruders[i].zeroExtrudedLength();
-			}
-			selectExtruder(extruderNow);
-		}
-		
-		double datumX = getExtruder().getNozzleWipeDatumX();
-		double datumY = getExtruder().getNozzleWipeDatumY();
-		double strokeY = getExtruder().getNozzleWipeStrokeY();
-		double clearTime = getExtruder().getNozzleClearTime();
-		double waitTime = getExtruder().getNozzleWaitTime();
-		double coolTime = getExtruder().getCoolingPeriod();
-		
-		if (layerPauseCheckbox != null && layerPauseCheckbox.isSelected())
-			layerPause();
-		
-		if(isCancelled())
-		{
-			getExtruder().setCooler(false);
-			getExtruder().stopExtruding(); // Shouldn't be needed, but no harm
-			return;
-		}
-		// Cooling period
-		
-		// How long has the fan been on?
-		
-		double cool = Timer.elapsed();
-		if(startCooling >= 0)
-			cool = cool - startCooling;
-		else
-			cool = 0;
-		
-		// Wait the remainder of the cooling period
-		
-		if(startCooling >= 0)
-		{	
-			cool = coolTime - cool;
-			// NB - if cool is -ve machineWait will return immediately
-			machineWait(1000*cool, false);
-		}
-		// Fan off
-		
-		if(coolTime > 0)
-			getExtruder().setCooler(false);
-		
-		// If we were cooling, wait for warm-up
-		
-//		if(startCooling >= 0)
-//		{
-//			machineWait(200 * coolTime, false);			
-//			Debug.d("End of cooling period");			
-//		}
-		
-		// Do the clearing extrude then
-		// Wipe the nozzle on the doctor blade
-
-		if(getExtruder().getNozzleWipeEnabled())
-		{
-			//setFeedrate(getExtruder().getOutlineFeedrate());
-			
-			// Now hunt down the wiper.
-			singleMove(datumX, datumY, currentZ, getExtruder().getOutlineFeedrate());
-			
-			if(clearTime > 0)
-			{
-				getExtruder().setValve(true);
-				getExtruder().setMotor(true);
-				machineWait(1000*clearTime, false);
-				getExtruder().setMotor(false);
-				getExtruder().setValve(false);
-				machineWait(1000*waitTime, false);
-			}
-
-			singleMove(datumX, datumY + strokeY, currentZ, currentFeedrate);
-		}
-		
-		lc.moveZAtStartOfLayer();
-		//setFeedrate(getFastXYFeedrate());
-
-	}
 
 	
 

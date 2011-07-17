@@ -1,10 +1,12 @@
 package org.reprap.machines;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
 import org.reprap.Extruder;
 //import org.reprap.devices.NullStepperMotor;
 import org.reprap.devices.NullExtruder;
+import org.reprap.geometry.LayerRules;
 import org.reprap.utilities.Debug;
 
 /**
@@ -44,7 +46,7 @@ public class Simulator extends GenericRepRap {
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#terminate()
 	 */
-	public void terminate() throws Exception
+	public void terminate(LayerRules lr) throws Exception
 	{
 		//Debug.e("Generic terminate: " + getFinishX() + " " + getFinishY());
 		moveTo(getFinishX(), getFinishY(), getZ(), getExtruder().getFastXYFeedrate(), true, true);
@@ -121,7 +123,7 @@ public class Simulator extends GenericRepRap {
 	 * Here do no delay; it makes no sense for the simulation machine
 	 * @param milliseconds
 	 */
-	public void machineWait(double milliseconds, boolean fastExtrude)
+	public void machineWait(double milliseconds, boolean fastExtrude, boolean really)
 	{
 	}
 	
@@ -170,4 +172,11 @@ public class Simulator extends GenericRepRap {
 	{
 		return bedTemperatureTarget;
 	}
+	
+	public void forceOutputFile(PrintStream fos)
+	{
+		
+	}
+	
+	public String getOutputFilename() { return "RepRapSimulatorOutput"; }
 }

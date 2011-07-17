@@ -279,7 +279,7 @@ public class LayerProducer {
 	private void singleMove(Rr2Point p)
 	{
 		Printer pt = layerConditions.getPrinter();
-		pt.singleMove(p.x(), p.y(), pt.getZ(), pt.getFastXYFeedrate());
+		pt.singleMove(p.x(), p.y(), pt.getZ(), pt.getFastXYFeedrate(), true);
 	}
 	
 	/**
@@ -378,10 +378,17 @@ public class LayerProducer {
 			Debug.d("Rejected line with "+p.size()+" points, length: "+plotDist);
 			//startNearHere = null;
 			return;
-		}	
+		}
+		
+		double currentZ = printer.getZ();
 		
 		if(firstOneInLayer)
+		{
+			// The next line tells the printer that it is already at the first point.  It is not, but code will be added just before this
+			// to put it there by the LayerRules function that reverses the top-down order of the layers.
+			printer.singleMove(p.point(0).x(), p.point(0).y(), currentZ, printer.getSlowXYFeedrate(), false);
 			printer.forceNextExtruder();
+		}
 		printer.selectExtruder(att);
 		
 		
@@ -404,15 +411,15 @@ public class LayerProducer {
 		p.backStepExtrude(extrudeBackLength);
 		p.backStepValve(valveBackLength);
 		
-		double currentZ = printer.getZ();
+		
 		if(liftZ > 0)
-			printer.singleMove(printer.getX(), printer.getY(), currentZ + liftZ, printer.getFastFeedrateZ());
+			printer.singleMove(printer.getX(), printer.getY(), currentZ + liftZ, printer.getFastFeedrateZ(), true);
 	
 		currentFeedrate = att.getExtruder().getFastXYFeedrate();
 		singleMove(p.point(0));
 		
 		if(liftZ > 0)
-			printer.singleMove(printer.getX(), printer.getY(), currentZ, printer.getFastFeedrateZ());
+			printer.singleMove(printer.getX(), printer.getY(), currentZ, printer.getFastFeedrateZ(), true);
 		
 		if(acc)
 			currentFeedrate = p.speed(0);

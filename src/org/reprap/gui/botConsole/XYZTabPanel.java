@@ -718,22 +718,22 @@ public void goTo(double xTo, double yTo, double zTo)
 		{
 			int eNum = Integer.parseInt(extruderToPlotWith.getText());
 			GenericExtruderTabPanel etp = BotConsoleFrame.getGenericExtruderTabPanel(eNum);
-			printer.selectExtruder(eNum);
+			printer.selectExtruder(eNum, true);
 			printer.getExtruder().setExtrusion(etp.getExtruderSpeed(), false);
-			printer.machineWait(printer.getExtruder().getExtrusionDelayForLayer(), false);
+			printer.machineWait(printer.getExtruder().getExtrusionDelayForLayer(), false, true);
 		}
 		if(z >= zTo)
 		{
 			//printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
-			printer.singleMove(xTo, yTo, z, Double.parseDouble(xySpeedField.getText()));
+			printer.singleMove(xTo, yTo, z, Double.parseDouble(xySpeedField.getText()), true);
 			//printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
-			printer.singleMove(xTo, yTo, zTo, Double.parseDouble(zSpeedField.getText()));
+			printer.singleMove(xTo, yTo, zTo, Double.parseDouble(zSpeedField.getText()), true);
 		} else
 		{
 			//printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
-			printer.singleMove(x, y, zTo, Double.parseDouble(zSpeedField.getText()));
+			printer.singleMove(x, y, zTo, Double.parseDouble(zSpeedField.getText()), true);
 			//printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
-			printer.singleMove(xTo, yTo, zTo, Double.parseDouble(xySpeedField.getText()));	
+			printer.singleMove(xTo, yTo, zTo, Double.parseDouble(xySpeedField.getText()), true);	
 		}
 		if(plotExtruderCheck.isSelected())
 			printer.getExtruder().setExtrusion(0, false);

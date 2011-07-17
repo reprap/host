@@ -87,12 +87,12 @@ public class GCodeReaderAndWriter
 	/**
 	 * List of file names - used to reverse layer order when layers are done top-down
 	 */
-	private String[] opFileArray;
+	//private String[] opFileArray;
 	
 	/**
 	 * Index into opFileArray
 	 */
-	private int opFileIndex;
+	//private int opFileIndex;
 	
 	/**
 	 * How does the first file name in a multiple set end?
@@ -198,7 +198,7 @@ public class GCodeReaderAndWriter
 		responsesExpected = 0;
 //		responseAvailable = false;
 //		response = "0000";
-		opFileIndex = -1;
+		//opFileIndex = -1;
 		lastResp = "";
 		try
 		{
@@ -257,25 +257,7 @@ public class GCodeReaderAndWriter
 		paused = false;
 	}
 	
-	/**
-	 * Start the production run
-	 * (as opposed to driving the machine interactively).
-	 */
-	public void startRun()
-	{
-		if(fileOutStream != null)
-		{
-			// Exhause buffer before we start.
-			if(bufferThread != null)
-			{
-				exhaustBuffer = true;
-				while(exhaustBuffer) sleep(200);
-			}
-			bufferThread = null;
-			head = 0;
-			tail = 0;
-		}
-	}
+
 	
 	/**
 	 * Are we paused?
@@ -368,39 +350,7 @@ public class GCodeReaderAndWriter
 		} catch (Exception ex)
 		{}		
 	}
-	
-	/**
-	 * All done.
-	 *
-	 */
-	public void finish()
-	{
-		Debug.d("disposing of GCodeReaderAndWriter.");
-		
-//		// Wait for the ring buffer to be exhausted
-//		if(fileOutStream == null && bufferThread != null)
-//		{
-//			exhaustBuffer = true;
-//			while(exhaustBuffer) sleep(200);
-//		}
-		
-		try
-		{
-			if (serialInStream != null)
-				serialInStream.close();
 
-			if (serialOutStream != null)
-				serialOutStream.close();
-			
-			if (fileInStream != null)
-				fileInStream.close();
-			
-			if (fileOutStream != null)
-				fileOutStream.close();
-			
-		} catch (Exception e) {}
-		
-	}
 	
 	/**
 	 * Anything in the buffer?  (NB this still works if we aren't
@@ -427,6 +377,15 @@ public class GCodeReaderAndWriter
 	{
 		if(bufferThread != null)		
 			bufferThread.setPriority(myPriority);
+	}
+	
+	/**
+	 * Force the output stream - use with caution
+	 * @param fos
+	 */
+	public void forceOutputFile(PrintStream fos)
+	{
+		fileOutStream = fos;
 	}
 	
 	/**
@@ -548,7 +507,7 @@ public class GCodeReaderAndWriter
 				}
 			}
 		} 
-		Debug.e("bufferQueue(): failed to send " + cmd);	
+		Debug.d("bufferQueue(): did not send " + cmd);	
 	}
 	
 	private void resetReceived()
@@ -964,8 +923,8 @@ public class GCodeReaderAndWriter
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		
 		opFileName = null;
-		opFileArray = null;
-		opFileIndex = -1;
+		//opFileArray = null;
+		//opFileIndex = -1;
 		int result = chooser.showSaveDialog(null);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
@@ -979,7 +938,7 @@ public class GCodeReaderAndWriter
 				String fn = opFileName;
 				if(topDown)
 				{
-					opFileIndex = 0;
+					//opFileIndex = 0;
 					fn += firstEnding;
 					fn += tmpString;
 					doe = true;
@@ -997,8 +956,8 @@ public class GCodeReaderAndWriter
 				return shortName;
 			} catch (FileNotFoundException e) 
 			{
-				opFileArray = null;
-				opFileIndex = -1;
+				//opFileArray = null;
+				//opFileIndex = -1;
 				Debug.e("Can't write to file '" + opFileName);
 				opFileName = null;
 				fileOutStream = null;
@@ -1011,101 +970,140 @@ public class GCodeReaderAndWriter
 		return null;
 	}
 	
+	/**
+	 * Start the production run
+	 * (as opposed to driving the machine interactively).
+	 */
+	public void startRun()
+	{
+		if(fileOutStream != null)
+		{
+			// Exhause buffer before we start.
+			if(bufferThread != null)
+			{
+				exhaustBuffer = true;
+				while(exhaustBuffer) sleep(200);
+			}
+			bufferThread = null;
+			head = 0;
+			tail = 0;
+		}
+	}
+	
 	public void startingLayer(LayerRules lc)
 	{
 		// If no filename or the index is not set, forget about the start layer. - Vik, 23-Feb-2009
-		if((opFileIndex < 0)  || (opFileName == null))
-			return;
+		//if((opFileIndex < 0)  || (opFileName == null))
+		//	return;
 		
-		if(opFileArray == null)
-		{
-			if(lc.getTopDown())
-			{
-				opFileIndex = 0;
-				opFileArray = new String[lc.getMachineLayerMax() + 3];
-				opFileArray[opFileIndex] = opFileName + firstEnding + tmpString + gcodeExtension;
-				finishedLayer();
-			}
-		}
 		
-		opFileArray[opFileIndex] = opFileName + lc.getMachineLayer() + tmpString + gcodeExtension;
+		//if(opFileArray == null)
+//		if(lc.getPrologueFileName() == null)
+//		{
+//			if(lc.getTopDown())
+//			{
+//				//opFileIndex = 0;
+//				//opFileArray = new String[lc.getMachineLayerMax() + 3];
+//				//opFileArray[opFileIndex] = opFileName + firstEnding + tmpString + gcodeExtension;
+//				lc.setPrologueFileName(opFileName + firstEnding + tmpString + gcodeExtension);
+//				finishedLayer(lc);
+//			}
+//		}
+		
+		//opFileArray[opFileIndex] = opFileName + lc.getMachineLayer() + tmpString + gcodeExtension;
+		lc.setLayerFileName(opFileName + lc.getMachineLayer() + tmpString + gcodeExtension);
+		//System.out.println("Name out: " + lc.getLayerFileName());
+		if(!lc.getReversing())
 		try
 		{
-			File fl = new File(opFileArray[opFileIndex]);
+			//File fl = new File(opFileArray[opFileIndex]);
+			File fl = new File(lc.getLayerFileName());
 			fl.deleteOnExit();
 			FileOutputStream fileStream = new FileOutputStream(fl);
 			fileOutStream = new PrintStream(fileStream);
+			//System.out.println("Opening: " + lc.getLayerFileName());
 		} catch (Exception e)
 		{
-			Debug.e("Can't write to file " + opFileArray[opFileIndex]);
+			//Debug.e("Can't write to file " + opFileArray[opFileIndex]);
+			Debug.e("Can't write to file " + lc.getLayerFileName());
 		}
 	}
 	
-	public void startingEpilogue()
+	public void finishedLayer(LayerRules lc)
 	{
-		if(opFileArray == null)
-			return;
-		opFileArray[opFileIndex] = opFileName + lastEnding + tmpString + gcodeExtension;
+		//if(opFileArray == null)
+		//if(lc.getPrologueFileName() == null)
+			//return;
+		//System.out.println("Name close: " + lc.getLayerFileName());
+		if(!lc.getReversing())
+		{
+			//System.out.println("Closing: " + lc.getLayerFileName());
+			fileOutStream.close();
+		}
+		//opFileIndex++;
+	}
+	
+	public void startingEpilogue(LayerRules lc)
+	{
+		//if(opFileArray == null)
+		//if(lc.getPrologueFileName() == null)
+		//	return;
+		//opFileArray[opFileIndex] = opFileName + lastEnding + tmpString + gcodeExtension;
+		//lc.setEpilogueFileName(opFileName + lastEnding + tmpString + gcodeExtension);
+//		try
+//		{
+//			//File fl = new File(opFileArray[opFileIndex]);
+//			File fl = new File(lc.getEpilogueFileName());
+//			fl.deleteOnExit();
+//			FileOutputStream fileStream = new FileOutputStream(fl);
+//			fileOutStream = new PrintStream(fileStream);
+//		} catch (Exception e)
+//		{
+//			//Debug.e("Can't write to file " + opFileArray[opFileIndex]);
+//			Debug.e("Can't write to file " + lc.getEpilogueFileName());
+//		}
+	}
+	
+
+	
+
+
+	/**
+	 * All done.
+	 *
+	 */
+	public void finish(LayerRules lc)
+	{
+		
+		Debug.d("disposing of GCodeReaderAndWriter.");
+		//lc.reverseLayers(opFileName + gcodeExtension);
+		//	// Wait for the ring buffer to be exhausted
+		//	if(fileOutStream == null && bufferThread != null)
+		//	{
+		//		exhaustBuffer = true;
+		//		while(exhaustBuffer) sleep(200);
+		//	}
+
 		try
 		{
-			File fl = new File(opFileArray[opFileIndex]);
-			fl.deleteOnExit();
-			FileOutputStream fileStream = new FileOutputStream(fl);
-			fileOutStream = new PrintStream(fileStream);
-		} catch (Exception e)
-		{
-			Debug.e("Can't write to file " + opFileArray[opFileIndex]);
-		}
+			if (serialInStream != null)
+				serialInStream.close();
+
+			if (serialOutStream != null)
+				serialOutStream.close();
+
+			if (fileInStream != null)
+				fileInStream.close();
+
+			//if (fileOutStream != null)
+			//	fileOutStream.close();
+
+		} catch (Exception e) {}
+
 	}
 	
-	public void finishedLayer()
+	public String getOutputFilename()
 	{
-		if(opFileArray == null)
-			return;
-		fileOutStream.close();
-		opFileIndex++;
-	}
-	
-	private void copyFile(PrintStream ps, String ip)
-	{
-		File f = null;
-		try 
-		{
-			f = new File(ip);
-			FileReader fr = new FileReader(f);
-			int character;
-			while ((character = fr.read()) >= 0) 
-				ps.print((char)character);
-			
-			ps.flush();
-			fr.close();
-		} catch (Exception e) 
-		{  
-			Debug.e("Error copying file: " + e.toString());
-		}
-	}
-	
-	public void reverseLayers()
-	{
-		if(opFileArray == null || alreadyReversed)
-			return;
-		
-		// Stop this being called twice...
-		
-		alreadyReversed = true;
-		
-		try
-		{
-			FileOutputStream fileStream = new FileOutputStream(opFileName + gcodeExtension);
-			fileOutStream = new PrintStream(fileStream);
-		} catch (Exception e)
-		{
-			Debug.e("Can't write to file " + opFileName + gcodeExtension);
-		}
-		
-		copyFile(fileOutStream, opFileArray[0]);
-		for(int i = opFileIndex - 1; i > 0; i--)
-			copyFile(fileOutStream, opFileArray[i]);
-		copyFile(fileOutStream, opFileArray[opFileIndex]);
+		return opFileName + gcodeExtension;
 	}
 }
