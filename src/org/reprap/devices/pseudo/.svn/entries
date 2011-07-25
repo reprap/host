@@ -1,0 +1,41 @@
+8
+
+dir
+4142
+https://reprap.svn.sourceforge.net/svnroot/reprap/trunk/software/host/src/org/reprap/devices/pseudo
+https://reprap.svn.sourceforge.net/svnroot/reprap
+
+
+
+2010-10-07T17:01:38.139131Z
+3822
+adrian-bowyer
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+cb376a5e-1013-0410-a455-b6b1f9ac8223
+
+LinePrinter.java
+file
+
+
+
+
+2010-10-07T15:14:22.000000Z
+22a30a6584a7c2bacfdb3aead765993a
+2010-10-07T17:01:38.139131Z
+3822
+adrian-bowyer
+has-props
+

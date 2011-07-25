@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svnroot/reprap/!svn/ver/4134/trunk/software/host/src/org/reprap/geometry
+END
+Producer.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svnroot/reprap/!svn/ver/4130/trunk/software/host/src/org/reprap/geometry/Producer.java
+END
+LayerProducer.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/reprap/!svn/ver/4071/trunk/software/host/src/org/reprap/geometry/LayerProducer.java
+END
+LayerRules.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/reprap/!svn/ver/4080/trunk/software/host/src/org/reprap/geometry/LayerRules.java
+END

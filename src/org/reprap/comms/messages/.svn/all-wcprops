@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/comms/messages
+END
+VersionRequestMessage.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/comms/messages/VersionRequestMessage.java
+END
+VersionResponseMessage.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/comms/messages/VersionResponseMessage.java
+END

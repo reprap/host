@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svnroot/reprap/!svn/ver/4140/trunk/software/host/src/org/reprap/comms
+END
+GCodeReaderAndWriter.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svnroot/reprap/!svn/ver/4140/trunk/software/host/src/org/reprap/comms/GCodeReaderAndWriter.java
+END
+IncomingMessage.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/comms/IncomingMessage.java
+END
+OutgoingMessage.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/comms/OutgoingMessage.java
+END
+Communicator.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/comms/Communicator.java
+END
+IncomingContext.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/comms/IncomingContext.java
+END
+Address.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/comms/Address.java
+END

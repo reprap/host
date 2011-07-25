@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/reprap/!svn/ver/4141/trunk/software/host/src/org/reprap/gui/botConsole
+END
+bedPanel.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/reprap/!svn/ver/4141/trunk/software/host/src/org/reprap/gui/botConsole/bedPanel.java
+END
+StepperPositionJPanel.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svnroot/reprap/!svn/ver/4076/trunk/software/host/src/org/reprap/gui/botConsole/StepperPositionJPanel.java
+END
+GenericExtruderTabPanel.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svnroot/reprap/!svn/ver/4063/trunk/software/host/src/org/reprap/gui/botConsole/GenericExtruderTabPanel.java
+END
+PrintTabFrame.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svnroot/reprap/!svn/ver/4141/trunk/software/host/src/org/reprap/gui/botConsole/PrintTabFrame.java
+END
+BotConsoleFrame.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svnroot/reprap/!svn/ver/4141/trunk/software/host/src/org/reprap/gui/botConsole/BotConsoleFrame.java
+END

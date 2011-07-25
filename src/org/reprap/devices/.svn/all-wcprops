@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svnroot/reprap/!svn/ver/4135/trunk/software/host/src/org/reprap/devices
+END
+GenericStepperMotor.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/devices/GenericStepperMotor.java
+END
+GCodeExtruder.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/reprap/!svn/ver/3893/trunk/software/host/src/org/reprap/devices/GCodeExtruder.java
+END
+GenericExtruder.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/reprap/!svn/ver/4135/trunk/software/host/src/org/reprap/devices/GenericExtruder.java
+END
+SNAPStepperMotor.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/devices/SNAPStepperMotor.java
+END
+GenericThermalSensor.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svnroot/reprap/!svn/ver/3929/trunk/software/host/src/org/reprap/devices/GenericThermalSensor.java
+END
