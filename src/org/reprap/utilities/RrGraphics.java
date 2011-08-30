@@ -72,7 +72,6 @@ import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.RrHalfPlane;
 import org.reprap.geometry.polygons.RrInterval;
-import org.reprap.geometry.polygons.RrLine;
 import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.gui.StatusMessage;

@@ -8,7 +8,6 @@ package org.reprap.gui.botConsole;
 
 import java.io.IOException;
 import org.reprap.Printer;
-import org.reprap.ReprapException;
 import org.reprap.utilities.Debug;
 /**
  *

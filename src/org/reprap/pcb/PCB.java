@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.io.FileReader;
 import java.io.File;
@@ -30,9 +29,6 @@ import org.reprap.geometry.polygons.*;
 import org.reprap.utilities.RrGraphics;
 import org.reprap.utilities.Debug;
 import org.reprap.comms.GCodeReaderAndWriter;
-
-//import java.io.IOException;
-
 
 class PCBOffsets extends JPanel {
 	private static final long serialVersionUID = 1L;

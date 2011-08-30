@@ -1,7 +1,5 @@
 package org.reprap.devices;
 
-import java.io.IOException;
-
 import org.reprap.comms.GCodeReaderAndWriter;
 import org.reprap.Printer;
 import org.reprap.Preferences;

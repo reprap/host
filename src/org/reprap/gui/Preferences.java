@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
-import java.lang.System;
 import java.util.Arrays;
 
 import javax.swing.JButton;
@@ -16,8 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.Box;
 import java.awt.Button;

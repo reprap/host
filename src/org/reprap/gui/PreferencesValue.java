@@ -6,7 +6,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.awt.GridLayout;
 
 
 public class PreferencesValue {

@@ -12,7 +12,6 @@ import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.RrCSG;
 import org.reprap.geometry.polygons.BooleanGrid;
-import org.reprap.geometry.polygons.BooleanGridList;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
