@@ -16,7 +16,7 @@ import org.reprap.comms.GCodeReaderAndWriter;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
 import org.reprap.geometry.LayerRules;
-import org.reprap.geometry.polygons.Rr2Point;
+import org.reprap.geometry.polygons.Point2D;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
@@ -509,7 +509,7 @@ public class GCodeRepRap extends GenericRepRap {
 		{
 			// Fan off
 			//getExtruder().setCooler(false);
-			Rr2Point p = lc.getLastPoint(topLayer);
+			Point2D p = lc.getLastPoint(topLayer);
 			currentX = round(p.x(),1);
 			currentY = round(p.y(),1);
 			//System.out.println("final XY: " + currentX + ", " + currentY);

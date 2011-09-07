@@ -40,14 +40,14 @@ public class AllSTLsToBuild
 		BooleanGridList bridges;
 		BooleanGridList insides;
 		BooleanGridList surfaces;	
-		RrPolygonList hatchedPolygons;
+		PolygonList hatchedPolygons;
 		
 		InFillPatterns()
 		{
 			bridges = new BooleanGridList();
 			insides = new BooleanGridList();
 			surfaces = new BooleanGridList();
-			hatchedPolygons = new RrPolygonList();
+			hatchedPolygons = new PolygonList();
 		}
 		
 		InFillPatterns(InFillPatterns ifp)
@@ -66,25 +66,25 @@ public class AllSTLsToBuild
 	 */
 	class BoundingBox
 	{
-		private RrRectangle XYbox;
-		private RrInterval Zint;
+		private Rectangle XYbox;
+		private Interval Zint;
 		
 		public BoundingBox(Point3d p0)
 		{	
-			Zint = new RrInterval(p0.z, p0.z);
-			XYbox = new RrRectangle(new RrInterval(p0.x, p0.x), new RrInterval(p0.y, p0.y));
+			Zint = new Interval(p0.z, p0.z);
+			XYbox = new Rectangle(new Interval(p0.x, p0.x), new Interval(p0.y, p0.y));
 		}
 		
 		public BoundingBox(BoundingBox b)
 		{
-			Zint = new RrInterval(b.Zint);
-			XYbox = new RrRectangle(b.XYbox);
+			Zint = new Interval(b.Zint);
+			XYbox = new Rectangle(b.XYbox);
 		}
 		
 		public void expand(Point3d p0)
 		{
 			Zint.expand(p0.z);
-			XYbox.expand(new Rr2Point(p0.x, p0.y));
+			XYbox.expand(new Point2D(p0.x, p0.y));
 		}
 		
 		public void expand(BoundingBox b)
@@ -104,7 +104,7 @@ public class AllSTLsToBuild
 		/**
 		 * The ends of the line segment
 		 */
-		public Rr2Point a = null, b = null;
+		public Point2D a = null, b = null;
 		
 		/**
 		 * The attribute (i.e. RepRap material) of the segment.
@@ -124,7 +124,7 @@ public class AllSTLsToBuild
 		 * @param p
 		 * @param q
 		 */
-		public LineSegment(Rr2Point p, Rr2Point q, Attributes at)
+		public LineSegment(Point2D p, Point2D q, Attributes at)
 		{
 			if(at == null)
 				Debug.e("LineSegment(): null attributes!");
@@ -235,7 +235,7 @@ public class AllSTLsToBuild
 	/**
 	 * A plan box round each item
 	 */
-	private List<RrRectangle> rectangles;
+	private List<Rectangle> rectangles;
 	
 	/**
 	 * New list of things to be built for reordering
@@ -251,7 +251,7 @@ public class AllSTLsToBuild
 	/**
 	 * The lowest and highest points
 	 */
-	private RrInterval Zrange;
+	private Interval Zrange;
 	
 	/**
 	 * Is the list editable?
@@ -417,7 +417,7 @@ public class AllSTLsToBuild
 		if(frozen)
 			return;
 		frozen = true;
-		rectangles = new ArrayList<RrRectangle>();
+		rectangles = new ArrayList<Rectangle>();
 		for(int i = 0; i < stls.size(); i++)
 			rectangles.add(null);		
 		if(cache == null)
@@ -444,9 +444,9 @@ public class AllSTLsToBuild
 					{
 						XYZbox = BBox(att.getPart(), trans);
 						if(rectangles.get(i) == null)
-							rectangles.set(i, new RrRectangle(XYZbox.XYbox));
+							rectangles.set(i, new Rectangle(XYZbox.XYbox));
 						else
-							rectangles.set(i, RrRectangle.union(rectangles.get(i), XYZbox.XYbox));
+							rectangles.set(i, Rectangle.union(rectangles.get(i), XYZbox.XYbox));
 					} else
 					{
 						s = BBox(att.getPart(), trans);
@@ -454,9 +454,9 @@ public class AllSTLsToBuild
 						{
 							XYZbox.expand(s);
 							if(rectangles.get(i) == null)
-								rectangles.set(i, new RrRectangle(s.XYbox));
+								rectangles.set(i, new Rectangle(s.XYbox));
 							else
-								rectangles.set(i, RrRectangle.union(rectangles.get(i), s.XYbox));
+								rectangles.set(i, Rectangle.union(rectangles.get(i), s.XYbox));
 						}
 					}
 				}
@@ -537,7 +537,7 @@ public class AllSTLsToBuild
 	 * Return the XY box round everything
 	 * @return
 	 */
-	public RrRectangle ObjectPlanRectangle()
+	public Rectangle ObjectPlanRectangle()
 	{
 		freeze();
 		return XYZbox.XYbox;
@@ -559,7 +559,7 @@ public class AllSTLsToBuild
 	 * @param edges
 	 * @return
 	 */
-	private RrPolygon getNextPolygon(ArrayList<LineSegment> edges)
+	private Polygon getNextPolygon(ArrayList<LineSegment> edges)
 	{
 		if(!frozen)
 		{
@@ -570,16 +570,16 @@ public class AllSTLsToBuild
 			return null;
 		LineSegment next = edges.get(0);
 		edges.remove(0);
-		RrPolygon result = new RrPolygon(next.att, true);
+		Polygon result = new Polygon(next.att, true);
 		result.add(next.a);
 		result.add(next.b);
-		Rr2Point start = next.a;
-		Rr2Point end = next.b;
+		Point2D start = next.a;
+		Point2D end = next.b;
 		
 		boolean first = true;
 		while(edges.size() > 0)
 		{
-			double d2 = Rr2Point.dSquared(start, end);
+			double d2 = Point2D.dSquared(start, end);
 			if(first)
 				d2 = Math.max(d2, 1);
 			first = false;
@@ -587,14 +587,14 @@ public class AllSTLsToBuild
 			int index = -1;
 			for(int i = 0; i < edges.size(); i++)
 			{
-				double dd = Rr2Point.dSquared(edges.get(i).a, end);
+				double dd = Point2D.dSquared(edges.get(i).a, end);
 				if(dd < d2)
 				{
 					d2 = dd;
 					aEnd = true;
 					index = i;
 				}
-				dd = Rr2Point.dSquared(edges.get(i).b, end);
+				dd = Point2D.dSquared(edges.get(i).b, end);
 				if(dd < d2)
 				{
 					d2 = dd;
@@ -610,12 +610,12 @@ public class AllSTLsToBuild
 				int ipt = result.size() - 1;
 				if(aEnd)
 				{
-					result.set(ipt, Rr2Point.mul(Rr2Point.add(next.a, result.point(ipt)), 0.5));
+					result.set(ipt, Point2D.mul(Point2D.add(next.a, result.point(ipt)), 0.5));
 					result.add(next.b);
 					end = next.b;
 				} else
 				{
-					result.set(ipt, Rr2Point.mul(Rr2Point.add(next.b, result.point(ipt)), 0.5));
+					result.set(ipt, Point2D.mul(Point2D.add(next.b, result.point(ipt)), 0.5));
 					result.add(next.a);
 					end = next.a;				
 				}
@@ -633,15 +633,15 @@ public class AllSTLsToBuild
 	 * @param edges
 	 * @return
 	 */
-	private RrPolygonList simpleCull(ArrayList<LineSegment> edges)
+	private PolygonList simpleCull(ArrayList<LineSegment> edges)
 	{
 		if(!frozen)
 		{
 			Debug.e("AllSTLsToBuild:simpleCull() called for an unfrozen list!");
 			freeze();
 		}
-		RrPolygonList result = new RrPolygonList();
-		RrPolygon next = getNextPolygon(edges);
+		PolygonList result = new PolygonList();
+		Polygon next = getNextPolygon(edges);
 		while(next != null)
 		{
 			if(next.size() >= 3)
@@ -658,7 +658,7 @@ public class AllSTLsToBuild
 	 * @param layerConditions
 	 * @return
 	 */
-	public RrPolygonList computeSupport(int stl, LayerRules layerConditions)
+	public PolygonList computeSupport(int stl, LayerRules layerConditions)
 	{
 		// No more additions or movements, please
 		
@@ -748,7 +748,7 @@ public class AllSTLsToBuild
 	 */
 	private BooleanGrid findLand(BooleanGrid landPattern)
 	{
-		Rr2Point seed = landPattern.findSeed();
+		Point2D seed = landPattern.findSeed();
 		if(seed == null)
 			return null;
 		
@@ -761,7 +761,7 @@ public class AllSTLsToBuild
 	 * @param cen1
 	 * @return
 	 */
-	int findBridges(BooleanGridList unSupported, Rr2Point cen)
+	int findBridges(BooleanGridList unSupported, Point2D cen)
 	{
 		for(int i = 0; i < unSupported.size(); i++)
 		{
@@ -807,7 +807,7 @@ public class AllSTLsToBuild
 			{
 				// Find the middle of the land
 				
-				Rr2Point cen1 = land1.findCentroid();
+				Point2D cen1 = land1.findCentroid();
 				
 				// Wipe this land from the land pattern
 				
@@ -843,7 +843,7 @@ public class AllSTLsToBuild
 				
 				// Find the middle of this land
 				
-				Rr2Point cen2 = land2.findCentroid();
+				Point2D cen2 = land2.findCentroid();
 				if(cen2 == null)
 				{
 					Debug.d("AllSTLsToBuild.bridges(): Second land found with no centroid.");
@@ -868,26 +868,26 @@ public class AllSTLsToBuild
 
 					// (Roughly) what direction does the bridge go in?
 
-					Rr2Point centroidDirection = Rr2Point.sub(cen2, cen1).norm();
-					Rr2Point bridgeDirection = centroidDirection;
+					Point2D centroidDirection = Point2D.sub(cen2, cen1).norm();
+					Point2D bridgeDirection = centroidDirection;
 
 					// Fine the edge of the bridge that is nearest parallel to that, and use that as the fill direction
 
 					double spMax = Double.NEGATIVE_INFINITY;
 					double sp;
-					RrPolygonList bridgeOutline = bridge.allPerimiters(bridge.attribute());
+					PolygonList bridgeOutline = bridge.allPerimiters(bridge.attribute());
 					for(int pol = 0; pol < bridgeOutline.size(); pol++)
 					{
-						RrPolygon polygon = bridgeOutline.polygon(i);
+						Polygon polygon = bridgeOutline.polygon(i);
 
 						for(int vertex1 = 0; vertex1 < polygon.size(); vertex1++)
 						{
 							int vertex2 = vertex1+1;
 							if(vertex2 >= polygon.size()) // We know the polygon must be closed...
 								vertex2 = 0;
-							Rr2Point edge = Rr2Point.sub(polygon.point(vertex2), polygon.point(vertex1));
+							Point2D edge = Point2D.sub(polygon.point(vertex2), polygon.point(vertex1));
 
-							if((sp = Math.abs(Rr2Point.mul(edge, centroidDirection))) > spMax)
+							if((sp = Math.abs(Point2D.mul(edge, centroidDirection))) > spMax)
 							{
 								spMax = sp;
 								bridgeDirection = edge;
@@ -898,7 +898,7 @@ public class AllSTLsToBuild
 
 					// Build the bridge
 
-					result.hatchedPolygons.add(bridge.hatch(new RrHalfPlane(new Rr2Point(0,0), bridgeDirection), 
+					result.hatchedPolygons.add(bridge.hatch(new HalfSpace2D(new Point2D(0,0), bridgeDirection), 
 							bridge.attribute().getExtruder().getExtrusionInfillWidth(), 
 							bridge.attribute()));
 					
@@ -926,7 +926,7 @@ public class AllSTLsToBuild
 	 * @param startNearHere
 	 * @return
 	 */
-	public RrPolygonList computeInfill(int stl, LayerRules layerConditions) 
+	public PolygonList computeInfill(int stl, LayerRules layerConditions) 
 	{
 		// Where the result will be stored.
 		
@@ -1038,17 +1038,17 @@ public class AllSTLsToBuild
 	 * @param a
 	 * @return
 	 */
-	public RrPolygon shieldPolygon(Attributes a)
+	public Polygon shieldPolygon(Attributes a)
 	{
-		RrRectangle rr = ObjectPlanRectangle();
-		Rr2Point corner = Rr2Point.add(rr.sw(), new Rr2Point(-3, -3));
-		RrPolygon ell = new RrPolygon(a, false);
+		Rectangle rr = ObjectPlanRectangle();
+		Point2D corner = Point2D.add(rr.sw(), new Point2D(-3, -3));
+		Polygon ell = new Polygon(a, false);
 		ell.add(corner);
-		ell.add(Rr2Point.add(corner, new Rr2Point(0, 10)));
-		ell.add(Rr2Point.add(corner, new Rr2Point(-2, 10)));
-		ell.add(Rr2Point.add(corner, new Rr2Point(-2, -2)));
-		ell.add(Rr2Point.add(corner, new Rr2Point(20, -2)));
-		ell.add(Rr2Point.add(corner, new Rr2Point(20, 0)));
+		ell.add(Point2D.add(corner, new Point2D(0, 10)));
+		ell.add(Point2D.add(corner, new Point2D(-2, 10)));
+		ell.add(Point2D.add(corner, new Point2D(-2, -2)));
+		ell.add(Point2D.add(corner, new Point2D(20, -2)));
+		ell.add(Point2D.add(corner, new Point2D(20, 0)));
 		ell.add(corner);
 		return ell;
 	}
@@ -1060,7 +1060,7 @@ public class AllSTLsToBuild
 	 * @param shield
 	 * @return
 	 */
-	public RrPolygonList computeOutlines(int stl, LayerRules layerConditions, RrPolygonList hatchedPolygons, boolean shield)
+	public PolygonList computeOutlines(int stl, LayerRules layerConditions, PolygonList hatchedPolygons, boolean shield)
 	{
 		// No more additions or movements, please
 		
@@ -1070,7 +1070,7 @@ public class AllSTLsToBuild
 		
 		BooleanGridList slice = slice(stl, layerConditions.getModelLayer(), layerConditions);
 		
-		RrPolygonList borderPolygons;
+		PolygonList borderPolygons;
 		
 		// Are we building the raft under things?  If so, there is no border.
 		
@@ -1142,8 +1142,8 @@ public class AllSTLsToBuild
 		double z = layerRules.getModelZ(layer) + layerRules.getZStep()*0.5;
 		Extruder[] extruders = layerRules.getPrinter().getExtruders();
 		result = new BooleanGridList();
-		RrCSG csgp = null;
-		RrPolygonList pgl = new RrPolygonList();
+		CSG csgp = null;
+		PolygonList pgl = new PolygonList();
 		int extruderID;
 		
 		// Bin the edges by extruder ID.
@@ -1285,18 +1285,18 @@ public class AllSTLsToBuild
 		even1.sub((Tuple3d)odd);
 		even2.sub((Tuple3d)odd);
 		double t = (z - odd.z)/even1.z;	
-		Rr2Point e1 = new Rr2Point(odd.x + t*even1.x, odd.y + t*even1.y);	
+		Point2D e1 = new Point2D(odd.x + t*even1.x, odd.y + t*even1.y);	
 		//Point3d e3_1 = new Point3d(e1.x(), e1.y(), z);
 		//e1 = new Rr2Point(toGrid(e1.x()), toGrid(e1.y()));
-		e1 = new Rr2Point(e1.x(), e1.y());
+		e1 = new Point2D(e1.x(), e1.y());
 		t = (z - odd.z)/even2.z;
-		Rr2Point e2 = new Rr2Point(odd.x + t*even2.x, odd.y + t*even2.y);
+		Point2D e2 = new Point2D(odd.x + t*even2.x, odd.y + t*even2.y);
 		//Point3d e3_2 = new Point3d(e2.x(), e2.y(), z);
 		//e2 = new Rr2Point(toGrid(e2.x()), toGrid(e2.y()));
-		e2 = new Rr2Point(e2.x(), e2.y());
+		e2 = new Point2D(e2.x(), e2.y());
 		
 		// Too short?
-		if(!Rr2Point.same(e1, e2, Preferences.lessGridSquare()))
+		if(!Point2D.same(e1, e2, Preferences.lessGridSquare()))
 			edges[att.getExtruder().getID()].add(new LineSegment(e1, e2, att));
 	}
 	

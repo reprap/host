@@ -60,7 +60,7 @@ import org.reprap.utilities.Debug;
 /**
  * Real 1D intervals
  */
-public class RrInterval
+public class Interval
 {
 	private double low;
 	private double high;
@@ -82,7 +82,7 @@ public class RrInterval
 //		super.finalize();
 //	}
 	
-	public RrInterval()
+	public Interval()
 	{
 		empty = true;
 	}
@@ -92,7 +92,7 @@ public class RrInterval
 	 * @param l
 	 * @param h
 	 */
-	public RrInterval(double l, double h)
+	public Interval(double l, double h)
 	{
 		low = l;
 		high = h;
@@ -103,7 +103,7 @@ public class RrInterval
 	 * Deep copy
 	 * @param i
 	 */
-	public RrInterval(RrInterval i)
+	public Interval(Interval i)
 	{
 		low = i.low;
 		high = i.high;
@@ -121,9 +121,9 @@ public class RrInterval
 	 * The biggest possible
 	 * @return biggest possible interval
 	 */
-	public static RrInterval bigInterval()
+	public static Interval bigInterval()
 	{
-		return new RrInterval(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+		return new Interval(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 	}
 	
 	/* (non-Javadoc)
@@ -159,7 +159,7 @@ public class RrInterval
 	 * Accommodate another interval
 	 * @param i
 	 */
-	public void expand(RrInterval i)
+	public void expand(Interval i)
 	{
 		expand(i.low);
 		expand(i.high);
@@ -189,11 +189,11 @@ public class RrInterval
 	 * @param b
 	 * @return new interval based on addition of intervals a and b
 	 */
-	public static RrInterval add(RrInterval a, RrInterval b)
+	public static Interval add(Interval a, Interval b)
 	{
 		if(a.empty || b.empty)
 			Debug.e("RrInterval.add(...): adding empty interval(s).");	    
-		return new RrInterval(a.low + b.low, a.high + b.high);
+		return new Interval(a.low + b.low, a.high + b.high);
 	}
 	
 	/**
@@ -201,11 +201,11 @@ public class RrInterval
 	 * @param b
 	 * @return new interval based on addition of interval a and value b
 	 */
-	public static RrInterval add(RrInterval a, double b)
+	public static Interval add(Interval a, double b)
 	{
 		if(a.empty)
 			Debug.e("RrInterval.add(...): adding an empty interval.");	    
-		return new RrInterval(a.low + b, a.high + b);
+		return new Interval(a.low + b, a.high + b);
 	}
 	
 	/**
@@ -213,7 +213,7 @@ public class RrInterval
 	 * @param a
 	 * @return new interval based on addition of interval a and value b
 	 */
-	public static RrInterval add(double b, RrInterval a)
+	public static Interval add(double b, Interval a)
 	{	    
 		return add(a, b);
 	}
@@ -225,11 +225,11 @@ public class RrInterval
 	 * @param b
 	 * @return new interval based on subtraction of interval a and value b
 	 */
-	public static RrInterval sub(RrInterval a, RrInterval b)
+	public static Interval sub(Interval a, Interval b)
 	{
 		if(a.empty || b.empty)
 			Debug.e("RrInterval.sub(...): subtracting empty interval(s).");
-		return new RrInterval(a.low - b.high, a.high - b.low);
+		return new Interval(a.low - b.high, a.high - b.low);
 	}
 	
 	/**
@@ -237,11 +237,11 @@ public class RrInterval
 	 * @param b
 	 * @return new interval based on subtraction of interval a and value b
 	 */
-	public static RrInterval sub(RrInterval a, double b)
+	public static Interval sub(Interval a, double b)
 	{
 		if(a.empty)
 			Debug.e("RrInterval.sub(...): subtracting an empty interval.");
-		return new RrInterval(a.low - b, a.high - b);
+		return new Interval(a.low - b, a.high - b);
 	}
 	
 	/**
@@ -249,11 +249,11 @@ public class RrInterval
 	 * @param a
 	 * @return new interval based on subtraction of interval a and value b
 	 */
-	public static RrInterval sub(double b, RrInterval a)
+	public static Interval sub(double b, Interval a)
 	{
 		if(a.empty)
 			Debug.e("RrInterval.sub(...): subtracting an empty interval.");
-		return new RrInterval(b - a.high, b - a.low);
+		return new Interval(b - a.high, b - a.low);
 	}   
 	
 	/**
@@ -262,12 +262,12 @@ public class RrInterval
 	 * @param b
 	 * @return new interval based on interval multiplication of intervals a and b
 	 */
-	public static RrInterval mul(RrInterval a, RrInterval b)
+	public static Interval mul(Interval a, Interval b)
 	{
 		if(a.empty || b.empty)
 			Debug.e("RrInterval.mul(...): multiplying empty intervals.");
 		double d = a.low*b.low;
-		RrInterval r = new RrInterval(d, d);
+		Interval r = new Interval(d, d);
 		r.expand(a.low*b.high);
 		r.expand(a.high*b.low);
 		r.expand(a.high*b.high);
@@ -279,14 +279,14 @@ public class RrInterval
 	 * @param f
 	 * @return new interval based on interval multiplication of interval a by factor f
 	 */
-	public static RrInterval mul(RrInterval a, double f)
+	public static Interval mul(Interval a, double f)
 	{
 		if(a.empty)
 			Debug.e("RrInterval.mul(...): multiplying an empty interval.");
 		if(f > 0)
-			return new RrInterval(a.low*f, a.high*f);
+			return new Interval(a.low*f, a.high*f);
 		else
-			return new RrInterval(a.high*f, a.low*f);	    
+			return new Interval(a.high*f, a.low*f);	    
 	}
 	
 	/**
@@ -294,7 +294,7 @@ public class RrInterval
 	 * @param a
 	 * @return new interval based on interval multiplication of interval a by factor f
 	 */
-	public static RrInterval mul(double f, RrInterval a)
+	public static Interval mul(double f, Interval a)
 	{
 		return mul(a, f);	    
 	}
@@ -342,7 +342,7 @@ public class RrInterval
 	 * @param tolerance
 	 * @return true if intervals a and b are identical within the tolerance
 	 */
-	public static boolean same(RrInterval a, RrInterval b, double tolerance)
+	public static boolean same(Interval a, Interval b, double tolerance)
 	{
 		if(a.empty() && b.empty())   //??? !!!
 			return true;
@@ -358,21 +358,21 @@ public class RrInterval
 	 * Absolute value of an interval
 	 * @return absolute value of the interval
 	 */
-	public RrInterval abs()
+	public Interval abs()
 	{
-		RrInterval result = new RrInterval(this);
+		Interval result = new Interval(this);
 		double p;
 		
 		if (low < 0)
 		{
 			if (high <= 0)
 			{
-				result = new RrInterval(-high, -low);
+				result = new Interval(-high, -low);
 			} else
 			{
-				result = new RrInterval(0, result.high);
+				result = new Interval(0, result.high);
 				p = -low;
-				if ( p > high ) result = new RrInterval(result.low, p);
+				if ( p > high ) result = new Interval(result.low, p);
 			}
 		}
 		return(result);
@@ -383,9 +383,9 @@ public class RrInterval
 	 * @param x
 	 * @return sign of the interval
 	 */
-	public RrInterval sign()
+	public Interval sign()
 	{
-		return( new RrInterval(Math.signum(low), Math.signum(high)) );
+		return( new Interval(Math.signum(low), Math.signum(high)) );
 	}	
 	
 	/**
@@ -394,11 +394,11 @@ public class RrInterval
 	 * @param b
 	 * @return max value of the interval
 	 */
-	public static RrInterval max(RrInterval a, RrInterval b)
+	public static Interval max(Interval a, Interval b)
 	{
-		RrInterval result = new RrInterval(b);
-		if (a.low > b.low) result = new RrInterval(a.low, result.high);
-		if (a.high > b.high) result = new RrInterval(result.low, a.high);
+		Interval result = new Interval(b);
+		if (a.low > b.low) result = new Interval(a.low, result.high);
+		if (a.high > b.high) result = new Interval(result.low, a.high);
 		return(result);
 	}
 	
@@ -408,11 +408,11 @@ public class RrInterval
 	 * @param b
 	 * @return minimal value of the interval
 	 */
-	public static RrInterval min(RrInterval a, RrInterval b)
+	public static Interval min(Interval a, Interval b)
 	{
-		RrInterval result = new RrInterval(b);
-		if (a.low < b.low) result = new RrInterval(a.low, result.high);
-		if (a.high < b.high) result = new RrInterval(result.low, a.high);
+		Interval result = new Interval(b);
+		if (a.low < b.low) result = new Interval(a.low, result.high);
+		if (a.high < b.high) result = new Interval(result.low, a.high);
 		return(result);
 	}
 	
@@ -423,13 +423,13 @@ public class RrInterval
 	 * @param b
 	 * @return
 	 */
-	public static RrInterval intersection(RrInterval a, RrInterval b)
+	public static Interval intersection(Interval a, Interval b)
 	{
 		if(a.empty())
 			return a;
 		if(b.empty())
 			return b;
-		return new RrInterval(Math.max(a.low, b.low), Math.min(a.high, b.high));	
+		return new Interval(Math.max(a.low, b.low), Math.min(a.high, b.high));	
 	}
 	
 	/**
@@ -438,12 +438,12 @@ public class RrInterval
 	 * @param b
 	 * @return
 	 */
-	public static RrInterval union(RrInterval a, RrInterval b)
+	public static Interval union(Interval a, Interval b)
 	{
 		if(a.empty())
 			return b;
 		if(b.empty())
 			return a;
-		return new RrInterval(Math.min(a.low, b.low), Math.max(a.high, b.high));	
+		return new Interval(Math.min(a.low, b.low), Math.max(a.high, b.high));	
 	}
 }

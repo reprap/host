@@ -60,7 +60,7 @@ package org.reprap.geometry.polygons;
  *
  */
  
-public enum RrCSGOp 
+public enum CSGOp 
 {
     LEAF("LEAF SET"), 
     NULL("NULL SET"), 
@@ -76,7 +76,7 @@ public enum RrCSGOp
     /**
      * @param name
      */
-    RrCSGOp(String name)
+    CSGOp(String name)
     {
         this.name = name;
     }

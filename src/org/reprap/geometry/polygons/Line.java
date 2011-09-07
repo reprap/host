@@ -59,17 +59,17 @@ package org.reprap.geometry.polygons;
 /**
  * Class to hold and manipulate parametric lines
  */
-public class RrLine
+public class Line
 {
 	/**
 	 * direction 
 	 */
-	private Rr2Point direction = null;
+	private Point2D direction = null;
 	
 	/**
 	 * origin
 	 */
-	private Rr2Point origin = null;
+	private Point2D origin = null;
 	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
@@ -108,20 +108,20 @@ public class RrLine
 	 * @param a
 	 * @param b
 	 */
-	public RrLine(Rr2Point a, Rr2Point b)
+	public Line(Point2D a, Point2D b)
 	{
-		origin = new Rr2Point(a);
-		direction = Rr2Point.sub(b, a);
+		origin = new Point2D(a);
+		direction = Point2D.sub(b, a);
 	}
 	
 	/**
 	 * Copy constructor
 	 * @param r
 	 */
-	public RrLine(RrLine r)
+	public Line(Line r)
 	{
-		origin = new Rr2Point(r.origin);
-		direction = new Rr2Point(r.direction);
+		origin = new Point2D(r.origin);
+		direction = new Point2D(r.direction);
 	}
 	
 	/**
@@ -148,17 +148,17 @@ public class RrLine
 	/**
 	 * @return Return the contents
 	 */
-	public Rr2Point direction() { return direction; }
-	public Rr2Point origin() { return origin; }
+	public Point2D direction() { return direction; }
+	public Point2D origin() { return origin; }
 	
 	/**
 	 * The point at a given parameter value
 	 * @param t
 	 * @return point at parameter value t
 	 */
-	public Rr2Point point(double t)
+	public Point2D point(double t)
 	{
-		return Rr2Point.add(origin, Rr2Point.mul(direction, t));
+		return Point2D.add(origin, Point2D.mul(direction, t));
 	}
 	
 	
@@ -175,9 +175,9 @@ public class RrLine
 	 * Arithmetic
 	 * @return inverted direction of this line
 	 */
-	public RrLine neg()
+	public Line neg()
 	{
-		RrLine a = new RrLine(this);
+		Line a = new Line(this);
 		a.direction = direction.neg();
 		return a;
 	}
@@ -187,10 +187,10 @@ public class RrLine
 	 * @param b
 	 * @return translated line by value b
 	 */
-	public RrLine add(Rr2Point b)
+	public Line add(Point2D b)
 	{
-		Rr2Point a = Rr2Point.add(origin, b);
-		RrLine r = new RrLine(a, Rr2Point.add(a, direction));
+		Point2D a = Point2D.add(origin, b);
+		Line r = new Line(a, Point2D.add(a, direction));
 		return r;
 	}
 	
@@ -198,10 +198,10 @@ public class RrLine
 	 * @param b
 	 * @return ??
 	 */
-	public RrLine sub(Rr2Point b)
+	public Line sub(Point2D b)
 	{
-		Rr2Point a = Rr2Point.sub(origin, b);
-		RrLine r = new RrLine(a, Rr2Point.add(a, direction));
+		Point2D a = Point2D.sub(origin, b);
+		Line r = new Line(a, Point2D.add(a, direction));
 		return r;
 	}
 	
@@ -210,11 +210,11 @@ public class RrLine
 	 * @param d
 	 * @return translated line by distance d
 	 */
-	public RrLine offset(double d)
+	public Line offset(double d)
 	{
-		RrLine result = new RrLine(this);
-		Rr2Point n = Rr2Point.mul(-d, direction.norm().orthogonal());
-		result.origin = Rr2Point.add(origin, n);
+		Line result = new Line(this);
+		Point2D n = Point2D.mul(-d, direction.norm().orthogonal());
+		result.origin = Point2D.add(origin, n);
 		return result;
 	}
 	
@@ -224,13 +224,13 @@ public class RrLine
 	 * @return parameter value
 	 * @throws rr_ParallelLineException
 	 */
-	public double cross_t(RrLine a) throws RrParallelLineException 
+	public double cross_t(Line a) throws ParallelException 
 	{
-		double det = Rr2Point.op(a.direction, direction);
+		double det = Point2D.op(a.direction, direction);
 		if (det == 0)
-			throw new RrParallelLineException("cross_t: parallel lines.");  
-		Rr2Point d = Rr2Point.sub(a.origin, origin);
-		return Rr2Point.op(a.direction, d)/det;
+			throw new ParallelException("cross_t: parallel lines.");  
+		Point2D d = Point2D.sub(a.origin, origin);
+		return Point2D.op(a.direction, d)/det;
 	}
 	
 	
@@ -240,7 +240,7 @@ public class RrLine
 	 * @return crossing point 
 	 * @throws rr_ParallelLineException
 	 */
-	public Rr2Point cross_point(RrLine a) throws RrParallelLineException
+	public Point2D cross_point(Line a) throws ParallelException
 	{
 		return point(cross_t(a));
 	}
@@ -250,9 +250,9 @@ public class RrLine
 	 * @param p
 	 * @return nearest point on the eline
 	 */
-	public double nearest(Rr2Point p)
+	public double nearest(Point2D p)
 	{
-		return Rr2Point.mul(direction, p) - Rr2Point.mul(direction, origin);
+		return Point2D.mul(direction, p) - Point2D.mul(direction, origin);
 	}
 	
 	/**
@@ -260,18 +260,18 @@ public class RrLine
 	 * @param p
 	 * @return squared distance between point p and the line
 	 */
-	public Rr2Point d_2(Rr2Point p)
+	public Point2D d_2(Point2D p)
 	{
 		double fsq = direction.x()*direction.x();
 		double gsq = direction.y()*direction.y();
 		double finv = 1.0/(fsq + gsq);
-		Rr2Point j0 = Rr2Point.sub(p, origin);
+		Point2D j0 = Point2D.sub(p, origin);
 		double fg = direction.x()*direction.y();
 		double dx = gsq*j0.x() - fg*j0.y();
 		double dy = fsq*j0.y() - fg*j0.x();
 		double d2 = (dx*dx + dy*dy)*finv*finv;
-		double t = Rr2Point.mul(direction, j0)*finv;
-		return new Rr2Point(d2, t);
+		double t = Point2D.mul(direction, j0)*finv;
+		return new Point2D(d2, t);
 	}
 	
 	/**
@@ -279,9 +279,9 @@ public class RrLine
 	 * @param p
 	 * @return
 	 */
-	public double projection(Rr2Point p)
+	public double projection(Point2D p)
 	{
-		Rr2Point s = Rr2Point.sub(p, origin);
-		return Rr2Point.mul(direction, s);
+		Point2D s = Point2D.sub(p, origin);
+		return Point2D.mul(direction, s);
 	}
 }

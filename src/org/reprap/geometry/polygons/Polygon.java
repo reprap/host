@@ -83,7 +83,7 @@ import org.reprap.utilities.Debug;
 /**
  * The main boundary-representation polygon class
  */
-public class RrPolygon
+public class Polygon
 {
 	/**
 	 * End joined to beginning?
@@ -98,7 +98,7 @@ public class RrPolygon
 	/**
 	 * The (X, Y) points round the polygon as Rr2Points
 	 */
-	private List<Rr2Point> points = null;
+	private List<Point2D> points = null;
 	
 	/**
 	 * The speed of the machine at each corner
@@ -116,7 +116,7 @@ public class RrPolygon
 	/**
 	 * The minimum enclosing X-Y box round the polygon
 	 */
-	private RrRectangle box = null;
+	private Rectangle box = null;
 	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
@@ -149,14 +149,14 @@ public class RrPolygon
 	/**
 	 * Make an empty polygon
 	 */
-	public RrPolygon(Attributes a, boolean c)
+	public Polygon(Attributes a, boolean c)
 	{
 		if(a == null)
 			Debug.e("RrPolygon(): null attributes!");
-		points = new ArrayList<Rr2Point>();
+		points = new ArrayList<Point2D>();
 		speeds = null;
 		att = a;
-		box = new RrRectangle();
+		box = new Rectangle();
 		closed = c;
 		extrudeEnd = -1;
 		valveEnd = -1;
@@ -186,7 +186,7 @@ public class RrPolygon
 	 * @param i
 	 * @return i-th point object of polygon
 	 */
-	public Rr2Point point(int i)
+	public Point2D point(int i)
 	{
 		//return new Rr2Point(points.get(i));
 		return points.get(i);
@@ -311,11 +311,11 @@ public class RrPolygon
 	 * PolygonAttribute are.
 	 * @param p
 	 */
-	public RrPolygon(RrPolygon p)
+	public Polygon(Polygon p)
 	{
 		this(p.att, p.closed);
 		for(int i = 0; i < p.size(); i++)
-			add(new Rr2Point(p.point(i)));
+			add(new Point2D(p.point(i)));
 		if(p.speeds != null)
 		{
 			speeds = new ArrayList<Double>();
@@ -347,11 +347,11 @@ public class RrPolygon
 	 * @param p
 	 * @param f
 	 */
-	public void add(Rr2Point p)
+	public void add(Point2D p)
 	{
 		if(speeds != null)
 			Debug.e("Rr2Point.add(): adding a point to a polygon with its speeds set.");
-		points.add(new Rr2Point(p));
+		points.add(new Point2D(p));
 		box.expand(p);
 		updateExtrudeValveEnd();
 	}
@@ -361,12 +361,12 @@ public class RrPolygon
 	 * @param i
 	 * @param p
 	 */
-	public void add(int i, Rr2Point p)
+	public void add(int i, Point2D p)
 	{
 		if(speeds != null)
 			Debug.e("Rr2Point.add(): adding a point to a polygon with its speeds set.");
 		
-		points.add(i, new Rr2Point(p));
+		points.add(i, new Point2D(p));
 		box.expand(p);
 		boolean update = false;
 		if(i <= extrudeEnd)
@@ -386,11 +386,11 @@ public class RrPolygon
 	 * @param i
 	 * @param p
 	 */
-	public void set(int i, Rr2Point p)
+	public void set(int i, Point2D p)
 	{
 		if(speeds != null)
 			Debug.e("Rr2Point.set(): adding a point to a polygon with its speeds set.");
-		points.set(i, new Rr2Point(p));
+		points.set(i, new Point2D(p));
 		box.expand(p);  // Note if the old point was on the convex hull, and the new one is within, box will be too big after this
 		updateExtrudeValveEnd();
 	}
@@ -401,14 +401,14 @@ public class RrPolygon
 	 * @param p
 	 * @param s
 	 */
-	public void add(int i, Rr2Point p, double s)
+	public void add(int i, Point2D p, double s)
 	{
 		if(speeds == null)
 		{
 			Debug.e("Rr2Point.add(): adding a point and a speed to a polygon without its speeds set.");
 			return;
 		}
-		points.add(i, new Rr2Point(p));
+		points.add(i, new Point2D(p));
 		speeds.add(i, s);
 		box.expand(p);
 		boolean update = false;
@@ -430,11 +430,11 @@ public class RrPolygon
 	 * @param p
 	 * @param s
 	 */
-	public void set(int i, Rr2Point p, double s)
+	public void set(int i, Point2D p, double s)
 	{
 		if(speeds == null)
 			Debug.e("Rr2Point.set(): adding a point and a speed to a polygon without its speeds set.");
-		points.set(i, new Rr2Point(p));
+		points.set(i, new Point2D(p));
 		speeds.set(i, s);
 		box.expand(p); // Note if the old point was on the convex hull, and the new one is within, box will be too big after this
 		updateExtrudeValveEnd();
@@ -485,7 +485,7 @@ public class RrPolygon
 	/**
 	 * @return the current surrounding box
 	 */
-	public RrRectangle getBox() { return box; }
+	public Rectangle getBox() { return box; }
 	
 	/**
 	 * Sum of the edge lengths
@@ -495,9 +495,9 @@ public class RrPolygon
 	{
 		double len = 0;
 		for(int i = 1; i < size(); i++)
-			len = len + Rr2Point.d(point(i), point(i-1));
+			len = len + Point2D.d(point(i), point(i-1));
 		if(closed)
-			len = len + Rr2Point.d(point(0), point(size()-1));
+			len = len + Point2D.d(point(0), point(size()-1));
 		return len;
 	}
 	
@@ -506,14 +506,14 @@ public class RrPolygon
 	 * (N.B. Attributes of the new polygon are ignored)
 	 * @param p
 	 */
-	public void add(RrPolygon p)
+	public void add(Polygon p)
 	{
 		if(p.size() == 0)
 			return;
 		if(extrudeEnd >= 0 || valveEnd >= 0)
 			Debug.e("Rr2Point.add(): adding a polygon to another polygon with its extrude or valve ending set.");
 		for(int i = 0; i < p.size(); i++)
-			points.add(new Rr2Point(p.point(i)));
+			points.add(new Point2D(p.point(i)));
 
 		box.expand(p.box);
 		if(speeds == null)
@@ -541,7 +541,7 @@ public class RrPolygon
 	 * @param k
 	 * @param p
 	 */
-	public void add(int k, RrPolygon p)
+	public void add(int k, Polygon p)
 	{
 		if(p.size() == 0)
 			return;
@@ -553,9 +553,9 @@ public class RrPolygon
 		for(int i = 0; i < p.size(); i++)
 		{
 			if(speeds != null)
-				add(k, new Rr2Point(p.point(i)), p.speed(i));
+				add(k, new Point2D(p.point(i)), p.speed(i));
 			else
-				points.add(k, new Rr2Point(p.point(i)));
+				points.add(k, new Point2D(p.point(i)));
 			k++;
 		}
 		box.expand(p.box);
@@ -579,7 +579,7 @@ public class RrPolygon
 	 */
 	public void re_box()
 	{
-		box = new RrRectangle();
+		box = new Rectangle();
 		int leng = size();
 		for(int i = 0; i < leng; i++)
 		{
@@ -608,9 +608,9 @@ public class RrPolygon
 	 * Negate (i.e. reverse cyclic order)
 	 * @return reversed polygon object
 	 */
-	public RrPolygon negate()
+	public Polygon negate()
 	{
-		RrPolygon result = new RrPolygon(att, closed);
+		Polygon result = new Polygon(att, closed);
 		for(int i = size() - 1; i >= 0; i--)
 		{
 			result.add(point(i)); 
@@ -630,7 +630,7 @@ public class RrPolygon
 	/**
 	 * @return same polygon starting at a random vertex
 	 */
-	public RrPolygon randomStart()
+	public Polygon randomStart()
 	{
 		return newStart(rangen.nextInt(size()));
 	}
@@ -638,7 +638,7 @@ public class RrPolygon
 	/**
 	 * @return same polygon, but starting at vertex i
 	 */
-	public RrPolygon newStart(int i)
+	public Polygon newStart(int i)
 	{
 		if(!isClosed())
 			Debug.e("RrPolygon.newStart(i): reordering an open polygon!");
@@ -648,7 +648,7 @@ public class RrPolygon
 			Debug.e("RrPolygon.newStart(i): dud index: " + i);
 			return this;
 		}
-		RrPolygon result = new RrPolygon(att, closed);
+		Polygon result = new Polygon(att, closed);
 		for(int j = 0; j < size(); j++)
 		{
 			result.add(point(i));
@@ -667,7 +667,7 @@ public class RrPolygon
 	/**
 	 * @return same polygon starting at point incremented from last polygon
 	 */
-	public RrPolygon incrementedStart(LayerRules lc)
+	public Polygon incrementedStart(LayerRules lc)
 	{
 		if(size() == 0 || lc.getModelLayer() < 0)
 			return this;
@@ -680,13 +680,13 @@ public class RrPolygon
 	 * @param p
 	 * @return
 	 */
-	public int nearestVertex(Rr2Point p)
+	public int nearestVertex(Point2D p)
 	{
 		double d = Double.POSITIVE_INFINITY;
 		int result = -1;
 		for(int i = 0; i < size(); i++)
 		{
-			double d2 = Rr2Point.dSquared(point(i), p);
+			double d2 = Point2D.dSquared(point(i), p);
 			if(d2 < d)
 			{
 				d = d2;
@@ -709,7 +709,7 @@ public class RrPolygon
 	 * @param linkUp
 	 * @return
 	 */
-	public boolean nearestVertexReorderMerge(RrPolygon p, double linkUp)
+	public boolean nearestVertexReorderMerge(Polygon p, double linkUp)
 	{
 		if(!p.isClosed())
 			Debug.e("RrPolygon.nearestVertexReorder(): called for non-closed polygon.");
@@ -720,7 +720,7 @@ public class RrPolygon
 		for(int i = 0; i < size(); i++)
 		{
 			int j = p.nearestVertex(point(i));
-			double d2 = Rr2Point.dSquared(point(i), p.point(j));
+			double d2 = Point2D.dSquared(point(i), p.point(j));
 			if(d2 < d)
 			{
 				d = d2;
@@ -730,7 +730,7 @@ public class RrPolygon
 		}
 		if(itsPoint >= 0 && d < linkUp*linkUp)
 		{
-			RrPolygon ro = p.newStart(itsPoint);
+			Polygon ro = p.newStart(itsPoint);
 			ro.add(0, point(myPoint));
 			add(myPoint, ro);
 			updateExtrudeValveEnd();
@@ -745,7 +745,7 @@ public class RrPolygon
 	 * @param ln
 	 * @return
 	 */
-	public int maximalVertex(RrLine ln)
+	public int maximalVertex(Line ln)
 	{
 		double d = Double.NEGATIVE_INFINITY;
 		int result = -1;
@@ -778,7 +778,7 @@ public class RrPolygon
 		for(int i = 0; i < lim; i++)
 		{
 			int j = (i + 1)%size();
-			double d2 = Rr2Point.dSquared(point(i), point(j));
+			double d2 = Point2D.dSquared(point(i), point(j));
 			if(d2 > d)
 			{
 				d = d2;
@@ -797,14 +797,14 @@ public class RrPolygon
 	public double area()
 	{
 		double a = 0;
-		Rr2Point p, q;
+		Point2D p, q;
 		int j;
 		for(int i = 1; i < size() - 1; i++)
 		{
 			j = i + 1;
-			p = Rr2Point.sub(point(i), point(0));
-			q = Rr2Point.sub(point(j), point(0));
-			a += Rr2Point.op(q, p);
+			p = Point2D.sub(point(i), point(0));
+			q = Point2D.sub(point(j), point(0));
+			a += Point2D.op(q, p);
 		} 
 		return a*0.5;
 	}
@@ -818,11 +818,11 @@ public class RrPolygon
 		double result = 0;
 		
 		for(int i = 1; i < size() - 1; i++)
-			result = result + Rr2Point.d(point(i), point(i+1));
+			result = result + Point2D.d(point(i), point(i+1));
 		
 		if(closed)
 		{
-			result = result + Rr2Point.d(point(0), point(size()-1));
+			result = result + Point2D.d(point(0), point(size()-1));
 			return result/size();
 		}
 		
@@ -841,7 +841,7 @@ public class RrPolygon
 		if(d <= 0)
 			return;
 		
-		Rr2Point p, q;
+		Point2D p, q;
 		int start, last;
 		
 		if(extrudeEnd >= 0)
@@ -866,12 +866,12 @@ public class RrPolygon
 		double sum = 0;
 		for(int i = start; i >= 0; i--)
 		{
-			sum += Rr2Point.d(point(i), point(last));
+			sum += Point2D.d(point(i), point(last));
 			if(sum > d)
 			{
 				sum = sum - d;
-				q = Rr2Point.sub(point(last), point(i));
-				p = Rr2Point.add(point(i), Rr2Point.mul(sum/q.mod(), q));
+				q = Point2D.sub(point(last), point(i));
+				p = Point2D.add(point(i), Point2D.mul(sum/q.mod(), q));
 				double s = 0;
 				if(speeds != null)
 				{
@@ -910,7 +910,7 @@ public class RrPolygon
 		if(d <= 0)
 			return;
 		
-		Rr2Point p, q;
+		Point2D p, q;
 		int start, last;
 		
 		if(valveEnd >= 0)
@@ -935,12 +935,12 @@ public class RrPolygon
 		double sum = 0;
 		for(int i = start; i >= 0; i--)
 		{
-			sum += Rr2Point.d(point(i), point(last));
+			sum += Point2D.d(point(i), point(last));
 			if(sum > d)
 			{
 				sum = sum - d;
-				q = Rr2Point.sub(point(last), point(i));
-				p = Rr2Point.add(point(i), Rr2Point.mul(sum/q.mod(), q));
+				q = Point2D.sub(point(last), point(i));
+				p = Point2D.add(point(i), Point2D.mul(sum/q.mod(), q));
 				double s = 0;
 				if(speeds != null)
 				{
@@ -974,7 +974,7 @@ public class RrPolygon
 	 */
 	public int findBackPoint(double d)
 	{
-		Rr2Point last, p;
+		Point2D last, p;
 		int start = size() - 1;
 		if(isClosed())
 			last = point(0);
@@ -989,7 +989,7 @@ public class RrPolygon
 		for(int i = start; i >= 0; i--)
 		{
 			p = point(i);
-			sum += Rr2Point.d(p, last);
+			sum += Point2D.d(p, last);
 			if(sum > d)
 			{
 				if(sum - d < d - lastSum)
@@ -1012,12 +1012,12 @@ public class RrPolygon
 	private int findAngleStart(int v1, double d2)
 	{
 		int leng = size();
-		Rr2Point p1 = point(v1%leng);
+		Point2D p1 = point(v1%leng);
 		int v2 = v1;
 		for(int i = 0; i <= leng; i++)
 		{
 			v2++;
-			RrLine line = new RrLine(p1, point(v2%leng));
+			Line line = new Line(p1, point(v2%leng));
 			for (int j = v1+1; j < v2; j++)
 			{
 				if (line.d_2(point(j%leng)).x() > d2)
@@ -1035,12 +1035,12 @@ public class RrPolygon
 	 * @param d
 	 * @return simplified polygon object
 	 */
-	public RrPolygon simplify(double d)
+	public Polygon simplify(double d)
 	{
 		int leng = size();
 		if(leng <= 3)
-			return new RrPolygon(this);
-		RrPolygon r = new RrPolygon(att, closed);
+			return new Polygon(this);
+		Polygon r = new Polygon(att, closed);
 		double d2 = d*d;
 
 		int v1 = findAngleStart(0, d2);
@@ -1135,7 +1135,7 @@ public class RrPolygon
 	 * This ignores speeds
 	 * @param es
 	 */
-	public RrPolygon arcCompensate()
+	public Polygon arcCompensate()
 	{
 		Extruder e = att.getExtruder();
 		
@@ -1151,14 +1151,14 @@ public class RrPolygon
 		
 		double thickness = e.getExtrusionSize();
 		
-		RrPolygon result = new RrPolygon(att, closed);
+		Polygon result = new Polygon(att, closed);
 		
-		Rr2Point previous = point(size() - 1);
-		Rr2Point current = point(0);
-		Rr2Point next;
-		Rr2Point offsetPoint;
+		Point2D previous = point(size() - 1);
+		Point2D current = point(0);
+		Point2D next;
+		Point2D offsetPoint;
 		
-		double d1 = Rr2Point.dSquared(current, previous);
+		double d1 = Point2D.dSquared(current, previous);
 		double d2;
 		double short2 = shortSides*shortSides;
 		double t2 = thickness*thickness;
@@ -1171,16 +1171,16 @@ public class RrPolygon
 			else
 				next = point(i + 1);
 			
-			d2 = Rr2Point.dSquared(next, current);
+			d2 = Point2D.dSquared(next, current);
 			if(d1 < short2 && d2 < short2)
 			{
 				try
 				{
-					RrCircle c = new RrCircle(previous, current, next);
+					Circle c = new Circle(previous, current, next);
 					offset = factor*(Math.sqrt(t2 + 4*c.radiusSquared())*0.5 - Math.sqrt(c.radiusSquared()));
 					//System.out.println("Circle r: " + Math.sqrt(c.radiusSquared()) + " offset: " + offset);
-					offsetPoint = Rr2Point.sub(current, c.centre());
-					offsetPoint = Rr2Point.add(current, Rr2Point.mul(offsetPoint.norm(), offset));
+					offsetPoint = Point2D.sub(current, c.centre());
+					offsetPoint = Point2D.add(current, Point2D.mul(offsetPoint.norm(), offset));
 					result.add(offsetPoint);
 				} catch (Exception ex)
 				{
@@ -1203,7 +1203,7 @@ public class RrPolygon
 	// Speed and acceleration calculations
 	
 	
-	private RrInterval accRange(double startV, double s, double acc)
+	private Interval accRange(double startV, double s, double acc)
 	{
 		double vMax = Math.sqrt(2*acc*s + startV*startV);
 		double vMin = -2*acc*s + startV*startV;
@@ -1211,21 +1211,21 @@ public class RrPolygon
 			vMin = 0; //-Math.sqrt(-vMin);
 		else
 			vMin = Math.sqrt(vMin);
-		return new RrInterval(vMin, vMax);
+		return new Interval(vMin, vMax);
 	}
 	
 	private void backTrack(int j, double v, double vAccMin, double minSpeed, double acceleration, boolean fixup[])
 	{
-		Rr2Point a, b, ab;
+		Point2D a, b, ab;
 		double backV, s;
 		int i = j - 1;
 		b = point(j);
 		while(i >= 0)
 		{
 			a = point(i);
-			ab = Rr2Point.sub(b, a);
+			ab = Point2D.sub(b, a);
 			s = ab.mod();
-			ab = Rr2Point.div(ab, s);
+			ab = Point2D.div(ab, s);
 			backV = Math.sqrt(v*v + 2*acceleration*s);
 			setSpeed(j, v);
 			if(backV > speed(i))
@@ -1260,24 +1260,24 @@ public class RrPolygon
 		
 		boolean fixup[] = new boolean[size()];
 		setSpeed(0, minSpeed);
-		Rr2Point a, b, c, ab, bc;
+		Point2D a, b, c, ab, bc;
 		double oldV, vCorner, s, newS;
 		int next;
 		a = point(0);
 		b = point(1);
-		ab = Rr2Point.sub(b, a);
+		ab = Point2D.sub(b, a);
 		s = ab.mod();
-		ab = Rr2Point.div(ab, s);
+		ab = Point2D.div(ab, s);
 		oldV = minSpeed;
 		fixup[0] = true;
 		for(int i = 1; i < size(); i++)
 		{
 			next = (i+1)%size();
 			c = point(next);
-			bc = Rr2Point.sub(c, b);
+			bc = Point2D.sub(c, b);
 			newS = bc.mod();
-			bc = Rr2Point.div(bc, newS);
-			vCorner = Rr2Point.mul(ab, bc);
+			bc = Point2D.div(bc, newS);
+			vCorner = Point2D.mul(ab, bc);
 			if(vCorner >= 0)
 				vCorner = minSpeed + (maxSpeed - minSpeed)*vCorner;
 			else
@@ -1286,7 +1286,7 @@ public class RrPolygon
 			if(!isClosed() && i == size() - 1)
 				vCorner = minSpeed;
 			
-			RrInterval aRange = accRange(oldV, s, acceleration);
+			Interval aRange = accRange(oldV, s, acceleration);
 			
 			if(vCorner <= aRange.low())
 			{
@@ -1318,7 +1318,7 @@ public class RrPolygon
 				int ia = i - 1;
 				a = point(ia);
 				b = point(ib);
-				ab = Rr2Point.sub(b, a);
+				ab = Point2D.sub(b, a);
 				s = ab.mod();
 				double va = speed(ia);
 				double vb = speed(ib);
@@ -1330,12 +1330,12 @@ public class RrPolygon
 					break;
 					
 				case 1:
-					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s1()/s)), vp.v());
+					add(i, Point2D.add(a, Point2D.mul(ab, vp.s1()/s)), vp.v());
 					break;
 					
 				case 2:
-					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s2()/s)), maxSpeed);
-					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s1()/s)), maxSpeed);	
+					add(i, Point2D.add(a, Point2D.mul(ab, vp.s2()/s)), maxSpeed);
+					add(i, Point2D.add(a, Point2D.mul(ab, vp.s1()/s)), maxSpeed);	
 					break;
 					
 				default:
@@ -1360,10 +1360,10 @@ public class RrPolygon
 	/**
 	 * @return Convex hull as a polygon
 	 */
-	public RrPolygon convexHull()
+	public Polygon convexHull()
 	{
 		List<Integer> ls = listConvexHull();
-		RrPolygon result = new RrPolygon(att, true);
+		Polygon result = new Polygon(att, true);
 		for(int i = 0; i < ls.size(); i++)
 			result.add(listPoint(i, ls));
 		return result;
@@ -1372,7 +1372,7 @@ public class RrPolygon
 	/**
 	 * @return Convex hull as a CSG expression
 	 */
-	public RrCSG CSGConvexHull()
+	public CSG CSGConvexHull()
 	{
 		List<Integer> ls = listConvexHull();
 		return toCSGHull(ls);
@@ -1383,7 +1383,7 @@ public class RrPolygon
 	 */
 	private List<Integer> listConvexHull()
 	{
-		RrPolygon copy = new RrPolygon(this);
+		Polygon copy = new Polygon(this);
 		if(copy.area() < 0)
 			copy = copy.negate();
 
@@ -1397,7 +1397,7 @@ public class RrPolygon
 	 * @param a
 	 * @return the point
 	 */
-	private Rr2Point listPoint(int i, List<Integer> a)
+	private Point2D listPoint(int i, List<Integer> a)
 	{
 		return point((a.get(i)).intValue());
 	}
@@ -1457,9 +1457,9 @@ public class RrPolygon
 	{
 		if(a.size() == 3)
 		{
-			Rr2Point q = Rr2Point.sub(listPoint(1, a), listPoint(0, a));
-			Rr2Point r = Rr2Point.sub(listPoint(2, a), listPoint(0, a));
-			if(Rr2Point.op(q, r) > 0)
+			Point2D q = Point2D.sub(listPoint(1, a), listPoint(0, a));
+			Point2D r = Point2D.sub(listPoint(2, a), listPoint(0, a));
+			if(Point2D.op(q, r) > 0)
 			{
 				Integer k = a.get(0);
 				a.set(0, a.get(1));
@@ -1475,15 +1475,15 @@ public class RrPolygon
 	 * @param hullPoints
 	 * @return CSG representation
 	 */	
-	private RrCSG toCSGHull(List<Integer> hullPoints)
+	private CSG toCSGHull(List<Integer> hullPoints)
 	{
-		Rr2Point p, q;
-		RrCSG hull = RrCSG.universe();
+		Point2D p, q;
+		CSG hull = CSG.universe();
 		p = listPoint(hullPoints.size() - 1, hullPoints);
 		for(int i = 0; i < hullPoints.size(); i++)
 		{
 			q = listPoint(i, hullPoints);
-			hull = RrCSG.intersection(hull, new RrCSG(new RrHalfPlane(p, q)));
+			hull = CSG.intersection(hull, new CSG(new HalfSpace2D(p, q)));
 			p = q;
 		}
 
@@ -1495,9 +1495,9 @@ public class RrPolygon
 	 * @param inConsideration
 	 * @param hull
 	 */		
-	private void outsideHull(List<Integer> inConsideration, RrCSG hull)
+	private void outsideHull(List<Integer> inConsideration, CSG hull)
 	{
-		Rr2Point p;
+		Point2D p;
 		double small = Math.sqrt(Preferences.tiny());
 		for(int i = inConsideration.size() - 1; i >= 0; i--)
 		{
@@ -1546,10 +1546,10 @@ public class RrPolygon
 		// Repeatedly add the point that's farthest outside the current hull
 		
 		int corner, after;
-		RrCSG hull;
+		CSG hull;
 		double v, vMax;
-		Rr2Point p, q;
-		RrHalfPlane hp;
+		Point2D p, q;
+		HalfSpace2D hp;
 		while(inConsideration.size() > 0)
 		{
 			vMax = 0;   // Need epsilon?
@@ -1561,7 +1561,7 @@ public class RrPolygon
 				for(i = 0; i < result.size(); i++)
 				{
 					q = listPoint(i, result);
-					hp = new RrHalfPlane(p, q);
+					hp = new HalfSpace2D(p, q);
 					v = hp.value(listPoint(testPoint, inConsideration));
 					if(result.size() == 2)
 						v = Math.abs(v);
@@ -1680,7 +1680,7 @@ public class RrPolygon
 	 * @param level
 	 * @return CSG representation
 	 */
-	private RrCSG toCSGRecursive(List<Integer> a, int level, boolean closed, int[] flags)
+	private CSG toCSGRecursive(List<Integer> a, int level, boolean closed, int[] flags)
 	{	
 		flagSet(level, a, flags);	
 		level++;
@@ -1689,17 +1689,17 @@ public class RrPolygon
 		{
 			Debug.e("toCSGRecursive() - null convex hull: " + ch.size() +
 					" points.");
-			return RrCSG.nothing();
+			return CSG.nothing();
 		}
 		
 		flagSet(level, ch, flags);
-		RrCSG hull;
+		CSG hull;
 
 
 		if(level%2 == 1)
-			hull = RrCSG.universe();
+			hull = CSG.universe();
 		else
-			hull = RrCSG.nothing();
+			hull = CSG.nothing();
 
 		// Set-theoretically combine all the real edges on the convex hull
 
@@ -1722,11 +1722,11 @@ public class RrPolygon
 
 			if(oldFlag == level && flag == level)
 			{
-				RrHalfPlane hp = new RrHalfPlane(listPoint(oldi, a), listPoint(i, a));
+				HalfSpace2D hp = new HalfSpace2D(listPoint(oldi, a), listPoint(i, a));
 				if(level%2 == 1)
-					hull = RrCSG.intersection(hull, new RrCSG(hp));
+					hull = CSG.intersection(hull, new CSG(hp));
 				else
-					hull = RrCSG.union(hull, new RrCSG(hp));
+					hull = CSG.union(hull, new CSG(hp));
 			} 
 			
 			oldi = i;
@@ -1739,10 +1739,10 @@ public class RrPolygon
 		while(section != null)
 		{
 			if(level%2 == 1)
-				hull = RrCSG.intersection(hull,
+				hull = CSG.intersection(hull,
 						toCSGRecursive(section, level, false, flags));
 			else
-				hull = RrCSG.union(hull, 
+				hull = CSG.union(hull, 
 						toCSGRecursive(section, level, false, flags));
 			section = polSection(a, level, flags);
 		}
@@ -1755,16 +1755,16 @@ public class RrPolygon
 	 * @param tolerance
 	 * @return CSG polygon object based on polygon and tolerance 
 	 */
-	public RrCSG toCSG(double tolerance)
+	public CSG toCSG(double tolerance)
 	{
 		
-		RrPolygon copy = new RrPolygon(this);
+		Polygon copy = new Polygon(this);
 		if(copy.area() < 0)
 			copy = copy.negate();
 
 		List<Integer> all = copy.allPoints();
 		int [] flags = new int[copy.size()];
-		RrCSG expression = copy.toCSGRecursive(all, 0, true, flags);
+		CSG expression = copy.toCSGRecursive(all, 0, true, flags);
 
 		//RrRectangle b = copy.box.scale(1.1);
 		//expression = expression.simplify(tolerance);

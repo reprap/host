@@ -38,7 +38,7 @@ class PCBOffsets extends JPanel {
 	private static double xoff = 10;
 	private static double yoff = 10;
 	
-	private PCBOffsets(RrRectangle rec)
+	private PCBOffsets(Rectangle rec)
 	{
 		super(new BorderLayout());
 		JPanel radioPanel;
@@ -91,7 +91,7 @@ class PCBOffsets extends JPanel {
 		dialog.dispose();
 	}
     
-    public static void pcbo(RrRectangle rec) 
+    public static void pcbo(Rectangle rec) 
     {
         //Create and set up the window.
     	JFrame f = new JFrame();
@@ -128,7 +128,7 @@ public class PCB {
 	
 	GerberGCode gerberGcode; 
 	String[] splitline;
-	RrRectangle bigBox;
+	Rectangle bigBox;
 	BufferedReader in;
 	String line;
 	String formatX = "23", formatY="23";
@@ -145,7 +145,7 @@ public class PCB {
 	File inputDrill;
 	File outputGCodes;
 	Extruder pcbPen;
-	RrPolygonList penPaths;
+	PolygonList penPaths;
 	GCodeReaderAndWriter gcode;
 
 	/**
@@ -169,7 +169,7 @@ public class PCB {
 
 		penPaths = gerberGcode.getPolygons();
 		
-		penPaths = penPaths.nearEnds(new Rr2Point(0, 0), true, 1.5*penWidth);
+		penPaths = penPaths.nearEnds(new Point2D(0, 0), true, 1.5*penWidth);
 		
 
 		if(Preferences.simulate() && penPaths.size() > 0)
@@ -258,7 +258,7 @@ public class PCB {
 		}
 	}
 	
-	private void polygonPlot(RrPolygon p)
+	private void polygonPlot(Polygon p)
 	{
 		if(p.size() <= 0)
 			return;
@@ -303,8 +303,8 @@ public class PCB {
 	{
 		gerberGcode = new GerberGCode(pcbPen, null, true); 
 		
-		bigBox = new RrRectangle();
-		RrRectangle r;
+		bigBox = new Rectangle();
+		Rectangle r;
 		
 		// processing Gerber file
 		try {
@@ -314,7 +314,7 @@ public class PCB {
 			{
 				r = processLine(line, false);
 				if(r != null)
-					bigBox = RrRectangle.union(bigBox, r);
+					bigBox = Rectangle.union(bigBox, r);
 			}
 		
 			in.close();
@@ -324,12 +324,12 @@ public class PCB {
 			offsetX = PCBOffsets.getXoff() - bigBox.sw().x();
 			offsetY = PCBOffsets.getYoff() - bigBox.sw().y();
 			
-			bigBox = bigBox.translate(new Rr2Point(offsetX, offsetY));
+			bigBox = bigBox.translate(new Point2D(offsetX, offsetY));
 			
 			
 			in = new BufferedReader(new FileReader(inputTracksAndPads));
 			
-			BooleanGrid pattern = new BooleanGrid(RrCSG.nothing(), bigBox, new Attributes(null, null, null, pcbPen.getAppearance()));
+			BooleanGrid pattern = new BooleanGrid(CSG.nothing(), bigBox, new Attributes(null, null, null, pcbPen.getAppearance()));
 			
 			gerberGcode = new GerberGCode(pcbPen, pattern, true);
 
@@ -354,13 +354,13 @@ public class PCB {
 		}
 	}
 	
-	private RrRectangle processLine(String line, boolean drill)
+	private Rectangle processLine(String line, boolean drill)
 	{
 		Debug.d(line);
 		
 		boolean drillDef = false;
 		
-		RrRectangle result = null;
+		Rectangle result = null;
 		if(drill)
 		{
 			formatX = "24";
@@ -519,17 +519,17 @@ public class PCB {
 
 											if(d==1)
 											{
-												result = gerberGcode.drawLine(new Rr2Point(x, y));
+												result = gerberGcode.drawLine(new Point2D(x, y));
 											}
 											else
 												if(d==2)
 												{
-													gerberGcode.goTo(new Rr2Point(x, y));
+													gerberGcode.goTo(new Point2D(x, y));
 												}	
 												else
 													if(d==3)
 													{
-														result = gerberGcode.exposePoint(new Rr2Point(x, y));
+														result = gerberGcode.exposePoint(new Point2D(x, y));
 													}
 										}
 										else

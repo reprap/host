@@ -68,12 +68,12 @@ import java.awt.event.MouseListener;
 import java.util.List;
 
 import org.reprap.geometry.polygons.BooleanGrid;
-import org.reprap.geometry.polygons.Rr2Point;
-import org.reprap.geometry.polygons.RrRectangle;
-import org.reprap.geometry.polygons.RrHalfPlane;
-import org.reprap.geometry.polygons.RrInterval;
-import org.reprap.geometry.polygons.RrPolygon;
-import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.Point2D;
+import org.reprap.geometry.polygons.Rectangle;
+import org.reprap.geometry.polygons.HalfSpace2D;
+import org.reprap.geometry.polygons.Interval;
+import org.reprap.geometry.polygons.Polygon;
+import org.reprap.geometry.polygons.PolygonList;
 import org.reprap.gui.StatusMessage;
 import org.reprap.Attributes;
 import javax.media.j3d.Appearance;
@@ -116,7 +116,7 @@ public class RrGraphics
 	/**
 	 * 
 	 */
-	private RrPolygonList p_list = null;
+	private PolygonList p_list = null;
 	
 	/**
 	 * The layer being built
@@ -141,7 +141,7 @@ public class RrGraphics
 	/**
 	 * 
 	 */
-	private List<RrHalfPlane> hp = null;
+	private List<HalfSpace2D> hp = null;
 	
 	/**
 	 * 
@@ -151,14 +151,14 @@ public class RrGraphics
 	/**
 	 * 
 	 */
-	private Rr2Point p_0;
+	private Point2D p_0;
 	
 	/**
 	 * 
 	 */
-	private Rr2Point pos;
+	private Point2D pos;
 	
-	private RrRectangle scaledBox, originalBox;
+	private Rectangle scaledBox, originalBox;
 	
 	/**
 	 * 
@@ -179,7 +179,7 @@ public class RrGraphics
 	 * @param b
 	 * @param pb
 	 */
-	public RrGraphics(RrRectangle b, String t) 
+	public RrGraphics(Rectangle b, String t) 
 	{
 		p_list = null;
 		hp = null;
@@ -208,7 +208,7 @@ public class RrGraphics
 		layerNumber = ln;
 	}
 	
-	private void setScales(RrRectangle b)
+	private void setScales(Rectangle b)
 	{
 		scaledBox = b.scale(1.2);
 		
@@ -231,16 +231,16 @@ public class RrGraphics
 		else
 			scale = ys;	
 		
-		p_0 = new Rr2Point((frameWidth - (width + 2*scaledBox.x().low())*scale)*0.5,
+		p_0 = new Point2D((frameWidth - (width + 2*scaledBox.x().low())*scale)*0.5,
 				(frameHeight - (height + 2*scaledBox.y().low())*scale)*0.5);
 		
-		pos = new Rr2Point(width*0.5, height*0.5);
+		pos = new Point2D(width*0.5, height*0.5);
 	}
 	
 	/**
 	 * @param b
 	 */
-	public void init(RrRectangle b, boolean waitTillDone, int ln)
+	public void init(Rectangle b, boolean waitTillDone, int ln)
 	{
 		originalBox = b;
 		setScales(b);
@@ -301,8 +301,8 @@ public class RrGraphics
 	public void add(String gCode)
 	{
 		if(p_list == null)
-			p_list = new RrPolygonList();
-		RrRectangle box = new RrRectangle(new RrInterval(0, 200), new RrInterval(0, 200)); // Default is entire plot area
+			p_list = new PolygonList();
+		Rectangle box = new Rectangle(new Interval(0, 200), new Interval(0, 200)); // Default is entire plot area
 		int com = gCode.indexOf(';');
 		if(com > 0)
 			gCode = gCode.substring(0, com);
@@ -332,7 +332,7 @@ public class RrGraphics
 			double x1 = Double.parseDouble(xs.substring(xs.indexOf("h:") + 1, xs.indexOf("]")));
 			double y0 = Double.parseDouble(ys.substring(ys.indexOf("l:") + 1, ys.indexOf(",")));
 			double y1 = Double.parseDouble(ys.substring(ys.indexOf("h:") + 1, ys.indexOf("]")));
-			box = new RrRectangle(new RrInterval(x0, x1), new RrInterval(y0, y1));
+			box = new Rectangle(new Interval(x0, x1), new Interval(y0, y1));
 			init(box, false, 0);
 		}
 	}
@@ -340,14 +340,14 @@ public class RrGraphics
 	/**
 	 * @param pl
 	 */
-	public void add(RrPolygonList pl)
+	public void add(PolygonList pl)
 	{
 		if(pl == null)
 			return;
 		if(pl.size() <= 0)
 			return;
 		if(p_list == null)
-			p_list = new RrPolygonList(pl);
+			p_list = new PolygonList(pl);
 		else
 			p_list.add(pl);
 		jframe.repaint();
@@ -364,9 +364,9 @@ public class RrGraphics
 	 * @param p
 	 * @return
 	 */
-	private Rr2Point transform(Rr2Point p)
+	private Point2D transform(Point2D p)
 	{
-		return new Rr2Point(p_0.x() + scale*p.x(), (double)frameHeight - 
+		return new Point2D(p_0.x() + scale*p.x(), (double)frameHeight - 
 				(p_0.y() + scale*p.y()));
 	}
 	
@@ -375,9 +375,9 @@ public class RrGraphics
 	 * @param p
 	 * @return
 	 */
-	private Rr2Point iTransform(int x, int y)
+	private Point2D iTransform(int x, int y)
 	{
-		return new Rr2Point(((double)x - p_0.x())/scale, ((double)(frameHeight - y)
+		return new Point2D(((double)x - p_0.x())/scale, ((double)(frameHeight - y)
 				- p_0.y())/scale);
 	}
 	
@@ -385,7 +385,7 @@ public class RrGraphics
 	 * Move invisibly to a point
 	 * @param p
 	 */
-	private void move(Rr2Point p)
+	private void move(Point2D p)
 	{
 		pos = transform(p);
 	}
@@ -394,9 +394,9 @@ public class RrGraphics
 	 * Draw a straight line to a point
 	 * @param p
 	 */
-	private void plot(Rr2Point p)
+	private void plot(Point2D p)
 	{
-		Rr2Point a = transform(p);
+		Point2D a = transform(p);
 		g2d.drawLine((int)Math.round(pos.x()), (int)Math.round(pos.y()), 
 				(int)Math.round(a.x()), (int)Math.round(a.y()));
 		pos = a;
@@ -407,9 +407,9 @@ public class RrGraphics
 	 * Plot a box
 	 * @param b
 	 */
-	private void plot(RrRectangle b)
+	private void plot(Rectangle b)
 	{
-		if(RrRectangle.intersection(b, scaledBox).empty())
+		if(Rectangle.intersection(b, scaledBox).empty())
 			return;
 		
 		g2d.setColor(boxes);
@@ -437,11 +437,11 @@ public class RrGraphics
 	 * Plot a polygon
 	 * @param p
 	 */
-	private void plot(RrPolygon p)
+	private void plot(Polygon p)
 	{
 		if(p.size() <= 0)
 			return;
-		if(RrRectangle.intersection(p.getBox(), scaledBox).empty())
+		if(Rectangle.intersection(p.getBox(), scaledBox).empty())
 			return;
 	    if(p.getAttributes().getAppearance() == null)
 	    {
@@ -546,12 +546,12 @@ public class RrGraphics
 	 */
 	class myMouse implements MouseListener
 	{
-		private RrRectangle magBox(RrRectangle b, int ix, int iy)
+		private Rectangle magBox(Rectangle b, int ix, int iy)
 		{
-			Rr2Point cen = iTransform(ix, iy);
+			Point2D cen = iTransform(ix, iy);
 			//System.out.println("Mouse: " + cen.toString() + "; box: " +  scaledBox.toString());
-			Rr2Point off = new Rr2Point(b.x().length()*0.05, b.y().length()*0.05);
-			return new RrRectangle(Rr2Point.sub(cen, off), Rr2Point.add(cen, off));
+			Point2D off = new Point2D(b.x().length()*0.05, b.y().length()*0.05);
+			return new Rectangle(Point2D.sub(cen, off), Point2D.add(cen, off));
 		}
 		
 		public void mousePressed(MouseEvent e) {

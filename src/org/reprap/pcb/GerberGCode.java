@@ -41,7 +41,7 @@ public class GerberGCode {
 	boolean absolute = true;
 	Extruder pcbPen;
 	BooleanGrid pcb;
-	Rr2Point lastCoords = null;
+	Point2D lastCoords = null;
 
 	boolean colour = true;
 
@@ -53,17 +53,17 @@ public class GerberGCode {
 		disableDrawing();
 		pcb = p;
 		colour = c;
-		lastCoords = new Rr2Point(0, 0);
+		lastCoords = new Point2D(0, 0);
 	}
 	
-	public RrRectangle drawLine(Rr2Point c)
+	public Rectangle drawLine(Point2D c)
 	{
 		return drawFatLine(fixCoords(c));
 	}	
 	
-	public void goTo(Rr2Point c)
+	public void goTo(Point2D c)
 	{
-		lastCoords = new Rr2Point(fixCoords(c));
+		lastCoords = new Point2D(fixCoords(c));
 	}
 	
 	public void enableAbsolute()
@@ -102,7 +102,7 @@ public class GerberGCode {
 		apertures.add(new Aperture(apertureNum, width, height, 'R'));
 	}
 	
-	public RrRectangle exposePoint(Rr2Point c)
+	public Rectangle exposePoint(Point2D c)
 	{
 		if(curAperture.type == 'C')
 			return createCircle(fixCoords(c));
@@ -111,28 +111,28 @@ public class GerberGCode {
 		
 	}
 	
-	public RrRectangle createRec(Rr2Point c)
+	public Rectangle createRec(Point2D c)
 	{	
 		//TODO: make this fill the rectangle
 		double recWidth = curAperture.width/2.0f;
 		double recHeight = curAperture.height/2.0f;
 		c = fixCoords(c);
-		Rr2Point p = new Rr2Point(recWidth, recHeight);
-		RrRectangle result = new RrRectangle(Rr2Point.sub(c, p), Rr2Point.add(c, p));
+		Point2D p = new Point2D(recWidth, recHeight);
+		Rectangle result = new Rectangle(Point2D.sub(c, p), Point2D.add(c, p));
 		if(pcb == null)
 			return result;
 		pcb.homogeneous(result.sw(), result.ne(), colour);
-		lastCoords = new Rr2Point(fixCoords(c));
+		lastCoords = new Point2D(fixCoords(c));
 		return result;
 	}
 	
-	public RrRectangle createCircle(Rr2Point c)
+	public Rectangle createCircle(Point2D c)
 	{
-		RrRectangle result = circleToRectangle(c);
+		Rectangle result = circleToRectangle(c);
 		if(pcb == null)
 			return result;
 		pcb.disc(c, curAperture.width*0.5, colour);
-		lastCoords = new Rr2Point(fixCoords(c));
+		lastCoords = new Point2D(fixCoords(c));
 		//octagon(fixCoords(c), curAperture.width);
 		return result;
 	}
@@ -158,10 +158,10 @@ public class GerberGCode {
 //		enableDrawing();
 //	}
 	
-	private RrRectangle circleToRectangle(Rr2Point c)
+	private Rectangle circleToRectangle(Point2D c)
 	{
-		Rr2Point p = new Rr2Point(0.5*curAperture.width, 0.5*curAperture.width);
-		return new RrRectangle(Rr2Point.sub(c, p), Rr2Point.add(c, p));
+		Point2D p = new Point2D(0.5*curAperture.width, 0.5*curAperture.width);
+		return new Rectangle(Point2D.sub(c, p), Point2D.add(c, p));
 	}
 	
 //	private void octagon(Rr2Point p, double diameter)
@@ -186,17 +186,17 @@ public class GerberGCode {
 //		addPointToPolygons(c);
 //	}
 	
-	private RrRectangle drawFatLine(Rr2Point c)
+	private Rectangle drawFatLine(Point2D c)
 	{
-		RrRectangle result = circleToRectangle(c);
-		result = RrRectangle.union(result, circleToRectangle(lastCoords));
+		Rectangle result = circleToRectangle(c);
+		result = Rectangle.union(result, circleToRectangle(lastCoords));
 		if(pcb == null)
 			return result;
 		//TODO: make this draw a fat line
 		pcb.rectangle(lastCoords, c, 0.5*curAperture.width, colour);
 		pcb.disc(c, curAperture.width*0.5, true);
 		pcb.disc(lastCoords, curAperture.width*0.5, colour);
-		lastCoords = new Rr2Point(c);
+		lastCoords = new Point2D(c);
 		return result;
 	}
 
@@ -210,17 +210,17 @@ public class GerberGCode {
 		dawingOn = false;
 	}
 	
-	Rr2Point fixCoords(Rr2Point c)
+	Point2D fixCoords(Point2D c)
 	{
 		if(!absolute)
 		{
-			c = new Rr2Point(c);
-			c = Rr2Point.add(c, lastCoords);
+			c = new Point2D(c);
+			c = Point2D.add(c, lastCoords);
 		}
 		return c;
 	}
 	
-	public RrPolygonList getPolygons()
+	public PolygonList getPolygons()
 	{
 
 		if(Preferences.simulate())
@@ -232,10 +232,10 @@ public class GerberGCode {
 			simulationPlot1.add(pcb);
 		}
 
-		RrPolygonList result = new RrPolygonList();
+		PolygonList result = new PolygonList();
 		double penWidth = pcbPen.getExtrusionSize();
 		pcb = pcb.offset(-0.5*penWidth);
-		RrPolygonList pol = pcb.allPerimiters(pcb.attribute());
+		PolygonList pol = pcb.allPerimiters(pcb.attribute());
 		
 		while(pol.size() > 0)
 		{

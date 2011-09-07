@@ -74,9 +74,9 @@ class PolPoint
 	private int pEnd;
 	private int pg;
 	private double d2;
-	private RrPolygon pol;
+	private Polygon pol;
 	
-	public PolPoint(int pnr, int pgn, RrPolygon poly, double s)
+	public PolPoint(int pnr, int pgn, Polygon poly, double s)
 	{
 		set(pnr, pgn, poly, s);
 	}
@@ -84,10 +84,10 @@ class PolPoint
 	public int near() { return pNear; }
 	public int end() { return pEnd; }
 	public int pIndex() { return pg; }
-	public RrPolygon polygon() { return pol; }
+	public Polygon polygon() { return pol; }
 	public double dist2() { return d2; }
 	
-	public void set(int pnr, int pgn, RrPolygon poly, double s)
+	public void set(int pnr, int pgn, Polygon poly, double s)
 	{
 		pNear = pnr;
 		pg = pgn;
@@ -107,8 +107,8 @@ class PolPoint
 		if(i < 0 || i > pol.size() -1 || j < 0 || j > pol.size() -1)
 			Debug.e("RrPolygonList.midPoint(): i and/or j wrong: i = " + i + ", j = " + j);
 		
-		Rr2Point p = Rr2Point.add(pol.point(i), pol.point(j));
-		p = Rr2Point.mul(p, 0.5);
+		Point2D p = Point2D.add(pol.point(i), pol.point(j));
+		p = Point2D.mul(p, 0.5);
 		pol.add(j, p);
 		pEnd = j;
 	}
@@ -122,8 +122,8 @@ class PolPoint
 		double d;
 		double sum = 0;
 		double longest = -1;
-		Rr2Point p = pol.point(pNear);
-		Rr2Point q;
+		Point2D p = pol.point(pNear);
+		Point2D q;
 		int inc = 1;
 		if(pNear > pol.size()/2 - 1)
 			inc = -1;
@@ -135,7 +135,7 @@ class PolPoint
 		{
 			i += inc;
 			q = pol.point(i);
-			d = Rr2Point.d(p, q);
+			d = Point2D.d(p, q);
 			if(d >= longEnough)
 			{
 				midPoint(i, j);
@@ -382,24 +382,24 @@ class treeList
 	 * @param csgPols
 	 * @return
 	 */
-	public RrCSG buildCSG(List<RrCSG> csgPols)
+	public CSG buildCSG(List<CSG> csgPols)
 	{
 		if(size() == 0)
 			return csgPols.get(index);
 		
-		RrCSG offspring = RrCSG.nothing();
+		CSG offspring = CSG.nothing();
 		
 		for(int i = 0; i < size(); i++)
 		{
 			treeList iEntry = getChild(i);
-			RrCSG iCSG = iEntry.buildCSG(csgPols);
-			offspring = RrCSG.union(offspring, iCSG);
+			CSG iCSG = iEntry.buildCSG(csgPols);
+			offspring = CSG.union(offspring, iCSG);
 		}
 		
 		if(index < 0)
 			return offspring;
 		else
-			return RrCSG.difference(csgPols.get(index), offspring);
+			return CSG.difference(csgPols.get(index), offspring);
 	}
 	
 	/**
@@ -438,17 +438,17 @@ class treeList
  * RrPolygonList: A collection of 2D polygons
  * List of polygons class.  This too maintains a maximum enclosing rectangle.
  */
-public class RrPolygonList
+public class PolygonList
 {
 	/**
 	 * 
 	 */
-	private List<RrPolygon> polygons = null;
+	private List<Polygon> polygons = null;
 	
 	/**
 	 * 
 	 */
-	private RrRectangle box = null;
+	private Rectangle box = null;
 	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
@@ -483,10 +483,10 @@ public class RrPolygonList
 	/**
 	 * Empty constructor
 	 */
-	public RrPolygonList()
+	public PolygonList()
 	{
-		polygons = new ArrayList<RrPolygon>();
-		box = new RrRectangle();
+		polygons = new ArrayList<Polygon>();
+		box = new Rectangle();
 	}
 	
 	/**
@@ -494,7 +494,7 @@ public class RrPolygonList
 	 * @param i index of polygon to return
 	 * @return polygon at index i
 	 */
-	public RrPolygon polygon(int i)
+	public Polygon polygon(int i)
 	{
 		return polygons.get(i);
 	}
@@ -510,14 +510,14 @@ public class RrPolygonList
 	/**
 	 * @return the current enclosing box
 	 */
-	public RrRectangle getBox() { return box; }
+	public Rectangle getBox() { return box; }
 	
 	/**
 	 * Overwrite one of the polygons
 	 * @param i index of polygon to overwrite
 	 * @param p polygon to set at index i
 	 */
-	public void set(int i, RrPolygon p)
+	public void set(int i, Polygon p)
 	{
 		polygons.set(i, p);
 	}
@@ -535,24 +535,24 @@ public class RrPolygonList
 	 * Deep copy
 	 * @param lst list of polygons to copy
 	 */
-	public RrPolygonList(RrPolygonList lst)
+	public PolygonList(PolygonList lst)
 	{
-		polygons = new ArrayList<RrPolygon>();
-		box = new RrRectangle(lst.box);
+		polygons = new ArrayList<Polygon>();
+		box = new Rectangle(lst.box);
 		for(int i = 0; i < lst.size(); i++)
-			polygons.add(new RrPolygon(lst.polygon(i)));
+			polygons.add(new Polygon(lst.polygon(i)));
 	}
 	
 	/**
 	 * Put a new list on the end
 	 * @param lst list to append to existing polygon list
 	 */
-	public void add(RrPolygonList lst)
+	public void add(PolygonList lst)
 	{
 		if(lst.size() == 0)
 			return;
 		for(int i = 0; i < lst.size(); i++)
-			polygons.add(new RrPolygon(lst.polygon(i)));
+			polygons.add(new Polygon(lst.polygon(i)));
 		box.expand(lst.box);
 	}
 	
@@ -560,7 +560,7 @@ public class RrPolygonList
 	 * Add one new polygon to the list
 	 * @param p polygon to add to the list
 	 */
-	public void add(RrPolygon p)
+	public void add(Polygon p)
 	{
 		polygons.add(p);
 		box.expand(p.getBox());
@@ -570,7 +570,7 @@ public class RrPolygonList
 	 * Add one new polygon to the list at location i
 	 * @param p polygon to add to the list
 	 */
-	public void add(int i, RrPolygon p)
+	public void add(int i, Polygon p)
 	{
 		polygons.add(i, p);
 		box.expand(p.getBox());
@@ -583,7 +583,7 @@ public class RrPolygonList
 	 */
 	private void swap(int i, int j)
 	{
-		RrPolygon p = polygons.get(i);
+		Polygon p = polygons.get(i);
 		polygons.set(i, polygons.get(j));
 		polygons.set(j, p);
 	}
@@ -592,12 +592,12 @@ public class RrPolygonList
 	 * Negate all the polygons
 	 * @return negated polygons
 	 */
-	public RrPolygonList negate()
+	public PolygonList negate()
 	{
-		RrPolygonList result = new RrPolygonList();
+		PolygonList result = new PolygonList();
 		for(int i = 0; i < size(); i++)
 			result.polygons.add(polygon(i).negate());
-		result.box = new RrRectangle(box);
+		result.box = new Rectangle(box);
 		return result;
 	}
 	
@@ -605,9 +605,9 @@ public class RrPolygonList
 	 * Remove empty entries (if any)
 	 * @return
 	 */
-	public RrPolygonList clean()
+	public PolygonList clean()
 	{
-		RrPolygonList result = new RrPolygonList();
+		PolygonList result = new PolygonList();
 		for(int i = 0; i < size(); i++)
 		{
 			if(polygon(i) != null)
@@ -632,9 +632,9 @@ public class RrPolygonList
 	 * polygon in the list
 	 * @return new polygonlist
 	 */
-	public RrPolygonList randomStart()
+	public PolygonList randomStart()
 	{
-		RrPolygonList result = new RrPolygonList();
+		PolygonList result = new PolygonList();
 		for(int i = 0; i < size(); i++)
 			result.add(polygon(i).randomStart());
 		return result;
@@ -646,7 +646,7 @@ public class RrPolygonList
 	 */
 	private void negate(int i)
 	{
-		RrPolygon p = polygon(i).negate();
+		Polygon p = polygon(i).negate();
 		polygons.set(i, p);
 	}
 	
@@ -697,14 +697,14 @@ public class RrPolygonList
 	 * @param d
 	 * @return simplified polygon list
 	 */
-	public RrPolygonList simplify(double d)
+	public PolygonList simplify(double d)
 	{
-		RrPolygonList r = new RrPolygonList();
+		PolygonList r = new PolygonList();
 		double d2 = d*d;
 		
 		for(int i = 0; i < size(); i++)
 		{
-			RrPolygon p = polygon(i);
+			Polygon p = polygon(i);
 			if(p.getBox().dSquared() > 2*d2)
 				r.add(p.simplify(d));
 		}
@@ -727,9 +727,9 @@ public class RrPolygonList
 	 * @param linkUp
 	 * @return new ordered polygon list
 	 */
-	public RrPolygonList nearEnds(Rr2Point startNearHere, boolean reOrder, double linkUp)
+	public PolygonList nearEnds(Point2D startNearHere, boolean reOrder, double linkUp)
 	{
-		RrPolygonList r = new RrPolygonList();
+		PolygonList r = new PolygonList();
 		if(size() <= 0)
 			return r;
 		
@@ -758,7 +758,7 @@ public class RrPolygonList
 				if(r.polygon(i).isClosed() && reOrder)
 				{
 					int nv = polygon(i).nearestVertex(startNearHere);
-					d2 = Rr2Point.dSquared(startNearHere, polygon(i).point(nv));
+					d2 = Point2D.dSquared(startNearHere, polygon(i).point(nv));
 					if(d2 < d)
 					{
 						near = i;
@@ -768,7 +768,7 @@ public class RrPolygonList
 					}
 				} else
 				{
-					d2 = Rr2Point.dSquared(startNearHere, r.polygon(i).point(0));
+					d2 = Point2D.dSquared(startNearHere, r.polygon(i).point(0));
 					if(d2 < d)
 					{
 						near = i;
@@ -778,7 +778,7 @@ public class RrPolygonList
 					}
 					if(!r.polygon(i).isClosed())
 					{
-						d2 = Rr2Point.dSquared(startNearHere, r.polygon(i).point(r.polygon(i).size() - 1));
+						d2 = Point2D.dSquared(startNearHere, r.polygon(i).point(r.polygon(i).size() - 1));
 						if(d2 < d)
 						{
 							near = i;
@@ -815,7 +815,7 @@ public class RrPolygonList
 		
 		for(i = 0; i < r.size() - 1; i++)
 		{
-			Rr2Point end;
+			Point2D end;
 			if(r.polygon(i).isClosed())
 				end = r.polygon(i).point(0);
 			else
@@ -825,7 +825,7 @@ public class RrPolygonList
 			d = Double.POSITIVE_INFINITY;
 			for(j = i+1; j < r.size(); j++)
 			{	
-				d2 = Rr2Point.dSquared(end, r.polygon(j).point(0));
+				d2 = Point2D.dSquared(end, r.polygon(j).point(0));
 				if(d2 < d)
 				{
 					near = j;
@@ -835,7 +835,7 @@ public class RrPolygonList
 
 				if(!r.polygon(j).isClosed())
 				{
-					d2 = Rr2Point.dSquared(end, r.polygon(j).point(r.polygon(j).size() - 1));
+					d2 = Point2D.dSquared(end, r.polygon(j).point(r.polygon(j).size() - 1));
 					if(d2 < d)
 					{
 						near = j;
@@ -891,7 +891,7 @@ public class RrPolygonList
 		
 		for(int i = 0; i < size() - 1; i++)
 		{
-			RrPolygon myPolygon = polygon(i);
+			Polygon myPolygon = polygon(i);
 			for(int j = i+1; j < size(); j++)
 			{
 				double d = Double.POSITIVE_INFINITY;
@@ -900,7 +900,7 @@ public class RrPolygonList
 				int itsPoint = -1;
 				int myTempPoint, itsTempPoint;
 				boolean reverseMe, reverseIt;
-				RrPolygon itsPolygon = polygon(j);
+				Polygon itsPolygon = polygon(j);
 				
 				// Swap the odd half of the asymmetric cases so they're all the same
 				
@@ -921,9 +921,9 @@ public class RrPolygonList
 					
 					reverseMe = true;
 					reverseIt = false;
-					d = Rr2Point.dSquared(myPolygon.point(0), itsPolygon.point(0));
+					d = Point2D.dSquared(myPolygon.point(0), itsPolygon.point(0));
 					
-					d2 = Rr2Point.dSquared(myPolygon.point(myPolygon.size() - 1), itsPolygon.point(0));
+					d2 = Point2D.dSquared(myPolygon.point(myPolygon.size() - 1), itsPolygon.point(0));
 					if(d2 < d)
 					{
 						reverseMe = false;
@@ -931,7 +931,7 @@ public class RrPolygonList
 						d = d2;
 					}
 					
-					d2 = Rr2Point.dSquared(myPolygon.point(0), itsPolygon.point(itsPolygon.size() - 1));
+					d2 = Point2D.dSquared(myPolygon.point(0), itsPolygon.point(itsPolygon.size() - 1));
 					if(d2 < d)
 					{
 						reverseMe = true;
@@ -939,7 +939,7 @@ public class RrPolygonList
 						d = d2;
 					}
 					
-					d2 = Rr2Point.dSquared(myPolygon.point(myPolygon.size() - 1), itsPolygon.point(itsPolygon.size() - 1));
+					d2 = Point2D.dSquared(myPolygon.point(myPolygon.size() - 1), itsPolygon.point(itsPolygon.size() - 1));
 					if(d2 < d)
 					{
 						reverseMe = false;
@@ -965,9 +965,9 @@ public class RrPolygonList
 					
 					reverseMe = true;
 					itsPoint = itsPolygon.nearestVertex(myPolygon.point(0));
-					d = Rr2Point.dSquared(itsPolygon.point(itsPoint), myPolygon.point(0));
+					d = Point2D.dSquared(itsPolygon.point(itsPoint), myPolygon.point(0));
 					itsTempPoint = itsPolygon.nearestVertex(myPolygon.point(myPolygon.size() - 1));
-					d2 = Rr2Point.dSquared(itsPolygon.point(itsTempPoint), myPolygon.point(myPolygon.size() - 1));
+					d2 = Point2D.dSquared(itsPolygon.point(itsTempPoint), myPolygon.point(myPolygon.size() - 1));
 					if(d2 < d)
 					{
 						itsPoint = itsTempPoint;
@@ -995,7 +995,7 @@ public class RrPolygonList
 					for(int k = 0; k < itsPolygon.size(); k++)
 					{
 						myTempPoint = myPolygon.nearestVertex(itsPolygon.point(k));
-						d2 = Rr2Point.dSquared(myPolygon.point(myTempPoint), itsPolygon.point(k));
+						d2 = Point2D.dSquared(myPolygon.point(myTempPoint), itsPolygon.point(k));
 						if(d2 < d)
 						{
 							myPoint = myTempPoint;
@@ -1039,9 +1039,9 @@ public class RrPolygonList
 	 */
 	private void cutPolygon(int pol, int st, int en)
 	{
-		RrPolygon old = polygon(pol);
-		RrPolygon p1 = new RrPolygon(old.getAttributes(), old.isClosed());
-		RrPolygon p2 = new RrPolygon(old.getAttributes(), old.isClosed());
+		Polygon old = polygon(pol);
+		Polygon p1 = new Polygon(old.getAttributes(), old.isClosed());
+		Polygon p2 = new Polygon(old.getAttributes(), old.isClosed());
 		if(st > en)
 		{
 			int temp = st;
@@ -1075,7 +1075,7 @@ public class RrPolygonList
 	 * @param omit
 	 * @return
 	 */
-	private PolPoint ppSearch(Rr2Point p, int omit, int physicalExtruder)
+	private PolPoint ppSearch(Point2D p, int omit, int physicalExtruder)
 	{
 		double d = Double.POSITIVE_INFINITY;
 		PolPoint result = null;
@@ -1087,11 +1087,11 @@ public class RrPolygonList
 		{
 			if(i != omit)
 			{
-				RrPolygon pgon = polygon(i);
+				Polygon pgon = polygon(i);
 				if(physicalExtruder == pgon.getAttributes().getExtruder().getPhysicalExtruderNumber())
 				{
 					int n = pgon.nearestVertex(p);
-					double d2 = Rr2Point.dSquared(p, pgon.point(n));
+					double d2 = Point2D.dSquared(p, pgon.point(n));
 					if(d2 < d)
 					{
 						if(result == null)
@@ -1126,20 +1126,20 @@ public class RrPolygonList
 	 * @param hatching
 	 * @param lc
 	 */
-	public void middleStarts(RrPolygonList hatching, LayerRules lc, BooleanGridList slice)
+	public void middleStarts(PolygonList hatching, LayerRules lc, BooleanGridList slice)
 	{
 		for(int i = 0; i < size(); i++)
 		{
-			RrPolygon outline = polygon(i);
+			Polygon outline = polygon(i);
 			Extruder ex = outline.getAttributes().getExtruder();
 			if(ex.getMiddleStart())
 			{
-				RrLine l = lc.getHatchDirection(ex).pLine();
+				Line l = lc.getHatchDirection(ex).pLine();
 				if(i%2 != 0 ^ lc.getMachineLayer()%4 > 1)
 					l = l.neg();
 				outline = outline.newStart(outline.maximalVertex(l));
 
-				Rr2Point start = outline.point(0);
+				Point2D start = outline.point(0);
 				PolPoint pp = hatching.ppSearch(start, -1, outline.getAttributes().getExtruder().getPhysicalExtruderNumber());
 				boolean failed = true;
 				if(pp != null)
@@ -1149,17 +1149,17 @@ public class RrPolygonList
 					int st = pp.near();
 					int en = pp.end();
 
-					RrPolygon pg = pp.polygon();
+					Polygon pg = pp.polygon();
 					
 					// Check that the line from the start of the outline polygon to the first point
 					// of the tail-in is in solid.  If not, we have jumped between polygons and don't
 					// want to use that as a lead in.
 					
-					Rr2Point pDif = Rr2Point.sub(pg.point(st), start);
+					Point2D pDif = Point2D.sub(pg.point(st), start);
 					
-					Rr2Point pq1 = Rr2Point.add(start, Rr2Point.mul(0.25, pDif));
-					Rr2Point pq2 = Rr2Point.add(start, Rr2Point.mul(0.5, pDif));
-					Rr2Point pq3 = Rr2Point.add(start, Rr2Point.mul(0.5, pDif));
+					Point2D pq1 = Point2D.add(start, Point2D.mul(0.25, pDif));
+					Point2D pq2 = Point2D.add(start, Point2D.mul(0.5, pDif));
+					Point2D pq3 = Point2D.add(start, Point2D.mul(0.5, pDif));
 					
 					if(slice.membership(pq1) & slice.membership(pq2) & slice.membership(pq3))
 					{
@@ -1202,13 +1202,13 @@ public class RrPolygonList
 	 *
 	 * @param es
 	 */	
-	public RrPolygonList arcCompensate()
+	public PolygonList arcCompensate()
 	{
-		RrPolygonList r = new RrPolygonList();
+		PolygonList r = new PolygonList();
 		
 		for(int i = 0; i < size(); i++)
 		{
-			RrPolygon p = polygon(i);
+			Polygon p = polygon(i);
 			r.add(p.arcCompensate());
 		}
 		
@@ -1219,13 +1219,13 @@ public class RrPolygonList
 	 * Remove polygons shorter than 3 times the infillwidth
 	 * @return
 	 */
-	public RrPolygonList cullShorts()
+	public PolygonList cullShorts()
 	{
-		RrPolygonList r = new RrPolygonList();
+		PolygonList r = new PolygonList();
 		
 		for(int i = 0; i < size(); i++)
 		{
-			RrPolygon p = polygon(i);
+			Polygon p = polygon(i);
 			if(p.getLength() > p.getAttributes().getExtruder().getExtrusionInfillWidth()*3)
 				r.add(p);
 		}
@@ -1240,10 +1240,10 @@ public class RrPolygonList
 	 * @param csgPols
 	 * @return true if the polygon is inside the CSG polygon, false if otherwise
 	 */
-	private boolean inside(int i, int j, List<RrCSG> csgPols)
+	private boolean inside(int i, int j, List<CSG> csgPols)
 	{
-		RrCSG exp = csgPols.get(j);
-		Rr2Point p = polygon(i).point(0);
+		CSG exp = csgPols.get(j);
+		Point2D p = polygon(i).point(0);
 		boolean a = (exp.value(p) <= 0);
 		p = polygon(i).point(polygon(i).size()/2);
 		boolean b = (exp.value(p) <= 0);
@@ -1265,7 +1265,7 @@ public class RrPolygonList
 	 * @param polAttributes
 	 * @return single CSG expression based on csgPols list 
 	 */
-	private RrCSG resolveInsides(List<RrCSG> csgPols)
+	private CSG resolveInsides(List<CSG> csgPols)
 	{
 		int i, j;
 		
@@ -1330,7 +1330,7 @@ public class RrPolygonList
 		// We now have a tree of containment.  universe is the root.
 		// Walk the tree turning it into a single CSG expression
 		
-		RrCSG expression = universe.buildCSG(csgPols);
+		CSG expression = universe.buildCSG(csgPols);
 		
 		//RrCSGPolygon res = new RrCSGPolygon(expression, box.scale(1.1), polygon(0).getAttributes());
 		//res.divide(0.0001, 0);
@@ -1342,23 +1342,23 @@ public class RrPolygonList
 	 * Compute the CSG representation of all the polygons in the list
 	 * @return CSG representation
 	 */
-	public RrCSG toCSG(double tolerance)
+	public CSG toCSG(double tolerance)
 	{	
 		if(size() == 0)
 		{
-			return RrCSG.nothing();
+			return CSG.nothing();
 		}
 		if(size() == 1)
 		{
 			return polygon(0).toCSG(tolerance);
 		}
 		
-		List<RrCSG> csgPols = new ArrayList<RrCSG>();
+		List<CSG> csgPols = new ArrayList<CSG>();
 		
 		for(int i = 0; i < size(); i++)
 			csgPols.add(polygon(i).toCSG(tolerance));
 		
-		RrCSG polygons = resolveInsides(csgPols);
+		CSG polygons = resolveInsides(csgPols);
 		//expression = expression.simplify(tolerance);
 		
 		return polygons;

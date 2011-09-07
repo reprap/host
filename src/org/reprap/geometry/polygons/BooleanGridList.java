@@ -52,7 +52,7 @@ public class BooleanGridList
 		 * @param p
 		 * @return
 		 */
-		public boolean membership(Rr2Point p)
+		public boolean membership(Point2D p)
 		{
 			for(int i = 0; i < size(); i++)
 				if(get(i).get(p))
@@ -199,9 +199,9 @@ public class BooleanGridList
 		 * Work out all the polygons forming a set of borders
 		 * @return
 		 */
-		public RrPolygonList borders()
+		public PolygonList borders()
 		{
-			RrPolygonList result = new RrPolygonList();
+			PolygonList result = new PolygonList();
 			for(int i = 0; i < size(); i++)
 				result.add(get(i).allPerimiters(attribute(i))); 
 			return result;
@@ -217,9 +217,9 @@ public class BooleanGridList
 		 * @param overrideDirection
 		 * @return
 		 */
-		public RrPolygonList hatch(LayerRules layerConditions, boolean surface, RrHalfPlane overrideDirection) //, Rr2Point startNearHere)
+		public PolygonList hatch(LayerRules layerConditions, boolean surface, HalfSpace2D overrideDirection) //, Rr2Point startNearHere)
 		{
-			RrPolygonList result = new RrPolygonList();
+			PolygonList result = new PolygonList();
 			boolean foundation = layerConditions.getLayingSupport();
 			Extruder [] es = layerConditions.getPrinter().getExtruders();
 			for(int i = 0; i < size(); i++)
@@ -240,7 +240,7 @@ public class BooleanGridList
 					ei = e;
 				if(ei != null)
 				{
-					RrHalfPlane hatchLine;
+					HalfSpace2D hatchLine;
 					if(overrideDirection != null)
 						hatchLine = overrideDirection;
 					else

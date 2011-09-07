@@ -12,12 +12,12 @@ import org.reprap.Attributes;
 import org.reprap.Preferences;
 //import org.reprap.ReprapException;
 //import org.reprap.devices.pseudo.LinePrinter;
-import org.reprap.geometry.polygons.Rr2Point;
+import org.reprap.geometry.polygons.Point2D;
 //import org.reprap.geometry.polygons.RrCSGPolygonList;
-import org.reprap.geometry.polygons.RrPolygon;
+import org.reprap.geometry.polygons.Polygon;
 import org.reprap.geometry.polygons.PolygonAttributes;
-import org.reprap.geometry.polygons.RrPolygonList;
-import org.reprap.geometry.polygons.RrRectangle;
+import org.reprap.geometry.polygons.PolygonList;
+import org.reprap.geometry.polygons.Rectangle;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
 
@@ -29,7 +29,7 @@ class segmentSpeeds
 	/**
 	 * 
 	 */
-	public Rr2Point p1, p2, p3;
+	public Point2D p1, p2, p3;
 	
 	/**
 	 * 
@@ -52,18 +52,18 @@ class segmentSpeeds
 	 * @param after
 	 * @param fastLength
 	 */
-	public segmentSpeeds(Rr2Point before, Rr2Point now, Rr2Point after, double fastLength)
+	public segmentSpeeds(Point2D before, Point2D now, Point2D after, double fastLength)
 	{
-		Rr2Point a = Rr2Point.sub(now, before);
+		Point2D a = Point2D.sub(now, before);
 		double amod = a.mod();
 		abandon = amod == 0;
 		if(abandon)
 			return;
-		Rr2Point b = Rr2Point.sub(after, now);
+		Point2D b = Point2D.sub(after, now);
 		if(b.mod() == 0)
 			ca = 0;
 		else
-			ca = Rr2Point.mul(a.norm(), b.norm());
+			ca = Point2D.mul(a.norm(), b.norm());
 		plotMiddle = true;
 		if(amod <= 2*fastLength)
 		{
@@ -71,9 +71,9 @@ class segmentSpeeds
 			plotMiddle = false;
 		}
 		a = a.norm();
-		p1 = Rr2Point.add(before, Rr2Point.mul(a, fastLength));
-		p2 = Rr2Point.add(p1, Rr2Point.mul(a, amod - 2*fastLength));
-		p3 = Rr2Point.add(p2, Rr2Point.mul(a, fastLength));
+		p1 = Point2D.add(before, Point2D.mul(a, fastLength));
+		p2 = Point2D.add(p1, Point2D.mul(a, amod - 2*fastLength));
+		p3 = Point2D.add(p2, Point2D.mul(a, fastLength));
 	}
 	
 //	int speed(int currentSpeed, double angFac)
@@ -102,7 +102,7 @@ public class LayerProducer {
 
 
 	
-	private RrPolygonList allPolygons[];
+	private PolygonList allPolygons[];
 	
 	/**
 	 * The clue is in the name...
@@ -112,7 +112,7 @@ public class LayerProducer {
 	/**
 	 * Record the end of each polygon as a clue where to start next
 	 */
-	private Rr2Point startNearHere = null;
+	private Point2D startNearHere = null;
 
 	
 	/**
@@ -145,7 +145,7 @@ public class LayerProducer {
 	 * @param simPlot
 	 * @throws Exception
 	 */
-	public LayerProducer(RrPolygonList ap[], LayerRules lc, RrGraphics simPlot) throws Exception 
+	public LayerProducer(PolygonList ap[], LayerRules lc, RrGraphics simPlot) throws Exception 
 	{
 		layerConditions = lc;
 		startNearHere = null;
@@ -157,9 +157,9 @@ public class LayerProducer {
 		{
 			if(!simulationPlot.isInitialised())
 			{
-				RrRectangle rec = lc.getBox();
+				Rectangle rec = lc.getBox();
 				if(Preferences.loadGlobalBool("Shield"))
-					rec.expand(Rr2Point.add(rec.sw(), new Rr2Point(-7, -7))); // TODO: Yuk - this should be a parameter
+					rec.expand(Point2D.add(rec.sw(), new Point2D(-7, -7))); // TODO: Yuk - this should be a parameter
 				simulationPlot.init(rec, false, lc.getModelLayer());
 			} else
 				simulationPlot.cleanPolygons(lc.getModelLayer());
@@ -189,9 +189,9 @@ public class LayerProducer {
 	/**
 	 * @return current X and Y position of the printer
 	 */
-	private Rr2Point posNow()
+	private Point2D posNow()
 	{
-		return new Rr2Point(layerConditions.getPrinter().getX(), layerConditions.getPrinter().getY());
+		return new Point2D(layerConditions.getPrinter().getX(), layerConditions.getPrinter().getY());
 	}
 	
 	/**
@@ -200,13 +200,13 @@ public class LayerProducer {
 	 * @return
 	 * @throws Exception 
 	 */
-	private boolean shortLine(Rr2Point p, boolean stopExtruder, boolean closeValve) throws Exception
+	private boolean shortLine(Point2D p, boolean stopExtruder, boolean closeValve) throws Exception
 	{
 		Printer printer = layerConditions.getPrinter();
 		double shortLen = printer.getExtruder().getShortLength();
 		if(shortLen < 0)
 			return false;
-		Rr2Point a = Rr2Point.sub(posNow(), p);
+		Point2D a = Point2D.sub(posNow(), p);
 		double amod = a.mod();
 		if(amod > shortLen) {
 //			Debug.d("Long segment.  Current feedrate is: " + currentFeedrate);
@@ -228,7 +228,7 @@ public class LayerProducer {
 	 * @param turnOff True if the extruder should be turned off at the end of this segment.
 	 * @throws Exception 
 	 */
-	private void plot(Rr2Point first, Rr2Point second, boolean stopExtruder, boolean closeValve) throws Exception
+	private void plot(Point2D first, Point2D second, boolean stopExtruder, boolean closeValve) throws Exception
 	{
 		Printer printer = layerConditions.getPrinter();
 		if (printer.isCancelled()) return;
@@ -276,7 +276,7 @@ public class LayerProducer {
 			printer.printTo(first.x(), first.y(), z, currentFeedrate, stopExtruder, closeValve);
 	}
 	
-	private void singleMove(Rr2Point p)
+	private void singleMove(Point2D p)
 	{
 		Printer pt = layerConditions.getPrinter();
 		pt.singleMove(p.x(), p.y(), pt.getZ(), pt.getFastXYFeedrate(), true);
@@ -289,7 +289,7 @@ public class LayerProducer {
 	 * @param endUp
 	 * @throws Exception 
 	 */
-	private void move(Rr2Point first, Rr2Point second, boolean startUp, boolean endUp, boolean fast) 
+	private void move(Point2D first, Point2D second, boolean startUp, boolean endUp, boolean fast) 
 		throws Exception
 	{
 		Printer printer = layerConditions.getPrinter();
@@ -348,7 +348,7 @@ public class LayerProducer {
 	 * @return
 	 * @throws Exception 
 	 */
-	private void plot(RrPolygon p, boolean firstOneInLayer) throws Exception
+	private void plot(Polygon p, boolean firstOneInLayer) throws Exception
 	{
 		Attributes att = p.getAttributes();
 		PolygonAttributes pAtt = p.getPolygonAttribute();
@@ -367,11 +367,11 @@ public class LayerProducer {
 		// If the length of the plot is <0.05mm, don't bother with it.
 		// This will not spot an attempt to plot 10,000 points in 1mm.
 		double plotDist=0;
-		Rr2Point lastPoint=p.point(0);
+		Point2D lastPoint=p.point(0);
 		for (int i=1; i<p.size(); i++)
 		{
-			Rr2Point n=p.point(i);
-			plotDist+=Rr2Point.d(lastPoint, n);
+			Point2D n=p.point(i);
+			plotDist+=Point2D.d(lastPoint, n);
 			lastPoint=n;
 		}
 		if (plotDist<Preferences.machineResolution()*0.5) {
@@ -450,7 +450,7 @@ public class LayerProducer {
 		
 		for(int i = 1; i < p.size(); i++)
 		{
-			Rr2Point next = p.point((i+1)%p.size());
+			Point2D next = p.point((i+1)%p.size());
 
 			if (printer.isCancelled())
 			{
@@ -488,7 +488,7 @@ public class LayerProducer {
 		
 		if(simulationPlot != null)
 		{
-			RrPolygonList pgl = new RrPolygonList();
+			PolygonList pgl = new PolygonList();
 			pgl.add(p);
 			simulationPlot.add(pgl);
 		}
@@ -507,7 +507,7 @@ public class LayerProducer {
 		for(int i = 0; i < allPolygons.length; i++)
 		{
 			firstOneInLayer = true;
-			RrPolygonList pl = allPolygons[i];
+			PolygonList pl = allPolygons[i];
 			for(int j = 0; j < pl.size(); j++)
 			{
 				plot(pl.polygon(j), firstOneInLayer);

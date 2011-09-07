@@ -8,10 +8,10 @@ import java.io.PrintStream;
 
 import org.reprap.Printer;
 import org.reprap.Extruder;
-import org.reprap.geometry.polygons.RrHalfPlane;
-import org.reprap.geometry.polygons.RrRectangle;
-import org.reprap.geometry.polygons.Rr2Point;
-import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.HalfSpace2D;
+import org.reprap.geometry.polygons.Rectangle;
+import org.reprap.geometry.polygons.Point2D;
+import org.reprap.geometry.polygons.PolygonList;
 import org.reprap.Preferences;
 import org.reprap.utilities.Debug;
 
@@ -24,7 +24,7 @@ public class LayerRules
 	/**
 	 * The coordinates of the first point plotted in a layer
 	 */
-	private Rr2Point[] firstPoint;
+	private Point2D[] firstPoint;
 	
 	/**
 	 * The extruder first used in a layer
@@ -34,7 +34,7 @@ public class LayerRules
 	/**
 	 * The coordinates of the last point plotted in a layer
 	 */
-	private Rr2Point[] lastPoint;
+	private Point2D[] lastPoint;
 	
 	/**
 	 * The extruder last used in a layer
@@ -159,7 +159,7 @@ public class LayerRules
 	/**
 	 * The XY rectangle that bounds the build
 	 */
-	private RrRectangle bBox;
+	private Rectangle bBox;
 	
 	/**
 	 * 
@@ -171,12 +171,12 @@ public class LayerRules
 	 * @param found
 	 */
 	public LayerRules(Printer p, double modZMax, double macZMax,
-			int modLMax, int macLMax, boolean found, RrRectangle bb)
+			int modLMax, int macLMax, boolean found, Rectangle bb)
 	{
 		printer = p;
 		reversing = false;
 		alreadyReversed = false;
-		bBox = new RrRectangle(bb);	
+		bBox = new Rectangle(bb);	
 		notStartedYet = true;
 
 		topDown = printer.getTopDown();
@@ -200,9 +200,9 @@ public class LayerRules
 		}
 		addToStep = 0;
 		
-		firstPoint = new Rr2Point[machineLayerMax+1];
+		firstPoint = new Point2D[machineLayerMax+1];
 		firstExtruder = new int[machineLayerMax+1];
-		lastPoint = new Rr2Point[machineLayerMax+1];
+		lastPoint = new Point2D[machineLayerMax+1];
 		lastExtruder = new int[machineLayerMax+1];
 		layerZ = new double[machineLayerMax+1];
 		layerFileNames = new String[machineLayerMax+1];
@@ -231,9 +231,9 @@ public class LayerRules
 		layerPointer = 0;
 	}
 	
-	public RrRectangle getBox()
+	public Rectangle getBox()
 	{
-		return new RrRectangle(bBox); // Something horrible happens to return by reference here; hence copy...
+		return new Rectangle(bBox); // Something horrible happens to return by reference here; hence copy...
 	}
 	
 	public boolean getTopDown() { return topDown; }
@@ -254,7 +254,7 @@ public class LayerRules
 	
 	public int getModelLayer() { return modelLayer; }
 	
-	public void setFirstAndLast(RrPolygonList[] pl)
+	public void setFirstAndLast(PolygonList[] pl)
 	{
 		firstPoint[machineLayer] = null;
 		lastPoint[machineLayer] = null;
@@ -309,12 +309,12 @@ public class LayerRules
 	public String getLayerFileName() { return layerFileNames[machineLayer]; }
 	public void setLayerFileName(String s) { layerFileNames[machineLayer] = s; }
 	
-	public Rr2Point getFirstPoint(int layer)
+	public Point2D getFirstPoint(int layer)
 	{
 		return firstPoint[layer];
 	}
 	
-	public Rr2Point getLastPoint(int layer)
+	public Point2D getLastPoint(int layer)
 	{
 		return lastPoint[layer];
 	}
@@ -382,7 +382,7 @@ public class LayerRules
 	 *   
 	 * @return
 	 */
-	public RrHalfPlane getHatchDirection(Extruder e) 
+	public HalfSpace2D getHatchDirection(Extruder e) 
 	{
 		double angle;
 		
@@ -400,7 +400,7 @@ public class LayerRules
 				angle = e.getOddHatchDirection();
 		}
 		angle = angle*Math.PI/180;
-		return new RrHalfPlane(new Rr2Point(0.0, 0.0), new Rr2Point(Math.sin(angle), Math.cos(angle)));
+		return new HalfSpace2D(new Point2D(0.0, 0.0), new Point2D(Math.sin(angle), Math.cos(angle)));
 	}
 	
 	/**

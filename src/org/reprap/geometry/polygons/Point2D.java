@@ -60,7 +60,7 @@ package org.reprap.geometry.polygons;
 /**
  * Class for (x, y) points and vectors
  */
-public class Rr2Point
+public class Point2D
 {
 	/**
 	 * 
@@ -87,7 +87,7 @@ public class Rr2Point
 	/**
 	 * Default to the origin
 	 */
-	public Rr2Point()
+	public Point2D()
 	{
 		x = 0;
 		y = 0;
@@ -98,7 +98,7 @@ public class Rr2Point
 	 * @param a
 	 * @param b
 	 */
-	public Rr2Point(double a, double b)
+	public Point2D(double a, double b)
 	{
 		x = a;
 		y = b;
@@ -108,7 +108,7 @@ public class Rr2Point
 	 * Copy
 	 * @param r Rr2Point to copy from
 	 */
-	public Rr2Point(Rr2Point r)
+	public Point2D(Point2D r)
 	{
 		x = r.x;
 		y = r.y;
@@ -118,7 +118,7 @@ public class Rr2Point
 	 * Overwrite
 	 * @param p Rr2Point containing values to take
 	 */
-	public void set(Rr2Point p)
+	public void set(Point2D p)
 	{
 		x = p.x;
 		y = p.y;
@@ -142,17 +142,17 @@ public class Rr2Point
 	 * Arithmetic
 	 * @return neg of point
 	 */
-	public Rr2Point neg()
+	public Point2D neg()
 	{
-		return new Rr2Point(-x, -y);
+		return new Point2D(-x, -y);
 	}
 	
 	/**
 	 * @return orthogonal of (this) point
 	 */
-	public Rr2Point orthogonal()
+	public Point2D orthogonal()
 	{
-		return new Rr2Point(y, -x);
+		return new Point2D(y, -x);
 	}
 	
 	/**
@@ -160,9 +160,9 @@ public class Rr2Point
 	 * @param b
 	 * @return a new point based on a vector addition of points a and b
 	 */
-	public static Rr2Point add(Rr2Point a, Rr2Point b)
+	public static Point2D add(Point2D a, Point2D b)
 	{
-		Rr2Point r = new Rr2Point(a);
+		Point2D r = new Point2D(a);
 		r.x += b.x;
 		r.y += b.y;
 		return r;
@@ -173,7 +173,7 @@ public class Rr2Point
 	 * @param b
 	 * @return a new point based on a vector subtraction of a - b
 	 */
-	public static Rr2Point sub(Rr2Point a, Rr2Point b)
+	public static Point2D sub(Point2D a, Point2D b)
 	{
 		return add(a, b.neg());
 	}
@@ -185,9 +185,9 @@ public class Rr2Point
 	 * @param factor A scale factor
 	 * @return The point Rr2Point scaled by a factor of factor
 	 */
-	public static Rr2Point mul(Rr2Point b, double factor)
+	public static Point2D mul(Point2D b, double factor)
 	{
-		return new Rr2Point(b.x*factor, b.y*factor);
+		return new Point2D(b.x*factor, b.y*factor);
 	}
 	
 	/**
@@ -195,7 +195,7 @@ public class Rr2Point
 	 * @param b
 	 * @return the point Rr2Point scaled by a factor of a
 	 */
-	public static Rr2Point mul(double a, Rr2Point b)
+	public static Point2D mul(double a, Point2D b)
 	{
 		return mul(b, a);
 	}
@@ -206,7 +206,7 @@ public class Rr2Point
 	 * @param factor A scale factor
 	 * @return The point Rr2Point divided by a factor of a
 	 */
-	public static Rr2Point div(Rr2Point b, double factor)
+	public static Point2D div(Point2D b, double factor)
 	{
 		return mul(b, 1/factor);
 	}
@@ -217,7 +217,7 @@ public class Rr2Point
 	 * @param b
 	 * @return The scalar product of the points
 	 */
-	public static double mul(Rr2Point a, Rr2Point b)
+	public static double mul(Point2D a, Point2D b)
 	{
 		return a.x*b.x + a.y*b.y;
 	}
@@ -237,7 +237,7 @@ public class Rr2Point
 	 * Unit length normalization
 	 * @return normalized unit lenght 
 	 */
-	public Rr2Point norm()
+	public Point2D norm()
 	{
 		return div(this, mod());
 	}
@@ -249,7 +249,7 @@ public class Rr2Point
 	 * @param b
 	 * @return oute product
 	 */
-	public static double op(Rr2Point a, Rr2Point b)
+	public static double op(Point2D a, Point2D b)
 	{
 		return a.x*b.y - a.y*b.x;
 	}
@@ -278,9 +278,9 @@ public class Rr2Point
 	 * @param b
 	 * @return squared distance
 	 */
-	public static double dSquared(Rr2Point a, Rr2Point b)
+	public static double dSquared(Point2D a, Point2D b)
 	{
-		Rr2Point c = sub(a, b);
+		Point2D c = sub(a, b);
 		return mul(c, c);
 	}
 	
@@ -290,7 +290,7 @@ public class Rr2Point
 	 * @param b
 	 * @return distance
 	 */
-	public static double d(Rr2Point a, Rr2Point b)
+	public static double d(Point2D a, Point2D b)
 	{
 		return Math.sqrt(dSquared(a, b));
 	}
@@ -303,7 +303,7 @@ public class Rr2Point
 	 * @return true if the squared distance between points a and b 
 	 * is within tolerance tol_2, otherwise false
 	 */
-	public static boolean same(Rr2Point a, Rr2Point b, double tol_2)
+	public static boolean same(Point2D a, Point2D b, double tol_2)
 	{
 		return dSquared(a, b) < tol_2;
 	}

@@ -60,7 +60,7 @@ import org.reprap.utilities.Debug;
 /**
  * A 2D box is an X and a Y interval
  */
-public class RrRectangle
+public class Rectangle
 {
 	/**
 	 * Compass directions
@@ -73,12 +73,12 @@ public class RrRectangle
 	/**
 	 * X interval
 	 */
-	private RrInterval x = null;
+	private Interval x = null;
 	
 	/**
 	 * Y interval
 	 */
-	private RrInterval y = null;
+	private Interval y = null;
 	
 	/**
 	 * Anyone home?
@@ -120,7 +120,7 @@ public class RrRectangle
 	/**
 	 * Default is empty
 	 */ 
-	public RrRectangle()
+	public Rectangle()
 	{
 		empty = true;
 	}
@@ -139,10 +139,10 @@ public class RrRectangle
 	/**
 	 * Copy constructor
 	 */
-	public RrRectangle(RrRectangle b)
+	public Rectangle(Rectangle b)
 	{
-		x = new RrInterval(b.x);
-		y = new RrInterval(b.y);
+		x = new Interval(b.x);
+		y = new Interval(b.y);
 		empty = b.empty;
 	}
 	
@@ -151,10 +151,10 @@ public class RrRectangle
 	 * @param sw
 	 * @param ne
 	 */
-	public RrRectangle(Rr2Point a, Rr2Point b)
+	public Rectangle(Point2D a, Point2D b)
 	{
-		x = new RrInterval(Math.min(a.x(), b.x()), Math.max(a.x(), b.x()));
-		y = new RrInterval(Math.min(a.y(), b.y()), Math.max(a.y(), b.y()));
+		x = new Interval(Math.min(a.x(), b.x()), Math.max(a.x(), b.x()));
+		y = new Interval(Math.min(a.y(), b.y()), Math.max(a.y(), b.y()));
 		empty = x.empty() || y.empty();
 	}
 	
@@ -163,10 +163,10 @@ public class RrRectangle
 	 * @param sw
 	 * @param ne
 	 */
-	public RrRectangle(RrInterval xi, RrInterval yi)
+	public Rectangle(Interval xi, Interval yi)
 	{
-		x = new RrInterval(xi);
-		y = new RrInterval(yi);
+		x = new Interval(xi);
+		y = new Interval(yi);
 		empty = x.empty() || y.empty();
 	}
 	
@@ -174,14 +174,14 @@ public class RrRectangle
 	/**
 	 * @return Return the x interval
 	 */
-	public RrInterval x() { return x; }
+	public Interval x() { return x; }
 	
 	
 	/**
 	 * @return Return the y interval
 	 * 
 	 */
-	public RrInterval y() { return y; }
+	public Interval y() { return y; }
 	
 	/**
 	 * 
@@ -194,15 +194,15 @@ public class RrRectangle
 	 * Expand the box to incorporate another box or a point
 	 * @param a
 	 */
-	public void expand(RrRectangle a)
+	public void expand(Rectangle a)
 	{
 		if(a.empty)
 			return;
 		if(empty)
 		{
 			empty = false;
-			x = new RrInterval(a.x);
-			y = new RrInterval(a.y);
+			x = new Interval(a.x);
+			y = new Interval(a.y);
 		} else
 		{
 			x.expand(a.x);
@@ -215,10 +215,10 @@ public class RrRectangle
 	 * @param dist
 	 * @return
 	 */
-	public RrRectangle offset(double dist)
+	public Rectangle offset(double dist)
 	{
-		return new RrRectangle(new RrInterval(x.low() - dist, x.high() + dist), 
-				new RrInterval(y.low() - dist, y.high() + dist));
+		return new Rectangle(new Interval(x.low() - dist, x.high() + dist), 
+				new Interval(y.low() - dist, y.high() + dist));
 	}
 	
 	/**
@@ -226,22 +226,22 @@ public class RrRectangle
 	 * @param p
 	 * @return
 	 */
-	public RrRectangle translate(Rr2Point p)
+	public Rectangle translate(Point2D p)
 	{
-		return new RrRectangle(new RrInterval(x.low() + p.x(), x.high() + p.x()), 
-				new RrInterval(y.low() + p.y(), y.high() + p.y()));
+		return new Rectangle(new Interval(x.low() + p.x(), x.high() + p.x()), 
+				new Interval(y.low() + p.y(), y.high() + p.y()));
 	}
 	
 	/**
 	 * @param a
 	 */
-	public void expand(Rr2Point a)
+	public void expand(Point2D a)
 	{
 		if(empty)
 		{
 			empty = false;
-			x = new RrInterval(a.x(), a.x());
-			y = new RrInterval(a.y(), a.y());
+			x = new Interval(a.x(), a.x());
+			y = new Interval(a.y(), a.y());
 		} else
 		{
 			x.expand(a.x());
@@ -253,57 +253,57 @@ public class RrRectangle
 	 * Corner points and center
 	 * @return NE cornerpoint
 	 */
-	public Rr2Point ne()
+	public Point2D ne()
 	{
-		return new Rr2Point(x.high(), y.high());
+		return new Point2D(x.high(), y.high());
 	}
 	
 	/**
 	 * @return SW cornerpoint
 	 */
-	public Rr2Point sw()
+	public Point2D sw()
 	{
-		return new Rr2Point(x.low(), y.low());
+		return new Point2D(x.low(), y.low());
 	}
 	
 	/**
 	 * @return SE cornerpoint
 	 */
-	public Rr2Point se()
+	public Point2D se()
 	{
-		return new Rr2Point(x.high(), y.low());
+		return new Point2D(x.high(), y.low());
 	}
 	
 	/**
 	 * @return NW cornerpoint
 	 */
-	public Rr2Point nw()
+	public Point2D nw()
 	{
-		return new Rr2Point(x.low(), y.high());
+		return new Point2D(x.low(), y.high());
 	}   
 	
 	/**
 	 * @return Centre point
 	 */
-	public Rr2Point centre()
+	public Point2D centre()
 	{
-		return new Rr2Point(x.cen(), y.cen());
+		return new Point2D(x.cen(), y.cen());
 	}	
 	/**
 	 * Scale the box by a factor about its center
 	 * @param f
 	 * @return scaled box object
 	 */
-	public RrRectangle scale(double f)
+	public Rectangle scale(double f)
 	{
-		RrRectangle r = new RrRectangle();
+		Rectangle r = new Rectangle();
 		if(empty)
 			return r;
 		f = 0.5*f;
-		Rr2Point p = new Rr2Point(x.length()*f, y.length()*f);
-		Rr2Point c = centre();
-		r.expand(Rr2Point.add(c, p));
-		r.expand(Rr2Point.sub(c, p));
+		Point2D p = new Point2D(x.length()*f, y.length()*f);
+		Point2D c = centre();
+		r.expand(Point2D.add(c, p));
+		r.expand(Point2D.sub(c, p));
 		return r;
 	}
 	
@@ -325,14 +325,14 @@ public class RrRectangle
 	{
 		if(empty)
 			return 0;
-		return Rr2Point.dSquared(sw(), ne());
+		return Point2D.dSquared(sw(), ne());
 	}
 
 	/**
 	 * Squared distance to a point
 	 * @return minimal squared distance to a point from one of the corners of the box
 	 */
-	public double dSquared(Rr2Point p)
+	public double dSquared(Point2D p)
 	{
 		if(empty)
 			return Double.POSITIVE_INFINITY;
@@ -344,36 +344,36 @@ public class RrRectangle
 			return 0;
 			
 		case 1:
-			d1 = Rr2Point.dSquared(p, nw());
-			d2 = Rr2Point.dSquared(p, ne());
+			d1 = Point2D.dSquared(p, nw());
+			d2 = Point2D.dSquared(p, ne());
 			break;
 			
 		case 2:
-			d1 = Rr2Point.dSquared(p, ne());
-			d2 = Rr2Point.dSquared(p, se());
+			d1 = Point2D.dSquared(p, ne());
+			d2 = Point2D.dSquared(p, se());
 			break;
 			
 		case 3:
-			return Rr2Point.dSquared(p, ne());
+			return Point2D.dSquared(p, ne());
 			
 		case 4:
-			d1 = Rr2Point.dSquared(p, sw());
-			d2 = Rr2Point.dSquared(p, se());
+			d1 = Point2D.dSquared(p, sw());
+			d2 = Point2D.dSquared(p, se());
 			break;
 			
 		case 6:
-			return Rr2Point.dSquared(p, se());
+			return Point2D.dSquared(p, se());
 			
 		case 8:
-			d1 = Rr2Point.dSquared(p, sw());
-			d2 = Rr2Point.dSquared(p, nw());
+			d1 = Point2D.dSquared(p, sw());
+			d2 = Point2D.dSquared(p, nw());
 			break;
 			
 		case 9:
-			return Rr2Point.dSquared(p, nw());
+			return Point2D.dSquared(p, nw());
 			
 		case 12:
-			return Rr2Point.dSquared(p, sw());
+			return Point2D.dSquared(p, sw());
 			
 		default:
 			Debug.e("RrRectangle.dSquared(): dud value from point_relative()!");	
@@ -392,25 +392,25 @@ public class RrRectangle
 	 * @param oldRange
 	 * @return intersection interval
 	 */
-	public RrInterval wipe(RrLine a, RrInterval oldRange)
+	public Interval wipe(Line a, Interval oldRange)
 	{
 		if(oldRange.empty()) return oldRange;
 		
-		RrInterval range = new RrInterval(oldRange);
+		Interval range = new Interval(oldRange);
 		
-		RrHalfPlane hp = new RrHalfPlane(sw(), nw());
+		HalfSpace2D hp = new HalfSpace2D(sw(), nw());
 		range = hp.wipe(a, range);
 		if(range.empty()) return range;
 		
-		hp = new RrHalfPlane(nw(), ne());
+		hp = new HalfSpace2D(nw(), ne());
 		range = hp.wipe(a, range);
 		if(range.empty()) return range;
 		
-		hp = new RrHalfPlane(ne(), se());
+		hp = new HalfSpace2D(ne(), se());
 		range = hp.wipe(a, range);
 		if(range.empty()) return range;
 		
-		hp = new RrHalfPlane(se(), sw());
+		hp = new HalfSpace2D(se(), sw());
 		range = hp.wipe(a, range);
 		return range;
 	}
@@ -420,7 +420,7 @@ public class RrRectangle
 	 * @param p 
 	 * @return relative position of a point p (E, W, N or S)
 	 */
-	public byte pointRelative(Rr2Point p)
+	public byte pointRelative(Point2D p)
 	{
 		byte result = 0;
 		if(p.x() >= x.high())
@@ -440,13 +440,13 @@ public class RrRectangle
 	 * @param b
 	 * @return
 	 */
-	public static RrRectangle intersection(RrRectangle a, RrRectangle b)
+	public static Rectangle intersection(Rectangle a, Rectangle b)
 	{
 		if(a.empty)
 			return a;
 		if(b.empty)
 			return b;
-		return new RrRectangle(RrInterval.intersection(a.x, b.x), RrInterval.intersection(a.y, b.y));	
+		return new Rectangle(Interval.intersection(a.x, b.x), Interval.intersection(a.y, b.y));	
 	}
 	
 	/**
@@ -455,13 +455,13 @@ public class RrRectangle
 	 * @param b
 	 * @return
 	 */
-	public static RrRectangle union(RrRectangle a, RrRectangle b)
+	public static Rectangle union(Rectangle a, Rectangle b)
 	{
 		if(a.empty)
 			return b;
 		if(b.empty)
 			return a;
-		return new RrRectangle(RrInterval.union(a.x, b.x), RrInterval.union(a.y, b.y));	
+		return new Rectangle(Interval.union(a.x, b.x), Interval.union(a.y, b.y));	
 	}
 }
 

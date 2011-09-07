@@ -5,12 +5,12 @@ import org.reprap.Preferences;
 import org.reprap.Printer;
 import org.reprap.Extruder;
 import org.reprap.Attributes;
-import org.reprap.geometry.polygons.Rr2Point;
-import org.reprap.geometry.polygons.RrRectangle;
+import org.reprap.geometry.polygons.Point2D;
+import org.reprap.geometry.polygons.Rectangle;
 import org.reprap.geometry.polygons.AllSTLsToBuild;
-import org.reprap.geometry.polygons.RrPolygonList;
-import org.reprap.geometry.polygons.RrPolygon;
-import org.reprap.geometry.polygons.RrCSG;
+import org.reprap.geometry.polygons.PolygonList;
+import org.reprap.geometry.polygons.Polygon;
+import org.reprap.geometry.polygons.CSG;
 import org.reprap.geometry.polygons.BooleanGrid;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.utilities.Debug;
@@ -48,9 +48,9 @@ public class Producer {
 		
 		allSTLs = bld.getSTLs();
 		
-		RrRectangle gp = allSTLs.ObjectPlanRectangle();
-		gp = new RrRectangle(new Rr2Point(gp.x().low() - 6, gp.y().low() - 6), 
-		new Rr2Point(gp.x().high() + 6, gp.y().high() + 6));
+		Rectangle gp = allSTLs.ObjectPlanRectangle();
+		gp = new Rectangle(new Point2D(gp.x().low() - 6, gp.y().low() - 6), 
+		new Point2D(gp.x().high() + 6, gp.y().high() + 6));
 		if(Preferences.simulate())
 		{
 			simulationPlot = new RrGraphics("RepRap building simulation");
@@ -158,16 +158,16 @@ public class Producer {
 		}
 	}
 
-	private void fillFoundationRectangle(Printer reprap, RrRectangle gp) throws Exception
+	private void fillFoundationRectangle(Printer reprap, Rectangle gp) throws Exception
 	{
-		RrPolygonList shield = new RrPolygonList();
+		PolygonList shield = new PolygonList();
 		Extruder e = reprap.getExtruder();
 		Attributes fa = new Attributes(e.getMaterial(), null, null, e.getAppearance());
 //		if(Preferences.loadGlobalBool("Shield")) // Should the foundation have a shield, or not?
 //			shield.add(allSTLs.shieldPolygon(fa));
-		RrCSG rect = RrCSG.RrCSGFromBox(gp);
+		CSG rect = CSG.RrCSGFromBox(gp);
 		BooleanGrid bg = new BooleanGrid(rect, gp.scale(1.1), fa);
-		RrPolygonList h[] = {shield, bg.hatch(layerRules.getHatchDirection(e), layerRules.getHatchWidth(e), bg.attribute())};
+		PolygonList h[] = {shield, bg.hatch(layerRules.getHatchDirection(e), layerRules.getHatchWidth(e), bg.attribute())};
 		LayerProducer lp = new LayerProducer(h, layerRules, simulationPlot);
 		lp.plot();
 		reprap.getExtruder().stopExtruding();
@@ -201,7 +201,7 @@ public class Producer {
 //		layerRules.setLayingSupport(false);
 //	}
 	
-	private void layFoundationTopDown(RrRectangle gp) throws Exception
+	private void layFoundationTopDown(Rectangle gp) throws Exception
 	{
 		if(layerRules.getFoundationLayers() <= 0)
 			return;
@@ -263,9 +263,9 @@ public class Producer {
 			}
 		}
 		
-		RrPolygonList allPolygons[] = new RrPolygonList[totalPhysicalExtruders];
-		RrPolygonList tempBorderPolygons[] = new RrPolygonList[totalPhysicalExtruders];
-		RrPolygonList tempFillPolygons[] = new RrPolygonList[totalPhysicalExtruders];
+		PolygonList allPolygons[] = new PolygonList[totalPhysicalExtruders];
+		PolygonList tempBorderPolygons[] = new PolygonList[totalPhysicalExtruders];
+		PolygonList tempFillPolygons[] = new PolygonList[totalPhysicalExtruders];
 		
 		boolean firstTimeRound = true;
 		
@@ -290,36 +290,36 @@ public class Producer {
 			
 
 			for(int physicalExtruder = 0; physicalExtruder < allPolygons.length; physicalExtruder++)
-				allPolygons[physicalExtruder] = new RrPolygonList();
+				allPolygons[physicalExtruder] = new PolygonList();
 			
 			boolean shield = true;
-			Rr2Point startNearHere = new Rr2Point(0, 0);
+			Point2D startNearHere = new Point2D(0, 0);
 			for(int stl = 0; stl < allSTLs.size(); stl++)
 			{
-					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules);
-					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
+					PolygonList fills = allSTLs.computeInfill(stl, layerRules);
+					PolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
 					fills = fills.cullShorts();
 					shield = false;
-					RrPolygonList support = allSTLs.computeSupport(stl, layerRules);
+					PolygonList support = allSTLs.computeSupport(stl, layerRules);
 					
 					for(int physicalExtruder = 0; physicalExtruder < allPolygons.length; physicalExtruder++)
 					{
-						tempBorderPolygons[physicalExtruder] = new RrPolygonList();
-						tempFillPolygons[physicalExtruder] = new RrPolygonList();
+						tempBorderPolygons[physicalExtruder] = new PolygonList();
+						tempFillPolygons[physicalExtruder] = new PolygonList();
 					}
 					for(int pol = 0; pol < borders.size(); pol++)
 					{
-						RrPolygon p = borders.polygon(pol);
+						Polygon p = borders.polygon(pol);
 						tempBorderPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
 					for(int pol = 0; pol < fills.size(); pol++)
 					{
-						RrPolygon p = fills.polygon(pol);
+						Polygon p = fills.polygon(pol);
 						tempFillPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
 					for(int pol = 0; pol < support.size(); pol++)
 					{
-						RrPolygon p = support.polygon(pol);
+						Polygon p = support.polygon(pol);
 						tempFillPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
 					
@@ -333,7 +333,7 @@ public class Producer {
 							tempBorderPolygons[physicalExtruder] = tempBorderPolygons[physicalExtruder].nearEnds(startNearHere, false, -1);
 							if(tempBorderPolygons[physicalExtruder].size() > 0)
 							{
-								RrPolygon last = tempBorderPolygons[physicalExtruder].polygon(tempBorderPolygons[physicalExtruder].size() - 1);
+								Polygon last = tempBorderPolygons[physicalExtruder].polygon(tempBorderPolygons[physicalExtruder].size() - 1);
 								startNearHere = last.point(last.size() - 1);
 							}
 							allPolygons[physicalExtruder].add(tempBorderPolygons[physicalExtruder]);
@@ -346,7 +346,7 @@ public class Producer {
 							tempFillPolygons[physicalExtruder] = tempFillPolygons[physicalExtruder].nearEnds(startNearHere, false, -1);
 							if(tempFillPolygons[physicalExtruder].size() > 0)
 							{
-								RrPolygon last = tempFillPolygons[physicalExtruder].polygon(tempFillPolygons[physicalExtruder].size() - 1);
+								Polygon last = tempFillPolygons[physicalExtruder].polygon(tempFillPolygons[physicalExtruder].size() - 1);
 								startNearHere = last.point(last.size() - 1);
 							}
 							allPolygons[physicalExtruder].add(tempFillPolygons[physicalExtruder]);

@@ -127,19 +127,19 @@ package org.reprap.geometry.polygons;
 /**
  * Class to hold and manipulate linear half-planes
  */
-public class RrHalfPlane
+public class HalfSpace2D
 {
 	
 	/**
 	 * The half-plane is normal*(x, y) + offset <= 0 
 	 */
-	private Rr2Point normal = null; 
+	private Point2D normal = null; 
 	private double offset;
 	
 	/**
 	 * Keep the parametric equivalent to save computing it
 	 */
-	private RrLine p = null;
+	private Line p = null;
 	
 	/**
 	 * List of intersections with others
@@ -192,12 +192,12 @@ public class RrHalfPlane
 	 * Convert a parametric line
 	 * @param l
 	 */
-	public RrHalfPlane(RrLine l)
+	public HalfSpace2D(Line l)
 	{
-		p = new RrLine(l);
+		p = new Line(l);
 		p.norm();
-		normal = new Rr2Point(-p.direction().y(), p.direction().x());
-		offset = -Rr2Point.mul(l.origin(), normal());
+		normal = new Point2D(-p.direction().y(), p.direction().x());
+		offset = -Point2D.mul(l.origin(), normal());
 		//crossings = new ArrayList<lineIntersection>();
 	}
 	
@@ -206,20 +206,20 @@ public class RrHalfPlane
 	 * @param a
 	 * @param b
 	 */
-	public RrHalfPlane(Rr2Point a, Rr2Point b)
+	public HalfSpace2D(Point2D a, Point2D b)
 	{
-		this(new RrLine(a, b));
+		this(new Line(a, b));
 	}   
 	
 	/**
 	 * Deep copy
 	 * @param a
 	 */
-	public RrHalfPlane(RrHalfPlane a)
+	public HalfSpace2D(HalfSpace2D a)
 	{
-		normal = new Rr2Point(a.normal);
+		normal = new Point2D(a.normal);
 		offset = a.offset;
-		p = new RrLine(a.p);
+		p = new Line(a.p);
 		//crossings = new ArrayList<lineIntersection>(); // No point in deep copy -
 		                             // No pointers would match
 	}
@@ -228,7 +228,7 @@ public class RrHalfPlane
 	 * Get the parametric equivalent
 	 * @return parametric equivalent of a line
 	 */
-	public RrLine pLine()
+	public Line pLine()
 	{
 		return p;
 	}
@@ -582,7 +582,7 @@ public class RrHalfPlane
 	 * Get the components
 	 * @return components?
 	 */
-	public Rr2Point normal() { return normal; }
+	public Point2D normal() { return normal; }
 	public double offset() { return offset; }
 	
 	/**
@@ -593,7 +593,7 @@ public class RrHalfPlane
 	 * @return 0 if the distance between halfplane a and b is less then the tolerance, -1 if one
 	 * is the complement of the other within the tolerance, otherwise 1
 	 */
-	public static int same(RrHalfPlane a, RrHalfPlane b, double tolerance)
+	public static int same(HalfSpace2D a, HalfSpace2D b, double tolerance)
 	{
 		if(a == b)
 			return 0;
@@ -637,9 +637,9 @@ public class RrHalfPlane
 	 * Change the sense
 	 * @return complent of half plane
 	 */
-	public RrHalfPlane complement()
+	public HalfSpace2D complement()
 	{
-		RrHalfPlane r = new RrHalfPlane(this);
+		HalfSpace2D r = new HalfSpace2D(this);
 		r.normal = r.normal.neg();
 		r.offset = -r.offset;
 		r.p = r.p.neg();
@@ -651,9 +651,9 @@ public class RrHalfPlane
 	 * @param d
 	 * @return offset halfplane
 	 */
-	public RrHalfPlane offset(double d)
+	public HalfSpace2D offset(double d)
 	{
-		RrHalfPlane r = new RrHalfPlane(this);
+		HalfSpace2D r = new HalfSpace2D(this);
 		r.offset = r.offset - d;
 		r.p = p.offset(d);
 		return r;
@@ -665,9 +665,9 @@ public class RrHalfPlane
 	 * @param p
 	 * @return potential value of point p
 	 */
-	public double value(Rr2Point p)
+	public double value(Point2D p)
 	{
-		return offset + Rr2Point.mul(normal, p);
+		return offset + Point2D.mul(normal, p);
 	}
 	
 	
@@ -676,40 +676,40 @@ public class RrHalfPlane
 	 * @param b
 	 * @return potential interval of box b
 	 */
-	public RrInterval value(RrRectangle b)
+	public Interval value(Rectangle b)
 	{
-		return RrInterval.add(RrInterval.add((RrInterval.mul(b.x(), normal.x())), 
-				(RrInterval.mul(b.y(), normal.y()))), offset);
+		return Interval.add(Interval.add((Interval.mul(b.x(), normal.x())), 
+				(Interval.mul(b.y(), normal.y()))), offset);
 	}
 	
 	/**
 	 * The point where another line crosses
 	 * @param a
 	 * @return cross point
-	 * @throws RrParallelLineException
+	 * @throws ParallelException
 	 */
-	public Rr2Point cross_point(RrHalfPlane a) throws RrParallelLineException
+	public Point2D cross_point(HalfSpace2D a) throws ParallelException
 	{
-		double det = Rr2Point.op(normal, a.normal);
+		double det = Point2D.op(normal, a.normal);
 		if(det == 0)
-			throw new RrParallelLineException("cross_point: parallel lines.");
+			throw new ParallelException("cross_point: parallel lines.");
 		det = 1/det;
 		double x = normal.y()*a.offset - a.normal.y()*offset;
 		double y = a.normal.x()*offset - normal.x()*a.offset;
-		return new Rr2Point(x*det, y*det);
+		return new Point2D(x*det, y*det);
 	}
 	
 	/**
 	 * Parameter value where a line crosses
 	 * @param a
 	 * @return parameter value
-	 * @throws RrParallelLineException
+	 * @throws ParallelException
 	 */
-	public double cross_t(RrLine a) throws RrParallelLineException 
+	public double cross_t(Line a) throws ParallelException 
 	{
-		double det = Rr2Point.mul(a.direction(), normal);
+		double det = Point2D.mul(a.direction(), normal);
 		if (det == 0)
-			throw new RrParallelLineException("cross_t: parallel lines.");  
+			throw new ParallelException("cross_t: parallel lines.");  
 		return -value(a.origin())/det;
 	}
 	
@@ -717,9 +717,9 @@ public class RrHalfPlane
 	 * Point where a parametric line crosses
 	 * @param a
 	 * @return cross point
-	 * @throws RrParallelLineException
+	 * @throws ParallelException
 	 */
-	public Rr2Point cross_point(RrLine a) throws RrParallelLineException
+	public Point2D cross_point(Line a) throws ParallelException
 	{
 		return a.point(cross_t(a));
 	}
@@ -732,13 +732,13 @@ public class RrHalfPlane
 	 * @param range
 	 * @return intersection interval
 	 */
-	public RrInterval wipe(RrLine a, RrInterval range)
+	public Interval wipe(Line a, Interval range)
 	{
 		if(range.empty()) return range;
 		
 		// Which way is the line pointing relative to our normal?
 		
-		boolean wipe_down = (Rr2Point.mul(a.direction(), normal) >= 0);
+		boolean wipe_down = (Point2D.mul(a.direction(), normal) >= 0);
 		
 		double t;
 		
@@ -750,27 +750,27 @@ public class RrHalfPlane
 				if(wipe_down)
 					return range;
 				else
-					return new RrInterval();
+					return new Interval();
 			} else if (t <= range.low())
 			{
 				if(wipe_down)
-					return new RrInterval();
+					return new Interval();
 				else
 					return range;                
 			} else
 			{
 				if(wipe_down)
-					return new RrInterval(range.low(), t);
+					return new Interval(range.low(), t);
 				else
-					return new RrInterval(t, range.high());                 
+					return new Interval(t, range.high());                 
 			}
-		} catch (RrParallelLineException ple)
+		} catch (ParallelException ple)
 		{
 			t = value(a.origin());
 			if(t <= 0)
 				return range;
 			else
-				return new RrInterval();  
+				return new Interval();  
 		}
 	}
 }
