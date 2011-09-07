@@ -70,7 +70,7 @@ import java.util.List;
 import org.reprap.geometry.polygons.BooleanGrid;
 import org.reprap.geometry.polygons.Point2D;
 import org.reprap.geometry.polygons.Rectangle;
-import org.reprap.geometry.polygons.HalfSpace2D;
+import org.reprap.geometry.polygons.HalfPlane;
 import org.reprap.geometry.polygons.Interval;
 import org.reprap.geometry.polygons.Polygon;
 import org.reprap.geometry.polygons.PolygonList;
@@ -141,7 +141,7 @@ public class RrGraphics
 	/**
 	 * 
 	 */
-	private List<HalfSpace2D> hp = null;
+	private List<HalfPlane> hp = null;
 	
 	/**
 	 * 

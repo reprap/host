@@ -1372,7 +1372,7 @@ public class Polygon
 	/**
 	 * @return Convex hull as a CSG expression
 	 */
-	public CSG CSGConvexHull()
+	public CSG2D CSGConvexHull()
 	{
 		List<Integer> ls = listConvexHull();
 		return toCSGHull(ls);
@@ -1475,15 +1475,15 @@ public class Polygon
 	 * @param hullPoints
 	 * @return CSG representation
 	 */	
-	private CSG toCSGHull(List<Integer> hullPoints)
+	private CSG2D toCSGHull(List<Integer> hullPoints)
 	{
 		Point2D p, q;
-		CSG hull = CSG.universe();
+		CSG2D hull = CSG2D.universe();
 		p = listPoint(hullPoints.size() - 1, hullPoints);
 		for(int i = 0; i < hullPoints.size(); i++)
 		{
 			q = listPoint(i, hullPoints);
-			hull = CSG.intersection(hull, new CSG(new HalfSpace2D(p, q)));
+			hull = CSG2D.intersection(hull, new CSG2D(new HalfPlane(p, q)));
 			p = q;
 		}
 
@@ -1495,7 +1495,7 @@ public class Polygon
 	 * @param inConsideration
 	 * @param hull
 	 */		
-	private void outsideHull(List<Integer> inConsideration, CSG hull)
+	private void outsideHull(List<Integer> inConsideration, CSG2D hull)
 	{
 		Point2D p;
 		double small = Math.sqrt(Preferences.tiny());
@@ -1546,10 +1546,10 @@ public class Polygon
 		// Repeatedly add the point that's farthest outside the current hull
 		
 		int corner, after;
-		CSG hull;
+		CSG2D hull;
 		double v, vMax;
 		Point2D p, q;
-		HalfSpace2D hp;
+		HalfPlane hp;
 		while(inConsideration.size() > 0)
 		{
 			vMax = 0;   // Need epsilon?
@@ -1561,7 +1561,7 @@ public class Polygon
 				for(i = 0; i < result.size(); i++)
 				{
 					q = listPoint(i, result);
-					hp = new HalfSpace2D(p, q);
+					hp = new HalfPlane(p, q);
 					v = hp.value(listPoint(testPoint, inConsideration));
 					if(result.size() == 2)
 						v = Math.abs(v);
@@ -1680,7 +1680,7 @@ public class Polygon
 	 * @param level
 	 * @return CSG representation
 	 */
-	private CSG toCSGRecursive(List<Integer> a, int level, boolean closed, int[] flags)
+	private CSG2D toCSGRecursive(List<Integer> a, int level, boolean closed, int[] flags)
 	{	
 		flagSet(level, a, flags);	
 		level++;
@@ -1689,17 +1689,17 @@ public class Polygon
 		{
 			Debug.e("toCSGRecursive() - null convex hull: " + ch.size() +
 					" points.");
-			return CSG.nothing();
+			return CSG2D.nothing();
 		}
 		
 		flagSet(level, ch, flags);
-		CSG hull;
+		CSG2D hull;
 
 
 		if(level%2 == 1)
-			hull = CSG.universe();
+			hull = CSG2D.universe();
 		else
-			hull = CSG.nothing();
+			hull = CSG2D.nothing();
 
 		// Set-theoretically combine all the real edges on the convex hull
 
@@ -1722,11 +1722,11 @@ public class Polygon
 
 			if(oldFlag == level && flag == level)
 			{
-				HalfSpace2D hp = new HalfSpace2D(listPoint(oldi, a), listPoint(i, a));
+				HalfPlane hp = new HalfPlane(listPoint(oldi, a), listPoint(i, a));
 				if(level%2 == 1)
-					hull = CSG.intersection(hull, new CSG(hp));
+					hull = CSG2D.intersection(hull, new CSG2D(hp));
 				else
-					hull = CSG.union(hull, new CSG(hp));
+					hull = CSG2D.union(hull, new CSG2D(hp));
 			} 
 			
 			oldi = i;
@@ -1739,10 +1739,10 @@ public class Polygon
 		while(section != null)
 		{
 			if(level%2 == 1)
-				hull = CSG.intersection(hull,
+				hull = CSG2D.intersection(hull,
 						toCSGRecursive(section, level, false, flags));
 			else
-				hull = CSG.union(hull, 
+				hull = CSG2D.union(hull, 
 						toCSGRecursive(section, level, false, flags));
 			section = polSection(a, level, flags);
 		}
@@ -1755,7 +1755,7 @@ public class Polygon
 	 * @param tolerance
 	 * @return CSG polygon object based on polygon and tolerance 
 	 */
-	public CSG toCSG(double tolerance)
+	public CSG2D toCSG(double tolerance)
 	{
 		
 		Polygon copy = new Polygon(this);
@@ -1764,7 +1764,7 @@ public class Polygon
 
 		List<Integer> all = copy.allPoints();
 		int [] flags = new int[copy.size()];
-		CSG expression = copy.toCSGRecursive(all, 0, true, flags);
+		CSG2D expression = copy.toCSGRecursive(all, 0, true, flags);
 
 		//RrRectangle b = copy.box.scale(1.1);
 		//expression = expression.simplify(tolerance);

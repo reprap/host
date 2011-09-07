@@ -898,7 +898,7 @@ public class AllSTLsToBuild
 
 					// Build the bridge
 
-					result.hatchedPolygons.add(bridge.hatch(new HalfSpace2D(new Point2D(0,0), bridgeDirection), 
+					result.hatchedPolygons.add(bridge.hatch(new HalfPlane(new Point2D(0,0), bridgeDirection), 
 							bridge.attribute().getExtruder().getExtrusionInfillWidth(), 
 							bridge.attribute()));
 					
@@ -1142,7 +1142,7 @@ public class AllSTLsToBuild
 		double z = layerRules.getModelZ(layer) + layerRules.getZStep()*0.5;
 		Extruder[] extruders = layerRules.getPrinter().getExtruders();
 		result = new BooleanGridList();
-		CSG csgp = null;
+		CSG2D csgp = null;
 		PolygonList pgl = new PolygonList();
 		int extruderID;
 		

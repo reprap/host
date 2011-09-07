@@ -8,7 +8,7 @@ import java.io.PrintStream;
 
 import org.reprap.Printer;
 import org.reprap.Extruder;
-import org.reprap.geometry.polygons.HalfSpace2D;
+import org.reprap.geometry.polygons.HalfPlane;
 import org.reprap.geometry.polygons.Rectangle;
 import org.reprap.geometry.polygons.Point2D;
 import org.reprap.geometry.polygons.PolygonList;
@@ -382,7 +382,7 @@ public class LayerRules
 	 *   
 	 * @return
 	 */
-	public HalfSpace2D getHatchDirection(Extruder e) 
+	public HalfPlane getHatchDirection(Extruder e) 
 	{
 		double angle;
 		
@@ -400,7 +400,7 @@ public class LayerRules
 				angle = e.getOddHatchDirection();
 		}
 		angle = angle*Math.PI/180;
-		return new HalfSpace2D(new Point2D(0.0, 0.0), new Point2D(Math.sin(angle), Math.cos(angle)));
+		return new HalfPlane(new Point2D(0.0, 0.0), new Point2D(Math.sin(angle), Math.cos(angle)));
 	}
 	
 	/**

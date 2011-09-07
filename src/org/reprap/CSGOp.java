@@ -51,7 +51,7 @@ http://www.gnu.org/
  * CSG operators; Null and Universal sets, and leaf nodes
  * First version 6 March 2006
  */
-package org.reprap.geometry.polygons;
+package org.reprap;
 
 
 /**

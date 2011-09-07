@@ -865,7 +865,7 @@ public class BooleanGrid
 	 * Build the grid from a CSG expression
 	 * @param csgP
 	 */
-	public BooleanGrid(CSG csgExp, Rectangle rectangle, Attributes a)
+	public BooleanGrid(CSG2D csgExp, Rectangle rectangle, Attributes a)
 	{
 		att = a;
 		Rectangle ri = rectangle.offset(rSwell);
@@ -1077,12 +1077,12 @@ public class BooleanGrid
 		r = Math.abs(r);
 		Point2D rp0 = new Point2D(p0.x, p0.y);
 		Point2D rp1 = new Point2D(p1.x, p1.y);
-		HalfSpace2D[] h = new HalfSpace2D[4];
-		h[0] = new HalfSpace2D(rp0, rp1);
+		HalfPlane[] h = new HalfPlane[4];
+		h[0] = new HalfPlane(rp0, rp1);
 		h[2] = h[0].offset(r);
 		h[0] = h[0].offset(-r).complement();
-		h[1] = new HalfSpace2D(rp0, Point2D.add(rp0, h[2].normal()));
-		h[3] = new HalfSpace2D(rp1, Point2D.add(rp1, h[0].normal()));
+		h[1] = new HalfPlane(rp0, Point2D.add(rp0, h[2].normal()));
+		h[3] = new HalfPlane(rp1, Point2D.add(rp1, h[0].normal()));
 		double xMin = Double.MAX_VALUE;
 		double xMax = Double.MIN_VALUE;
 		Point2D p = null;
@@ -1159,7 +1159,7 @@ public class BooleanGrid
 	 * @param ipne
 	 * @param v
 	 */
-	private void heterogeneous(iPoint ipsw, iPoint ipne, CSG csgExpression)
+	private void heterogeneous(iPoint ipsw, iPoint ipne, CSG2D csgExpression)
 	{
 		for(int x = ipsw.x; x <= ipne.x; x++)
 			for(int y = ipsw.y; y <= ipne.y; y++)
@@ -1306,7 +1306,7 @@ public class BooleanGrid
 	 * @param ipne
 	 * @param csg
 	 */
-	private void generateQuadTree(iPoint ipsw, iPoint ipne, CSG csgExpression)
+	private void generateQuadTree(iPoint ipsw, iPoint ipne, CSG2D csgExpression)
 	{
 		Point2D inc = new Point2D(pixSize*0.5, pixSize*0.5);
 		Point2D p0 = ipsw.realPoint();
@@ -2132,7 +2132,7 @@ public class BooleanGrid
 	 * @param h
 	 * @return
 	 */
-	private iPolygon hatch(HalfSpace2D h)
+	private iPolygon hatch(HalfPlane h)
 	{
 		iPolygon result = new iPolygon(false);
 		
@@ -2186,12 +2186,12 @@ public class BooleanGrid
      * @param targetP
      * @return polygon edge between start/originaPlane and targetPlane
      */
-    private SnakeEnd goToPlane(iPoint start, List<HalfSpace2D> hatches, int originP, int targetP) 
+    private SnakeEnd goToPlane(iPoint start, List<HalfPlane> hatches, int originP, int targetP) 
     {
     	iPolygon track = new iPolygon(false);
     	
-    	HalfSpace2D originPlane = hatches.get(originP);
-    	HalfSpace2D targetPlane = hatches.get(targetP);
+    	HalfPlane originPlane = hatches.get(originP);
+    	HalfPlane targetPlane = hatches.get(targetP);
     	
 
     		int dir = directionToNeighbour(originPlane.normal());
@@ -2251,7 +2251,7 @@ public class BooleanGrid
      * @param end
      * @return
      */
-    private iPolygon goToPoint(iPoint start, iPoint end, HalfSpace2D hatch, double tooFar) 
+    private iPolygon goToPoint(iPoint start, iPoint end, HalfPlane hatch, double tooFar) 
     {
     	iPolygon track = new iPolygon(false);
     	
@@ -2308,7 +2308,7 @@ public class BooleanGrid
      * @param thisPt
      * @return
      */
-	private iPolygon snakeGrow(iPolygonList ipl, List<HalfSpace2D> hatches, int thisHatch, int thisPt) 
+	private iPolygon snakeGrow(iPolygonList ipl, List<HalfPlane> hatches, int thisHatch, int thisPt) 
 	{
 		iPolygon result = new iPolygon(false);
 		
@@ -2346,7 +2346,7 @@ public class BooleanGrid
 	 * @param hatches
 	 * @return
 	 */
-	HalfSpace2D hPlane(iPoint p, List<HalfSpace2D> hatches)
+	HalfPlane hPlane(iPoint p, List<HalfPlane> hatches)
 	{
 		int bot = 0;
 		int top = hatches.size() - 1;
@@ -2378,7 +2378,7 @@ public class BooleanGrid
 	 * @param hatches
 	 * @param gap
 	 */
-	void joinUpSnakes(iPolygonList snakes, List<HalfSpace2D> hatches, double gap)
+	void joinUpSnakes(iPolygonList snakes, List<HalfPlane> hatches, double gap)
 	{
 		int i = 0;
 		if(hatches.size() <= 0)
@@ -2479,7 +2479,7 @@ public class BooleanGrid
 	 * @param a
 	 * @return a polygon list of hatch lines as the result with attributes a
 	 */
-	public PolygonList hatch(HalfSpace2D hp, double gap, Attributes a) //, Rr2Point startNearHere)
+	public PolygonList hatch(HalfPlane hp, double gap, Attributes a) //, Rr2Point startNearHere)
 	{	
 		//push("Computing hatching... ");
 		
@@ -2514,10 +2514,10 @@ public class BooleanGrid
 			break;
 		}
 		
-		HalfSpace2D hatcher = new 
-			HalfSpace2D(org, Point2D.add(org, hp.pLine().direction()));
+		HalfPlane hatcher = new 
+			HalfPlane(org, Point2D.add(org, hp.pLine().direction()));
 
-		List<HalfSpace2D> hatches = new ArrayList<HalfSpace2D>();
+		List<HalfPlane> hatches = new ArrayList<HalfPlane>();
 		iPolygonList iHatches = new iPolygonList();
 		
 		double g = 0;		
@@ -2593,7 +2593,7 @@ public class BooleanGrid
 			iRectangle newRec = new iRectangle(result.rec);
 			newRec.size.x = 1;
 			newRec.size.y = 1;
-			return new BooleanGrid(CSG.nothing(), newRec.realRectangle(), att);
+			return new BooleanGrid(CSG2D.nothing(), newRec.realRectangle(), att);
 		}
 
 		for(int p = 0; p < polygons.size(); p++)

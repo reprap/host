@@ -127,7 +127,7 @@ package org.reprap.geometry.polygons;
 /**
  * Class to hold and manipulate linear half-planes
  */
-public class HalfSpace2D
+public class HalfPlane
 {
 	
 	/**
@@ -192,7 +192,7 @@ public class HalfSpace2D
 	 * Convert a parametric line
 	 * @param l
 	 */
-	public HalfSpace2D(Line l)
+	public HalfPlane(Line l)
 	{
 		p = new Line(l);
 		p.norm();
@@ -206,7 +206,7 @@ public class HalfSpace2D
 	 * @param a
 	 * @param b
 	 */
-	public HalfSpace2D(Point2D a, Point2D b)
+	public HalfPlane(Point2D a, Point2D b)
 	{
 		this(new Line(a, b));
 	}   
@@ -215,7 +215,7 @@ public class HalfSpace2D
 	 * Deep copy
 	 * @param a
 	 */
-	public HalfSpace2D(HalfSpace2D a)
+	public HalfPlane(HalfPlane a)
 	{
 		normal = new Point2D(a.normal);
 		offset = a.offset;
@@ -593,7 +593,7 @@ public class HalfSpace2D
 	 * @return 0 if the distance between halfplane a and b is less then the tolerance, -1 if one
 	 * is the complement of the other within the tolerance, otherwise 1
 	 */
-	public static int same(HalfSpace2D a, HalfSpace2D b, double tolerance)
+	public static int same(HalfPlane a, HalfPlane b, double tolerance)
 	{
 		if(a == b)
 			return 0;
@@ -637,9 +637,9 @@ public class HalfSpace2D
 	 * Change the sense
 	 * @return complent of half plane
 	 */
-	public HalfSpace2D complement()
+	public HalfPlane complement()
 	{
-		HalfSpace2D r = new HalfSpace2D(this);
+		HalfPlane r = new HalfPlane(this);
 		r.normal = r.normal.neg();
 		r.offset = -r.offset;
 		r.p = r.p.neg();
@@ -651,9 +651,9 @@ public class HalfSpace2D
 	 * @param d
 	 * @return offset halfplane
 	 */
-	public HalfSpace2D offset(double d)
+	public HalfPlane offset(double d)
 	{
-		HalfSpace2D r = new HalfSpace2D(this);
+		HalfPlane r = new HalfPlane(this);
 		r.offset = r.offset - d;
 		r.p = p.offset(d);
 		return r;
@@ -688,7 +688,7 @@ public class HalfSpace2D
 	 * @return cross point
 	 * @throws ParallelException
 	 */
-	public Point2D cross_point(HalfSpace2D a) throws ParallelException
+	public Point2D cross_point(HalfPlane a) throws ParallelException
 	{
 		double det = Point2D.op(normal, a.normal);
 		if(det == 0)

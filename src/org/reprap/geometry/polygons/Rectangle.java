@@ -398,19 +398,19 @@ public class Rectangle
 		
 		Interval range = new Interval(oldRange);
 		
-		HalfSpace2D hp = new HalfSpace2D(sw(), nw());
+		HalfPlane hp = new HalfPlane(sw(), nw());
 		range = hp.wipe(a, range);
 		if(range.empty()) return range;
 		
-		hp = new HalfSpace2D(nw(), ne());
+		hp = new HalfPlane(nw(), ne());
 		range = hp.wipe(a, range);
 		if(range.empty()) return range;
 		
-		hp = new HalfSpace2D(ne(), se());
+		hp = new HalfPlane(ne(), se());
 		range = hp.wipe(a, range);
 		if(range.empty()) return range;
 		
-		hp = new HalfSpace2D(se(), sw());
+		hp = new HalfPlane(se(), sw());
 		range = hp.wipe(a, range);
 		return range;
 	}

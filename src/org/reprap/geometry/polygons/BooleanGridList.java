@@ -217,7 +217,7 @@ public class BooleanGridList
 		 * @param overrideDirection
 		 * @return
 		 */
-		public PolygonList hatch(LayerRules layerConditions, boolean surface, HalfSpace2D overrideDirection) //, Rr2Point startNearHere)
+		public PolygonList hatch(LayerRules layerConditions, boolean surface, HalfPlane overrideDirection) //, Rr2Point startNearHere)
 		{
 			PolygonList result = new PolygonList();
 			boolean foundation = layerConditions.getLayingSupport();
@@ -240,7 +240,7 @@ public class BooleanGridList
 					ei = e;
 				if(ei != null)
 				{
-					HalfSpace2D hatchLine;
+					HalfPlane hatchLine;
 					if(overrideDirection != null)
 						hatchLine = overrideDirection;
 					else

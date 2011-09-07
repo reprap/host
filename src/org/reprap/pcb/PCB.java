@@ -329,7 +329,7 @@ public class PCB {
 			
 			in = new BufferedReader(new FileReader(inputTracksAndPads));
 			
-			BooleanGrid pattern = new BooleanGrid(CSG.nothing(), bigBox, new Attributes(null, null, null, pcbPen.getAppearance()));
+			BooleanGrid pattern = new BooleanGrid(CSG2D.nothing(), bigBox, new Attributes(null, null, null, pcbPen.getAppearance()));
 			
 			gerberGcode = new GerberGCode(pcbPen, pattern, true);
 

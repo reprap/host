@@ -10,7 +10,7 @@ import org.reprap.geometry.polygons.Rectangle;
 import org.reprap.geometry.polygons.AllSTLsToBuild;
 import org.reprap.geometry.polygons.PolygonList;
 import org.reprap.geometry.polygons.Polygon;
-import org.reprap.geometry.polygons.CSG;
+import org.reprap.geometry.polygons.CSG2D;
 import org.reprap.geometry.polygons.BooleanGrid;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.utilities.Debug;
@@ -165,7 +165,7 @@ public class Producer {
 		Attributes fa = new Attributes(e.getMaterial(), null, null, e.getAppearance());
 //		if(Preferences.loadGlobalBool("Shield")) // Should the foundation have a shield, or not?
 //			shield.add(allSTLs.shieldPolygon(fa));
-		CSG rect = CSG.RrCSGFromBox(gp);
+		CSG2D rect = CSG2D.RrCSGFromBox(gp);
 		BooleanGrid bg = new BooleanGrid(rect, gp.scale(1.1), fa);
 		PolygonList h[] = {shield, bg.hatch(layerRules.getHatchDirection(e), layerRules.getHatchWidth(e), bg.attribute())};
 		LayerProducer lp = new LayerProducer(h, layerRules, simulationPlot);

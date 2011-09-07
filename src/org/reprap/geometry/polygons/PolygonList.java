@@ -382,24 +382,24 @@ class treeList
 	 * @param csgPols
 	 * @return
 	 */
-	public CSG buildCSG(List<CSG> csgPols)
+	public CSG2D buildCSG(List<CSG2D> csgPols)
 	{
 		if(size() == 0)
 			return csgPols.get(index);
 		
-		CSG offspring = CSG.nothing();
+		CSG2D offspring = CSG2D.nothing();
 		
 		for(int i = 0; i < size(); i++)
 		{
 			treeList iEntry = getChild(i);
-			CSG iCSG = iEntry.buildCSG(csgPols);
-			offspring = CSG.union(offspring, iCSG);
+			CSG2D iCSG = iEntry.buildCSG(csgPols);
+			offspring = CSG2D.union(offspring, iCSG);
 		}
 		
 		if(index < 0)
 			return offspring;
 		else
-			return CSG.difference(csgPols.get(index), offspring);
+			return CSG2D.difference(csgPols.get(index), offspring);
 	}
 	
 	/**
@@ -1240,9 +1240,9 @@ public class PolygonList
 	 * @param csgPols
 	 * @return true if the polygon is inside the CSG polygon, false if otherwise
 	 */
-	private boolean inside(int i, int j, List<CSG> csgPols)
+	private boolean inside(int i, int j, List<CSG2D> csgPols)
 	{
-		CSG exp = csgPols.get(j);
+		CSG2D exp = csgPols.get(j);
 		Point2D p = polygon(i).point(0);
 		boolean a = (exp.value(p) <= 0);
 		p = polygon(i).point(polygon(i).size()/2);
@@ -1265,7 +1265,7 @@ public class PolygonList
 	 * @param polAttributes
 	 * @return single CSG expression based on csgPols list 
 	 */
-	private CSG resolveInsides(List<CSG> csgPols)
+	private CSG2D resolveInsides(List<CSG2D> csgPols)
 	{
 		int i, j;
 		
@@ -1330,7 +1330,7 @@ public class PolygonList
 		// We now have a tree of containment.  universe is the root.
 		// Walk the tree turning it into a single CSG expression
 		
-		CSG expression = universe.buildCSG(csgPols);
+		CSG2D expression = universe.buildCSG(csgPols);
 		
 		//RrCSGPolygon res = new RrCSGPolygon(expression, box.scale(1.1), polygon(0).getAttributes());
 		//res.divide(0.0001, 0);
@@ -1342,23 +1342,23 @@ public class PolygonList
 	 * Compute the CSG representation of all the polygons in the list
 	 * @return CSG representation
 	 */
-	public CSG toCSG(double tolerance)
+	public CSG2D toCSG(double tolerance)
 	{	
 		if(size() == 0)
 		{
-			return CSG.nothing();
+			return CSG2D.nothing();
 		}
 		if(size() == 1)
 		{
 			return polygon(0).toCSG(tolerance);
 		}
 		
-		List<CSG> csgPols = new ArrayList<CSG>();
+		List<CSG2D> csgPols = new ArrayList<CSG2D>();
 		
 		for(int i = 0; i < size(); i++)
 			csgPols.add(polygon(i).toCSG(tolerance));
 		
-		CSG polygons = resolveInsides(csgPols);
+		CSG2D polygons = resolveInsides(csgPols);
 		//expression = expression.simplify(tolerance);
 		
 		return polygons;
