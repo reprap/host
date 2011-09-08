@@ -5,7 +5,7 @@ import java.io.PrintStream;
 
 import javax.swing.JCheckBoxMenuItem;
 import org.reprap.geometry.LayerRules;
-//import org.reprap.devices.GenericStepperMotor;
+
 
 public interface Printer {
 	
@@ -249,6 +249,7 @@ public interface Printer {
 	 * @return current Z position
 	 */
 	public double getZ();
+
 	
 	/**
 	 * Get X, Y, Z and E (if supported) coordinates in an array

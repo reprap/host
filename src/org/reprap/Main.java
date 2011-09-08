@@ -395,6 +395,34 @@ public class Main {
         return "";   	
     }
     
+    public String saveSCAD(String fileRoot)
+    {
+        String result = null;
+        File f;
+        FileFilter filter;
+        
+        
+		File defaultFile = new File(fileRoot + ".scad");
+		JFileChooser chooser = new JFileChooser();
+		chooser.setSelectedFile(defaultFile);
+		filter = new ExtensionFileFilter("OpenSCAD file to write to", new String[] { "scad" });
+		chooser.setFileFilter(filter);
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+ 
+        chooser.setFileFilter(filter);
+
+        int returnVal = chooser.showSaveDialog(null);// chooser.showOpenDialog(mainFrame);
+        if(returnVal == JFileChooser.APPROVE_OPTION) 
+        {
+            f = chooser.getSelectedFile();
+            result = "file:" + f.getAbsolutePath();
+
+            	builder.saveSCADFile(result);
+            return f.getName();
+        }
+        return "";   	
+    }
+    
     public void deleteAllSTLs()
     {
     	builder.deleteAllSTLs();

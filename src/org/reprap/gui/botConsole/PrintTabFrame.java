@@ -855,9 +855,26 @@ private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
 	if(sp <= 0)
    	{
 		JOptionPane.showMessageDialog(null, "The loaded file is not an STL or an RFO file.");
-	}   		
+	} 
+	org.reprap.Main.gui.saveSCAD(loadedFiles.substring(0, sp));
 	printer.saveRFOFile(loadedFiles.substring(0, sp));
 }//GEN-LAST:event_saveRFO
+
+private void saveSCAD(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
+	if(!SLoadOK)
+		return;
+	if(loadedFiles.contentEquals(""))
+	{
+		JOptionPane.showMessageDialog(null, "There's nothing to save...");
+		return;
+	}
+	int sp = Math.max(loadedFiles.indexOf(".stl"), Math.max(loadedFiles.indexOf(".STL"), Math.max(loadedFiles.indexOf(".rfo"), loadedFiles.indexOf(".RFO"))));
+	if(sp <= 0)
+   	{
+		JOptionPane.showMessageDialog(null, "The loaded file is not an STL or an RFO file.");
+	} 
+	org.reprap.Main.gui.saveSCAD(loadedFiles.substring(0, sp));
+}
 
 private void displayPaths(boolean disp)
 {

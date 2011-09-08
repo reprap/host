@@ -467,6 +467,11 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		RFO.save(s, stls);
 	}
 	
+	public void saveSCADFile(String s)
+	{
+		stls.saveSCAD(s);
+	}
+	
 	public void moreCopies(STLObject original, Attributes originalAttributes, int number)
 	{
 		if (number <= 0)

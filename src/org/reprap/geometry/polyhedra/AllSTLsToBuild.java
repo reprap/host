@@ -1,5 +1,8 @@
 package org.reprap.geometry.polyhedra;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.ArrayList;
 import org.reprap.geometry.LayerRules;
@@ -378,6 +381,39 @@ public class AllSTLsToBuild
 	public int size()
 	{
 		return stls.size();
+	}
+	
+	/**
+	 * Create an OpenSCAD (http://www.openscad.org/) program that will read everything
+	 * in in the same pattern as it is stored here.  It can then
+	 * be written by OpenSCAD as a single STL.
+	 * @return
+	 */
+	public String toSCAD()
+	{
+		String result = "union()\n{\n";
+		for(int i = 0; i < size(); i++)
+			result += get(i).toSCAD();
+		result += "}";
+		return result;
+	}
+	
+	/**
+	 * Write everything to an OpenSCAD program.
+	 * @param s
+	 */
+	public void saveSCAD(String s)
+	{
+		try
+		{
+			File f = new File(s.substring(5));
+			PrintWriter out = new PrintWriter(new FileWriter(f));
+			out.println(toSCAD());
+			out.close();
+		} catch (Exception e)
+		{
+			Debug.e("AllSTLsToBuild.saveSCAD(): can't open file: " + s);
+		}
 	}
 	
 	/**

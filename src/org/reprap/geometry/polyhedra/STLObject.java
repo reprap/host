@@ -56,6 +56,7 @@ This version: 14 April 2006
 
 package org.reprap.geometry.polyhedra;
 
+import java.math.BigDecimal;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Matrix3d;
+import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Tuple3d;
 import javax.vecmath.Vector3d;
@@ -358,6 +360,47 @@ public class STLObject
     public String fileItCameFrom(int i)
     {
     	return contents.get(i).sourceFile;
+    }
+    
+    public String toSCAD()
+    {
+    	String result = "multmatrix(m = [ [";
+    	Transform3D t1 = new Transform3D();
+    	Transform3D t2 = new Transform3D();
+    	trans.getTransform(t1);
+    	t2.set(1.0, rootOffset);
+    	t1.mul(t2);
+    	Matrix4d m = new Matrix4d();
+    	t1.get(m);
+    	result += new BigDecimal(Double.toString(m.m00)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m01)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m02)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m03)).toPlainString() + "], \n   [";
+    	
+    	result += new BigDecimal(Double.toString(m.m10)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m11)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m12)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m13)).toPlainString() + "], \n   [";
+    	
+    	result += new BigDecimal(Double.toString(m.m20)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m21)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m22)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m23)).toPlainString() + "], \n   [";
+    	
+    	result += new BigDecimal(Double.toString(m.m30)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m31)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m32)).toPlainString() + ", ";
+    	result += new BigDecimal(Double.toString(m.m33)).toPlainString() + "]]) \n   {\n";
+    	
+    	for(int i = 0; i < contents.size(); i++)
+    	{
+    		result += "      import_stl(\"";
+    		String fn = fileItCameFrom(i).substring(5);  // Get rid of "file:"
+    		result += fn + "\", convexity = 10);\n";
+    	}
+    	result += "   }\n";
+    	
+    	return result;
     }
     
     public Attributes attributes(int i)

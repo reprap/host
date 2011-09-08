@@ -19,6 +19,7 @@ import org.reprap.gui.StatusMessage;
 import org.reprap.Extruder;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.Timer;
+import org.reprap.geometry.polyhedra.AllSTLsToBuild;
 
 public abstract class GenericRepRap implements CartesianPrinter
 {
@@ -310,6 +311,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		
 		Debug.refreshPreferences();
 	}
+
 	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#startRun()
