@@ -54,7 +54,7 @@ This version: 14 April 2006
  
  */
 
-package org.reprap.gui;
+package org.reprap.geometry.polyhedra;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -83,6 +83,7 @@ import com.sun.j3d.utils.picking.PickTool;
 import org.j3d.renderer.java3d.loaders.STLLoader;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
+import org.reprap.gui.MouseObject;
 import org.reprap.utilities.Debug;
 
 /**

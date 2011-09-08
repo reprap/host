@@ -33,6 +33,7 @@ import org.reprap.Preferences;
 
 import com.sun.j3d.audioengines.javasound.JavaSoundMixer;
 
+import org.reprap.geometry.polyhedra.STLObject;
 import org.reprap.utilities.Debug;
 
 abstract public class Panel3D extends JPanel {

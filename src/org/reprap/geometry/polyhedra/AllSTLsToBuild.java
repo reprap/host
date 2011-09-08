@@ -1,9 +1,17 @@
-package org.reprap.geometry.polygons;
+package org.reprap.geometry.polyhedra;
 
 import java.util.List;
 import java.util.ArrayList;
 import org.reprap.geometry.LayerRules;
-import org.reprap.gui.STLObject;
+import org.reprap.geometry.polygons.BooleanGrid;
+import org.reprap.geometry.polygons.BooleanGridList;
+import org.reprap.geometry.polygons.CSG2D;
+import org.reprap.geometry.polygons.HalfPlane;
+import org.reprap.geometry.polygons.Interval;
+import org.reprap.geometry.polygons.Point2D;
+import org.reprap.geometry.polygons.Polygon;
+import org.reprap.geometry.polygons.PolygonList;
+import org.reprap.geometry.polygons.Rectangle;
 import org.reprap.Attributes;
 import org.reprap.Extruder;
 import org.reprap.Preferences;

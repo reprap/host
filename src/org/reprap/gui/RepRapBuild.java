@@ -127,7 +127,8 @@ import com.sun.j3d.utils.picking.PickTool;
 import org.reprap.Attributes;
 import org.reprap.RFO;
 import org.reprap.Preferences;
-import org.reprap.geometry.polygons.AllSTLsToBuild;
+import org.reprap.geometry.polyhedra.AllSTLsToBuild;
+import org.reprap.geometry.polyhedra.STLObject;
 import org.reprap.utilities.Debug;
 
 /**
