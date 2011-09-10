@@ -476,7 +476,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 	{
 		if (number <= 0)
 			return;
-		String fileName = original.fileItCameFrom(0);
+		String fileName = original.fileAndDirectioryItCameFrom(0);
 		Vector3d offset = new Vector3d();
 		offset.y = 0;
 		offset.z = 0;

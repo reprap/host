@@ -56,6 +56,7 @@ This version: 14 April 2006
 
 package org.reprap.geometry.polyhedra;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -357,14 +358,22 @@ public class STLObject
     	return extent;
     }
     
-    public String fileItCameFrom(int i)
+    public String fileAndDirectioryItCameFrom(int i)
     {
     	return contents.get(i).sourceFile;
     }
     
+    public String fileItCameFrom(int i)
+    {
+    	String fn = fileAndDirectioryItCameFrom(i);
+		int sepIndex = fn.lastIndexOf(File.separator);
+		fn = fn.substring(sepIndex + 1, fn.length());
+    	return fn;
+    }
+    
     public String toSCAD()
     {
-    	String result = "multmatrix(m = [ [";
+    	String result = " multmatrix(m = [ [";
     	Transform3D t1 = new Transform3D();
     	Transform3D t2 = new Transform3D();
     	trans.getTransform(t1);
@@ -395,8 +404,7 @@ public class STLObject
     	for(int i = 0; i < contents.size(); i++)
     	{
     		result += "      import_stl(\"";
-    		String fn = fileItCameFrom(i).substring(5);  // Get rid of "file:"
-    		result += fn + "\", convexity = 10);\n";
+    		result += fileItCameFrom(i) + "\", convexity = 10);\n";
     	}
     	result += "   }\n";
     	

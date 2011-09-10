@@ -183,6 +183,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         loadRFO = new javax.swing.JButton();
 //        preferencesButton = new javax.swing.JButton();
         saveRFO = new javax.swing.JButton();
+        saveSCAD = new javax.swing.JButton();
         
  //       printButton = new java.awt.Button();
  //       pcbButton = new java.awt.Button();
@@ -204,7 +205,8 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         loadSTL.setText("Load STL");
         loadGCode.setText("Load GCode"); 
         loadRFO.setText("Load RFO");         
-        saveRFO.setText("Save RFO"); 
+        saveRFO.setText("Save RFO");
+        saveSCAD.setText("Save SCAD");
         
         
         layerPauseCheck = new javax.swing.JCheckBox();
@@ -365,6 +367,15 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
             }
         });
         
+        saveSCAD.setActionCommand("saveSCAD");
+        saveSCAD.setBackground(new java.awt.Color(153, 153, 153));
+ // NOI18N
+        saveSCAD.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveSCAD(evt);
+            }
+        });
+        
         
         
         
@@ -407,6 +418,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                         	.add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)	
                             .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(saveSCAD, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(loadGCode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                 .add(loadRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -503,6 +515,8 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
                                     .add(loadRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                     .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                    .add(saveSCAD, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                     .add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                     )))))
@@ -856,11 +870,10 @@ private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
    	{
 		JOptionPane.showMessageDialog(null, "The loaded file is not an STL or an RFO file.");
 	} 
-	org.reprap.Main.gui.saveSCAD(loadedFiles.substring(0, sp));
 	printer.saveRFOFile(loadedFiles.substring(0, sp));
 }//GEN-LAST:event_saveRFO
 
-private void saveSCAD(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
+private void saveSCAD(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveSCAD
 	if(!SLoadOK)
 		return;
 	if(loadedFiles.contentEquals(""))
@@ -894,6 +907,7 @@ private void enableSLoad()
 	loadSTL.setBackground(new java.awt.Color(0, 204, 255));
 	loadRFO.setBackground(new java.awt.Color(0, 204, 255));
 	saveRFO.setBackground(new java.awt.Color(0, 204, 255));
+	saveSCAD.setBackground(new java.awt.Color(0, 204, 255));
 	pcbButton.setBackground(new java.awt.Color(152, 99, 62));
 	try
 	{	
@@ -915,6 +929,7 @@ private void enableGLoad()
 	loadSTL.setBackground(new java.awt.Color(153, 153, 153));
     loadRFO.setBackground(new java.awt.Color(153, 153, 153));
     saveRFO.setBackground(new java.awt.Color(153, 153, 153));
+    saveSCAD.setBackground(new java.awt.Color(153, 153, 153));
     pcbButton.setBackground(new java.awt.Color(153, 153, 153));
 	try
 	{
@@ -955,6 +970,7 @@ private void enableGLoad()
     private javax.swing.JButton pcbButton;
     private javax.swing.JButton exitButton;
     private javax.swing.JButton saveRFO;
+    private javax.swing.JButton saveSCAD;
     private javax.swing.JButton stopButton;
     
     

@@ -405,9 +405,9 @@ public class Main {
 		File defaultFile = new File(fileRoot + ".scad");
 		JFileChooser chooser = new JFileChooser();
 		chooser.setSelectedFile(defaultFile);
-		filter = new ExtensionFileFilter("OpenSCAD file to write to", new String[] { "scad" });
+		filter = new ExtensionFileFilter("Directory to put OpenSCAD files in", new String[] { "" });
 		chooser.setFileFilter(filter);
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
  
         chooser.setFileFilter(filter);
 
@@ -416,7 +416,6 @@ public class Main {
         {
             f = chooser.getSelectedFile();
             result = "file:" + f.getAbsolutePath();
-
             	builder.saveSCADFile(result);
             return f.getName();
         }

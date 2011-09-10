@@ -18,6 +18,7 @@ import org.reprap.geometry.polygons.Rectangle;
 import org.reprap.Attributes;
 import org.reprap.Extruder;
 import org.reprap.Preferences;
+import org.reprap.RFO;
 import org.reprap.utilities.Debug;
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.GeometryArray;
@@ -239,6 +240,11 @@ public class AllSTLsToBuild
 	}
 	
 	/**
+	 * OpenSCAD file extension
+	 */
+	private static final String scad = ".scad";
+	
+	/**
 	 * The list of things to be built
 	 */
 	private List<STLObject> stls;
@@ -397,22 +403,44 @@ public class AllSTLsToBuild
 		result += "}";
 		return result;
 	}
+
 	
 	/**
 	 * Write everything to an OpenSCAD program.
-	 * @param s
+	 * @param s the directory to write into
 	 */
-	public void saveSCAD(String s)
+	public void saveSCAD(String fn)
 	{
+		if(fn.charAt(fn.length()-1) == File.separator.charAt(0))
+			fn = fn.substring(0, fn.length()-1);
+		int sepIndex = fn.lastIndexOf(File.separator);
+		int fIndex = fn.indexOf("file:");
+		String name = fn.substring(sepIndex + 1, fn.length());
+		String path;
+		if(sepIndex >= 0)
+		{
+			if(fIndex >= 0)
+				path = fn.substring(fIndex + 5, sepIndex + 1);
+			else
+				path = fn.substring(0, sepIndex + 1);
+		} else
+			path = "";
+		path += name + File.separator;
+		name += scad;
+		if(!RFO.checkFile(path, name))
+			return;
+		File file= new File(path);
+		if(!file.exists())
+			file.mkdir();
+		RFO.copySTLs(this, path);
 		try
 		{
-			File f = new File(s.substring(5));
-			PrintWriter out = new PrintWriter(new FileWriter(f));
+			PrintWriter out = new PrintWriter(new FileWriter(path+name));
 			out.println(toSCAD());
 			out.close();
 		} catch (Exception e)
 		{
-			Debug.e("AllSTLsToBuild.saveSCAD(): can't open file: " + s);
+			Debug.e("AllSTLsToBuild.saveSCAD(): can't open file: " + path+name);
 		}
 	}
 	

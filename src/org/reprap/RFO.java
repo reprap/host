@@ -14,7 +14,9 @@ package org.reprap;
 import java.io.*;
 import java.nio.channels.*;
 import java.util.zip.*;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 
 import org.xml.sax.XMLReader;
@@ -25,6 +27,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
+import javax.swing.JOptionPane;
 import javax.vecmath.Matrix4d;
 //import javax.vecmath.Matrix3d;
 //import javax.vecmath.Point3d;
@@ -372,6 +375,11 @@ public class RFO
 	private String fileName;
 	
 	/**
+	 * The unique file names;
+	 */
+	private List<String> uNames;
+	
+	/**
 	 * The directory in which it is.
 	 */
 	private String path;
@@ -410,6 +418,7 @@ public class RFO
 	private RFO(String fn, AllSTLsToBuild as)
 	{
 		astl = as;
+		uNames = null;
 		int sepIndex = fn.lastIndexOf(File.separator);
 		int fIndex = fn.indexOf("file:");
 		fileName = fn.substring(sepIndex + 1, fn.length());
@@ -502,48 +511,60 @@ public class RFO
 		copyFile(inputFile, outputFile);		
 	}
 	
-	/**
-	 * Create the name of STL file number i
-	 * @param i
-	 * @return
-	 */
-	private String stlName(int i)
-	{
-		return stlPrefix + i + stlSuffix;
-	}
+//	/**
+//	 * Create the name of STL file number i
+//	 * @param i
+//	 * @return
+//	 */
+//	private static String stlName(int i)
+//	{
+//	if (uNames == null)
+//	{
+//		Debug.e("RFO.createLegend(): no list of unique names saved.");
+//		return;
+//	}
+//		return stlPrefix + i + stlSuffix;
+//	}
 	
 	/**
-	 * Copy each unique STL file to the temporary directory.  Files used more
+	 * 
+	 * Copy each unique STL file to a directory.  Files used more
 	 * than once are only copied once.
 	 *
+	 * @param astltb
+	 * @param rfod
 	 */
-	private void copySTLs()
+	public static List<String> copySTLs(AllSTLsToBuild astltb, String rfod)
 	{
 		int u = 0;
-		for(int i = 0; i < astl.size(); i++)
+		List<String> uniqueNames = new ArrayList<String>();
+		for(int i = 0; i < astltb.size(); i++)
 		{
-			for(int subMod1 = 0; subMod1 < astl.get(i).size(); subMod1++)
+			for(int subMod1 = 0; subMod1 < astltb.get(i).size(); subMod1++)
 			{
-				String s = astl.get(i).fileItCameFrom(subMod1);
-				astl.get(i).setUnique(subMod1, u);
+				String s = astltb.get(i).fileAndDirectioryItCameFrom(subMod1);
+				astltb.get(i).setUnique(subMod1, u);
 				for(int j = 0; j < i; j++)
 				{
-					for(int subMod2 = 0; subMod2 < astl.get(j).size(); subMod2++)
+					for(int subMod2 = 0; subMod2 < astltb.get(j).size(); subMod2++)
 					{
-						if(s.equals(astl.get(j).fileItCameFrom(subMod2)))
+						if(s.equals(astltb.get(j).fileAndDirectioryItCameFrom(subMod2)))
 						{
-							astl.get(i).setUnique(subMod1, astl.get(j).getUnique(subMod2));
+							astltb.get(i).setUnique(subMod1, astltb.get(j).getUnique(subMod2));
 							break;
 						}
 					}
 				}
-				if(astl.get(i).getUnique(subMod1) == u)
+				if(astltb.get(i).getUnique(subMod1) == u)
 				{
-					copyFile(s, rfoDir + stlName(u));
+					String un = astltb.get(i).fileItCameFrom(subMod1);
+					copyFile(s, rfod + un);
+					uniqueNames.add(un);
 					u++;
 				}
 			}
-		}	
+		}
+		return uniqueNames;
 	}
 	
 	/**
@@ -570,6 +591,11 @@ public class RFO
 	 */
 	private void createLegend()
 	{
+		if (uNames == null)
+		{
+			Debug.e("RFO.createLegend(): no list of unique names saved.");
+			return;
+		}
 		xml = new XMLOut(rfoDir + legendName, "reprap-fab-at-home-build version=\"0.1\"");
 		for(int i = 0; i < astl.size(); i++)
 		{
@@ -578,7 +604,7 @@ public class RFO
 			  STLObject stlo = astl.get(i);
 			  for(int subObj = 0; subObj < stlo.size(); subObj++)
 			  {
-				  xml.push("file location=\"" + stlName(stlo.getUnique(subObj)) + "\" filetype=\"application/sla\" material=\"" + 
+				  xml.push("file location=\"" + uNames.get(stlo.getUnique(subObj)) + "\" filetype=\"application/sla\" material=\"" + 
 						  stlo.attributes(subObj).getMaterial() + "\"");
 				  xml.pop();
 			  }
@@ -629,6 +655,24 @@ public class RFO
 	}
 	
 	/**
+	 * Warn the user of an overwrite
+	 * @return
+	 */
+	public static boolean checkFile(String pth, String nm)
+	{
+		File file= new File(pth + nm);
+		if(file.exists())
+		{
+			String[] options = { "OK", "Cancel" };
+			int r = JOptionPane.showOptionDialog(null, "The file " + nm + " exists.  Overwrite it?", "Warning",
+			        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+			        null, options, options[0]);
+			return r == 0;
+		}
+		return true;
+	}
+	
+	/**
 	 * This is what gets called to write an rfo file.  It saves all the parts of allSTL in rfo file fn.
 	 * @param fn
 	 * @param allSTL
@@ -638,7 +682,9 @@ public class RFO
 		if(!fn.endsWith(".rfo"))
 			fn += ".rfo";
 		RFO rfo = new RFO(fn, allSTL);
-		rfo.copySTLs();
+		if(!RFO.checkFile(rfo.path, rfo.fileName))
+			return;
+		rfo.uNames = RFO.copySTLs(allSTL, rfo.rfoDir);
 		rfo.createLegend();
 		rfo.compress();
 		File t = new File(rfo.tempDir);
