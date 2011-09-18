@@ -812,7 +812,7 @@ public class GCodeRepRap extends GenericRepRap {
 	 * otherwise return false.
 	 * @return
 	 */
-	public boolean filePlay()
+	public Thread filePlay()
 	{
 		return gcode.filePlay();
 	}

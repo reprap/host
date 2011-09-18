@@ -21,19 +21,19 @@ LIBFILES="lib/*"
 
 # Where are all the other non-host-software files we need to include?
 DESIGNFILES=""
-for i in ../$MACHINE ../electronics ../firmware
-do
-  if [ -d "$i" ]
-  then
-    DESIGNFILES="$DESIGNFILES $i"
-  elif [ -d ../"$i" ]
-  then
-    DESIGNFILES="$DESIGNFILES ../$i"
-  else
-    echo "ERROR: directory $i not found"
-    exit 1
-  fi
-done 
+#for i in ../$MACHINE ../electronics ../firmware
+#do
+#  if [ -d "$i" ]
+#  then
+#    DESIGNFILES="$DESIGNFILES $i"
+#  elif [ -d ../"$i" ]
+#  then
+#    DESIGNFILES="$DESIGNFILES ../$i"
+#  else
+#    echo "ERROR: directory $i not found"
+#    exit 1
+#  fi
+#done 
 
 CLASSPATH=$CLASSPATH:./lib/j3dcore.jar
 CLASSPATH=$CLASSPATH:./lib/j3d-org-java3d-all.jar
@@ -50,10 +50,11 @@ export CLASSPATH
 # Recompile java files and create Reprap.jar
 ant clean jar || exit 1
 
-# Delete and then create temporary package directories
-rm -rf "release"
-mkdir "release"
-BASENAME="release/$RELEASENAME"
+
+#Delete any old release
+rm -f "../release/*.zip"
+
+BASENAME="../release/$RELEASENAME"
 mkdir "$BASENAME"
 SRCFILENAME="$BASENAME/src"
 mkdir "$SRCFILENAME"
@@ -109,13 +110,26 @@ cd ..
 
 echo "Git references removed."
 
+# Make sure executable permissions are right
+
+chmod 755 "$RELEASENAME"/reprap
+
 # Create zip archive
 
-[ -f "$RELEASENAME".zip ] && rm "$RELEASENAME".zip
+rm -f *.zip
 zip -qr "$RELEASENAME.zip" "$RELEASENAME"
-cd ..
-
 
 echo "Zip file created."
+
+# Remove the lot that is now in the .zip file
+
+rm -rf "$RELEASENAME"
+
+cd host
+# Remove any old jar directory
+[ -d jar ] && rm -rf jar
+
+cd ..
+
 echo "RepRap Release $RELEASE created."
 

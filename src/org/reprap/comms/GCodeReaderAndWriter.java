@@ -273,12 +273,12 @@ public class GCodeReaderAndWriter
 	 * return true.  Otherwise return false.
 	 *
 	 */
-	public boolean filePlay()
+	public Thread filePlay()
 	{
 		if(fileInStream == null)
 		{
 			// Not playing a file...
-			return false;
+			return null;
 		}
 		
 		simulationPlot = null;
@@ -326,11 +326,12 @@ public class GCodeReaderAndWriter
 					e.printStackTrace();
 				}
 			}
+			
 		};
 		
 		playFile.start();
 
-	    return true;
+	    return playFile;
 	}
 	
 	public void setFractionDone(double fractionDone, int layer, int outOf)

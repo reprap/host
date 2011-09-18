@@ -160,9 +160,9 @@ public class Simulator extends GenericRepRap {
 		return null;		
 	}
 	
-	public boolean filePlay()
+	public Thread filePlay()
 	{
-		return false;
+		return null;
 	}
 	
 	public void stabilise()

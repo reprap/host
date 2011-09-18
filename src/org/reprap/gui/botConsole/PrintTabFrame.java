@@ -9,6 +9,7 @@ package org.reprap.gui.botConsole;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
@@ -38,7 +39,8 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
     private boolean loadedFilesLong = false;
     private boolean stlLoaded = false;
     private boolean gcodeLoaded = false;
-    
+    private boolean printing = false;
+    private Thread printerFilePlay;
     /** Creates new form PrintTabFrame */
     public PrintTabFrame(boolean pref) {
         initComponents(pref);
@@ -51,7 +53,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
 
 
     	seenGCode = true;
-
+    	printerFilePlay = null;
 
     	printer = org.reprap.Main.gui.getPrinter();
     	enableSLoad();
@@ -106,7 +108,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
     	GregorianCalendar cal = new GregorianCalendar();
     	SimpleDateFormat dateFormat = new SimpleDateFormat("EE HH:mm:ss Z");
     	Date d = cal.getTime();
-	long e = d.getTime();
+    	long e = d.getTime();
     	if(startTime < 0)
     	{
     		startTime = e;
@@ -125,6 +127,12 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
     	else
     		expectedBuildTime.setText("" + h + ":0" + m);
     	expectedFinishTime.setText(dateFormat.format(new Date(startTime + f)));
+    	
+    	if(printerFilePlay != null)
+    	{
+    		if(!printerFilePlay.isAlive())
+    			printDone();
+    	}
     }
     
     /**
@@ -441,7 +449,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
                                 )
                             .add(layout.createSequentialGroup()
                             	
-                                .add(printButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(printButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 //.add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 //.addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -542,9 +550,36 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         
         //pack(); //AB99
     }// </editor-fold>//GEN-END:initComponents
+    
+public void printLive()
+{
+	printing = true;
+	printButton.setText("Printing...");
+	printButton.setBackground(Color.gray);    	
+}
 
-private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-    parentBotConsoleFrame.suspendPolling();
+public void printDone()
+{
+	printing = false;
+	printButton.setText("Print");
+	printButton.setBackground(Color.green); 
+	printerFilePlay = null;
+	String[] options = { "Exit" };
+	//int r = 
+		JOptionPane.showOptionDialog(null, "The file has been printed.", "Message",
+			JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+			null, options, options[0]);
+	org.reprap.Main.gui.dispose();
+}
+
+private void printButtonActionPerformed(java.awt.event.ActionEvent evt) 
+{//GEN-FIRST:event_printButtonActionPerformed
+	if(printing)
+		return;
+	
+	printLive();
+	
+	parentBotConsoleFrame.suspendPolling();
     parentBotConsoleFrame.setFractionDone(-1, -1, -1);
     org.reprap.Main.gui.mouseToWorld();
     if(gCodeToFileRadioButton.isSelected())
@@ -564,7 +599,12 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     	if(printer.setGCodeFileForOutput(loadedFiles.substring(0, sp)) == null)
     		return;
     }
-    if(!printer.filePlay())
+
+
+	if((printerFilePlay = printer.filePlay()) != null)
+	{
+	}
+    else
     	org.reprap.Main.gui.onProduceB();
     //parentBotConsoleFrame.resumePolling();
 }//GEN-LAST:event_printButtonActionPerformed
@@ -623,18 +663,18 @@ public void pauseAction()
     paused = !paused;
     if(paused)
     {
-    	pauseButton.setLabel("Pausing...");
+    	pauseButton.setText("Pausing...");
     	org.reprap.Main.gui.pause();
     	//while(!printer.iAmPaused());
         parentBotConsoleFrame.resumePolling();
         parentBotConsoleFrame.getPosition();
         //parentBotConsoleFrame.getXYZTabPanel().recordCurrentPosition();
-        pauseButton.setLabel("Resume");
+        pauseButton.setText("Resume");
     } else
     {
     	org.reprap.Main.gui.resume();
         parentBotConsoleFrame.suspendPolling();
-        pauseButton.setLabel("Pause");
+        pauseButton.setText("Pause");
     }   
 }
 

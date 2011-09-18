@@ -516,7 +516,7 @@ public interface Printer {
 	 * otherwise return false.
 	 * @return
 	 */
-	public boolean filePlay();
+	public Thread filePlay();
 	
 	/**
 	 * Stop the printer building.
