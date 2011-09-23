@@ -328,7 +328,7 @@ public class Main {
 					producer = null;
 			        cancelMenuItem.setEnabled(false);
 			        produceProduceB.setEnabled(true);
-					JOptionPane.showMessageDialog(mainFrame, "Production complete.");
+					JOptionPane.showMessageDialog(mainFrame, "Production complete - Exit");
 					dispose();
 				}
 				catch (Exception ex) {
