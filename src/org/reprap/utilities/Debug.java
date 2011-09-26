@@ -41,6 +41,12 @@ public class Debug {
 		}			
 	}
 	
+	static public boolean d()
+	{
+		initialiseIfNeedBe();
+		return db.debug;
+	}
+	
 	static private void initialiseIfNeedBe()
 	{
 		if(db != null) return;

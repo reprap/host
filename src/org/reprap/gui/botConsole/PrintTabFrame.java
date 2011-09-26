@@ -558,12 +558,17 @@ public void printLive()
 	printButton.setBackground(Color.gray);    	
 }
 
-public void printDone()
+private void restorePrintButton()
 {
 	printing = false;
 	printButton.setText("Print");
 	printButton.setBackground(Color.green); 
-	printerFilePlay = null;
+	printerFilePlay = null;	
+}
+
+public void printDone()
+{
+	restorePrintButton();
 	String[] options = { "Exit" };
 	//int r = 
 		JOptionPane.showOptionDialog(null, "The file has been printed.", "Message",
@@ -588,6 +593,7 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt)
     	if(sp <= 0)
     	{
     		JOptionPane.showMessageDialog(null, "There are no STLs/RFOs loaded to print to file.");
+    		restorePrintButton();
     		return;
     	}
     	sp = Math.max(loadedFiles.indexOf(".stl"), Math.max(loadedFiles.indexOf(".STL"), Math.max(loadedFiles.indexOf(".rfo"), loadedFiles.indexOf(".RFO"))));
@@ -597,7 +603,10 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt)
     	}   		
     	printer.setTopDown(true);	
     	if(printer.setGCodeFileForOutput(loadedFiles.substring(0, sp)) == null)
+    	{
+    		restorePrintButton();
     		return;
+    	}
     }
 
 

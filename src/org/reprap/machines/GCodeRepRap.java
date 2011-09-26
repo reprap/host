@@ -41,7 +41,10 @@ public class GCodeRepRap extends GenericRepRap {
 		super();
 
 		gcode = new GCodeReaderAndWriter();
-		gcode.queue("M110 ; Reset the line numbers");
+		String s = "M110";
+		if(Debug.d())
+			s += " ; Reset the line numbers";
+		gcode.queue(s);
 		//gcode.queue("M115 ; Get the firmware version numbers etc");
 		//String FirmwareConfig = gcode.lastResponse();
 		//FirmwareConfig = FirmwareConfig.replace('\\','\n'); //make it easier to read for humans if it has "continuations" 
@@ -81,7 +84,10 @@ public class GCodeRepRap extends GenericRepRap {
 	{		
 		if(currentFeedrate == feedrate)
 			return;
-		gcode.queue("G1 F" + feedrate + "; feed for start of next move");
+		String s = "G1 F" + feedrate;
+		if(Debug.d())
+			s += " ; feed for start of next move";
+		gcode.queue(s);
 		currentFeedrate = feedrate;		
 	}
 	
@@ -110,12 +116,12 @@ public class GCodeRepRap extends GenericRepRap {
 		}
 		
 		double extrudeLength;
-		String code = "G1 ";
+		String s = "G1 ";
 
 		if (dx != 0)
-			code += "X" + x;
+			s += "X" + x;
 		if (dy != 0)
-			code += " Y" + y;
+			s += " Y" + y;
 
 		extrudeLength = extruders[extruder].getDistance(Math.sqrt(dx*dx + dy*dy));
 
@@ -126,17 +132,18 @@ public class GCodeRepRap extends GenericRepRap {
 			else
 				extruders[extruder].getExtruderState().add(extrudeLength);
 			if(extruders[extruder].get5D())
-				code += " E" + round(extruders[extruder].getExtruderState().length(), 1);
+				s += " E" + round(extruders[extruder].getExtruderState().length(), 1);
 		}
 		
 		if (currentFeedrate != feedrate)
 		{
-			code += " F" + feedrate;
+			s += " F" + feedrate;
 			currentFeedrate = feedrate;
 		}
 		
-		code += " ;horizontal move";
-		gcode.queue(code);
+		if(Debug.d())
+			s += " ;horizontal move";
+		gcode.queue(s);
 		currentX = x;
 		currentY = y;
 	}
@@ -164,7 +171,7 @@ public class GCodeRepRap extends GenericRepRap {
 		String code;
 		double extrudeLength;
 		
-		code = "G1 Z" + z;
+		String s = "G1 Z" + z;
 
 		extrudeLength = extruders[extruder].getDistance(dz);
 
@@ -175,17 +182,18 @@ public class GCodeRepRap extends GenericRepRap {
 			else
 				extruders[extruder].getExtruderState().add(extrudeLength);
 			if(extruders[extruder].get5D())
-				code += " E" + round(extruders[extruder].getExtruderState().length(), 1);
+				s += " E" + round(extruders[extruder].getExtruderState().length(), 1);
 		}
 		
 		if (currentFeedrate != feedrate)
 		{
-			code += " F" + feedrate;
+			s += " F" + feedrate;
 			currentFeedrate = feedrate;
 		}
 		
-		code += " ;z move";
-		gcode.queue(code);
+		if(Debug.d())
+			s += " ;z move";
+		gcode.queue(s);
 		currentZ = z;	
 	}
 
@@ -198,6 +206,26 @@ public class GCodeRepRap extends GenericRepRap {
 	{
 		if (isCancelled())
 			return;
+		
+		try
+		{
+		if(x > Preferences.loadGlobalDouble("WorkingX(mm)") || x < 0)
+		{
+			Debug.e("Attempt to move x to " + x + " which is outside [0, " + Preferences.loadGlobalDouble("WorkingX(mm)") + "]");
+			x = Math.max(0, Math.min(x, Preferences.loadGlobalDouble("WorkingX(mm)")));
+		}
+		if(y > Preferences.loadGlobalDouble("WorkingY(mm)") || y < 0)
+		{
+			Debug.e("Attempt to move y to " + y + " which is outside [0, " + Preferences.loadGlobalDouble("WorkingY(mm)") + "]");
+			y = Math.max(0, Math.min(y, Preferences.loadGlobalDouble("WorkingY(mm)")));
+		}
+		if(z > Preferences.loadGlobalDouble("WorkingZ(mm)") || z < 0)
+		{
+			Debug.e("Attempt to move z to " + z + " which is outside [0, " + Preferences.loadGlobalDouble("WorkingZ(mm)") + "]");
+			z = Math.max(0, Math.min(z, Preferences.loadGlobalDouble("WorkingZ(mm)")));
+		}
+		} catch (Exception e)
+		{}
 
 		x = round(x, 1);
 		y = round(y, 1);
@@ -456,12 +484,21 @@ public class GCodeRepRap extends GenericRepRap {
 		gcode.queue("; Created: " + myDateString);
 		gcode.queue(";#!RECTANGLE: " + lc.getBox());
 		
-		gcode.queue("M110 ; Reset the line numbers");
+		String s = "M110";
+		if(Debug.d())
+			s += " ; Reset the line numbers";
+		gcode.queue(s);
 		//take us to fun, safe metric land.
-		gcode.queue("G21 ;metric is good!");
+		s = "G21";
+		if(Debug.d())
+			s += " ; metric is good!";
+		gcode.queue(s);
 		
 		// Set absolute positioning, which is what we use.
-		gcode.queue("G90 ;absolute positioning");
+		s = "G90";
+		if(Debug.d())
+			s += " ; absolute positioning";		
+		gcode.queue(s);
 		
 		currentX = 0;
 		currentY = 0;
@@ -518,7 +555,10 @@ public class GCodeRepRap extends GenericRepRap {
 			moveToFinish(lc);
 			// Extruder off
 			//getExtruder().setExtrusion(0, false);
-			gcode.queue("M0 ;shut RepRap down");
+			String s = "M0";
+			if(Debug.d())
+				s += " ; shut RepRap down";
+			gcode.queue(s);
 			// heater off
 			//getExtruder().heatOff();
 		} catch(Exception e){
@@ -539,9 +579,12 @@ public class GCodeRepRap extends GenericRepRap {
 //		delay(msDelay);
 //	}
 
-	public void home() throws Exception {
-
-		gcode.queue("G28; go home");
+	public void home() throws Exception 
+	{
+		String s = "G28";
+		if(Debug.d())
+			s += " ; go home";
+		gcode.queue(s);
 //		// Assume the extruder is off...
 //		try
 //		{
@@ -560,6 +603,9 @@ public class GCodeRepRap extends GenericRepRap {
 	private void delay(long millis, boolean fastExtrude, boolean really) throws Exception
 	{
 		double extrudeLength = getExtruder().getDistanceFromTime(millis);
+		
+		String s;
+		
 		if(extrudeLength > 0)
 		{
 			if(extruders[extruder].get5D())
@@ -581,16 +627,21 @@ public class GCodeRepRap extends GenericRepRap {
 				extruders[extruder].getExtruderState().add(-extrudeLength);
 			else
 				extruders[extruder].getExtruderState().add(extrudeLength);
+			
+			
 			if(extruders[extruder].get5D())
 			{
-				String op = "G1 E" + round(extruders[extruder].getExtruderState().length(), 1);
-				if(extruders[extruder].getReversing())
-					op += "; extruder retraction";
-				else
-					op += "; extruder dwell";
+				s = "G1 E" + round(extruders[extruder].getExtruderState().length(), 1);
+				if(Debug.d())
+				{
+					if(extruders[extruder].getReversing())
+						s += " ; extruder retraction";
+					else
+						s += " ; extruder dwell";
+				}
 				if(really)
 				{
-					gcode.queue(op);
+					gcode.queue(s);
 					qFeedrate(getExtruder().getSlowXYFeedrate());
 				} else
 					currentFeedrate = getExtruder().getSlowXYFeedrate();
@@ -598,7 +649,10 @@ public class GCodeRepRap extends GenericRepRap {
 			}
 		}
 		
-		gcode.queue("G4 P" + millis + " ;delay");
+		s = "G4 P" + millis;
+		if(Debug.d())
+			s += " ; delay";
+		gcode.queue(s);
 	}
 	
 //	/**
@@ -633,7 +687,10 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public double[] getCoordinates() throws Exception
 	{
-		gcode.queue("M114; get coordinates");
+		String s = "M114";
+		if(Debug.d())
+			s += " ; get coordinates";
+		gcode.queue(s);
 		double [] result = new double[4];
 		result[0] = gcode.getX();
 		result[1] = gcode.getY();
@@ -649,7 +706,10 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public double[] getZeroError() throws Exception
 	{
-		gcode.queue("M117; get error coordinates");
+		String s = "M117";
+		if(Debug.d())
+			s += " ; get error coordinates";
+		gcode.queue(s);
 		double [] result = new double[4];
 		result[0] = gcode.getX();
 		result[1] = gcode.getY();
@@ -671,7 +731,10 @@ public class GCodeRepRap extends GenericRepRap {
 //		} catch (Exception e)
 //		{}
 //		gcode.queue("G92 X0 ;set x 0");
-		gcode.queue("G28 X0 ;set x 0");
+		String s = "G28 X0";
+		if(Debug.d())
+			s += " ; set x 0";
+		gcode.queue(s);
 		super.homeToZeroX();
 	}
 
@@ -688,7 +751,10 @@ public class GCodeRepRap extends GenericRepRap {
 //		} catch (Exception e)
 //		{}
 //		gcode.queue("G92 Y0 ;set y 0");
-		gcode.queue("G28 Y0 ;set y 0");
+		String s = "G28 Y0";
+		if(Debug.d())
+			s += " ; set y 0";
+		gcode.queue(s);
 		super.homeToZeroY();
 
 	}
@@ -729,7 +795,10 @@ public class GCodeRepRap extends GenericRepRap {
 //		} catch (Exception e)
 //		{}
 //		gcode.queue("G92 Z0 ;set z 0");
-		gcode.queue("G28 Z0 ;set z 0");
+		String s = "G28 Z0";
+		if(Debug.d())
+			s += " ; set z 0";
+		gcode.queue(s);
 		super.homeToZeroZ();
 	}
 	
@@ -856,12 +925,24 @@ public class GCodeRepRap extends GenericRepRap {
 		{
 			if(really)
 			{
-				gcode.queue("T" + newPhysicalExtruder + "; select new extruder");
+				String s = "T" + newPhysicalExtruder;
+				if(Debug.d())
+					s += " ; select new extruder";
+				gcode.queue(s);
 				double pwm = getExtruder().getPWM();
 				if(pwm >= 0)
-					gcode.queue("M113 S" + pwm + "; set extruder PWM");
-				else
-					gcode.queue("M113; set extruder to use pot for PWM");
+				{
+					s = "M113 S" + pwm;
+					if(Debug.d())
+						s += " ; set extruder PWM";
+					gcode.queue(s);
+				}else
+				{
+					s = "M113";
+					if(Debug.d())
+						s += " ; set extruder to use pot for PWM";
+					gcode.queue(s);
+				}
 			}
 			forceSelection = false;
 		}
@@ -879,7 +960,10 @@ public class GCodeRepRap extends GenericRepRap {
 	public void setBedTemperature(double temperature) throws Exception
 	{
 		super.setBedTemperature(temperature);
-		gcode.queue("M140 S" + temperature + " ;set bed temperature and return");
+		String s = "M140 S" + temperature;
+		if(Debug.d())
+			s += " ; set bed temperature and return";
+		gcode.queue(s);
 	}
 	
 	/**
@@ -889,7 +973,10 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public double getBedTemperature() throws Exception
 	{ 
-		gcode.queue("M105; get temperature");
+		String s = "M105";
+		if(Debug.d())
+			s += " ; get temperature";
+		gcode.queue(s);
 		return gcode.getBTemp();
 	}
 	
@@ -900,7 +987,10 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public void stabilise() throws Exception
 	{
-		gcode.queue("M116 ;wait for stability then return");
+		String s = "M116";
+		if(Debug.d())
+			s += " ; wait for stability then return";
+		gcode.queue(s);
 	}
 	
 	/**

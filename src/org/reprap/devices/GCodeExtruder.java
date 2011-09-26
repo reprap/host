@@ -1,6 +1,7 @@
 package org.reprap.devices;
 
 import org.reprap.comms.GCodeReaderAndWriter;
+import org.reprap.utilities.Debug;
 import org.reprap.Printer;
 import org.reprap.Preferences;
 
@@ -29,7 +30,12 @@ public class GCodeExtruder extends GenericExtruder
 		//{
 			super.zeroExtrudedLength(really);
 			if(really)
-				gcode.queue("G92 E0 ;zero the extruded length");
+			{
+				String s = "G92 E0";
+				if(Debug.d())
+					s += " ; zero the extruded length";
+				gcode.queue(s);
+			}
 		//}
 	}
 	
@@ -37,10 +43,19 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public void setTemperature(double temperature, boolean wait) throws Exception
 	{
+		String s;
 		if(wait)
-			gcode.queue("M109 S" + temperature + " ;set temperature and wait");
-		else
-			gcode.queue("M104 S" + temperature + " ;set temperature and return");
+		{
+			s = "M109 S" + temperature;
+			if(Debug.d())
+				s += " ; set temperature and wait";
+		} else
+		{
+			s = "M104 S" + temperature;
+			if(Debug.d())
+				s += " ; set temperature and return";
+		}
+		gcode.queue(s);
 		super.setTemperature(temperature, wait);
 	}
 	
@@ -48,7 +63,10 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public double getTemperature() throws Exception
 	{
-		gcode.queue("M105; get temperature");
+		String s = "M105";
+		if(Debug.d())
+			s += " ; get temperature";
+		gcode.queue(s);
 		es.setCurrentTemperature(gcode.getETemp());
 		return es.currentTemperature();
 	}
@@ -57,22 +75,41 @@ public class GCodeExtruder extends GenericExtruder
 	{
 		if(getExtruderSpeed() < 0)
 			return;
-		
+		String s;
 		if (speed < Preferences.tiny())
 		{
 			if(!fiveD)
-				gcode.queue("M103" + " ;extruder off");
+			{
+				s = "M103";
+				if(Debug.d())
+					s += " ; extruder off";
+				gcode.queue(s);
+			}
 		} else
 		{
 			if(!fiveD)
 			{
 				if (speed != es.speed())
-					gcode.queue("M108 S" + speed + " ;extruder speed in RPM");
+				{
+					s = "M108 S" + speed;
+					if(Debug.d())
+						s += " ; extruder speed in RPM";
+					gcode.queue(s);
+				}
 
 				if (es.reverse())
-					gcode.queue("M102" + " ;extruder on, reverse");
-				else
-					gcode.queue("M101" + " ;extruder on, forward");
+				{
+					s = "M102";
+					if(Debug.d())
+						s += " ; extruder on, reverse";
+					gcode.queue(s);
+				} else
+				{
+					s = "M101";
+					if(Debug.d())
+						s += " ; extruder on, forward";
+					gcode.queue(s);
+				}
 			}
 		}
 		super.setExtrusion(speed, reverse);
@@ -83,10 +120,20 @@ public class GCodeExtruder extends GenericExtruder
 	{
 		if(really)
 		{	
+			String s;
 			if (coolerOn)
-				gcode.queue("M106 ;cooler on");
-			else
-				gcode.queue("M107 ;cooler off");
+			{
+				s = "M106";
+				if(Debug.d())
+					s += " ; cooler on";
+				gcode.queue(s);
+			} else
+			{
+				s = "M107";
+				if(Debug.d())
+					s += " ; cooler off";
+				gcode.queue(s);
+			}
 		}
 	}
 	
@@ -95,10 +142,20 @@ public class GCodeExtruder extends GenericExtruder
 	{
 		if(valvePulseTime <= 0)
 			return;
+		String s;
 		if (valveOpen)
-			gcode.queue("M126 P" + valvePulseTime + ";valve open");
-		else
-			gcode.queue("M127 P" + valvePulseTime + ";valve closed");
+		{
+			s = "M126 P" + valvePulseTime;
+			if(Debug.d())
+				s += " ; valve open";
+			gcode.queue(s);
+		} else
+		{
+			s = "M127 P" + valvePulseTime;
+			if(Debug.d())
+				s += " ; valve closed";
+			gcode.queue(s);
+		}
 	}
 	
 	public boolean isEmpty()
