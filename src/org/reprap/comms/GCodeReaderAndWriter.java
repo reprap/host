@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.util.Date;
 
 import gnu.io.CommPortIdentifier;
@@ -660,6 +661,10 @@ public class GCodeReaderAndWriter
 		return lastResp;
 	}
 
+	public String toHex(String arg) 
+	{
+	    return String.format("%x", new BigInteger(1, arg.getBytes(/*YOUR_CHARSET?*/)));
+	}
 
 	/**
 	 * Parse the string sent back from the RepRap machine.
@@ -746,7 +751,7 @@ public class GCodeReaderAndWriter
 								".  RepRap said: " + resp);
 					} else if (!resp.startsWith("ok")) // Must be "ok" if not those - check
 					{
-						Debug.e("GCodeWriter.waitForResponse() - dud response from RepRap:" + resp);
+						Debug.e("GCodeWriter.waitForResponse() - dud response from RepRap:" + resp + " (hex: " + toHex(resp) + ")");
 						result = lineNumber; // Try to send the last line again
 					}
 					

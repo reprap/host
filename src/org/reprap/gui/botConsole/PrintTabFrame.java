@@ -205,7 +205,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
 //        saveRFO = new java.awt.Button();
         
         
-        printButton.setText("Print");
+        printButton.setText("Print/slice");
         pcbButton.setText("PCB");
         pauseButton.setText("Pause");       
         stopButton.setText("STOP !");       
@@ -231,7 +231,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         progressBar = new javax.swing.JProgressBar();
  
         gCodeToFileRadioButton = new javax.swing.JRadioButton();
-    
+        fromSDCardRadioButton = new javax.swing.JRadioButton();
         toGCodeRepRapRadioButton = new javax.swing.JRadioButton();
         fileNameBox = new javax.swing.JLabel();
   
@@ -337,8 +337,16 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         });
 
         buttonGroup1.add(gCodeToFileRadioButton);
-        gCodeToFileRadioButton.setText("Send GCodes to file");
+        gCodeToFileRadioButton.setText("Slice to GCode file");
         gCodeToFileRadioButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                selectorRadioButtonMousePressed(evt);
+            }
+        });
+        
+        buttonGroup1.add(fromSDCardRadioButton);
+        fromSDCardRadioButton.setText("Print from SD card");
+        fromSDCardRadioButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 selectorRadioButtonMousePressed(evt);
             }
@@ -354,7 +362,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         });
 
         buttonGroup1.add(toGCodeRepRapRadioButton);
-        toGCodeRepRapRadioButton.setText("Print on G-Code RepRap");
+        toGCodeRepRapRadioButton.setText("Print G-Code file");
         toGCodeRepRapRadioButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 selectorRadioButtonMousePressed(evt);
@@ -436,6 +444,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
                             //.add(toSNAPRepRapRadioButton)
                             .add(toGCodeRepRapRadioButton)
                             .add(gCodeToFileRadioButton)
+                            .add(fromSDCardRadioButton)
                             .add(layerPauseCheck)
                             .add(displayPathsCheck))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -502,7 +511,10 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(toGCodeRepRapRadioButton)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(gCodeToFileRadioButton))
+                                .add(fromSDCardRadioButton)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(gCodeToFileRadioButton)
+                                )
                             .add(preferencesButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 45, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(dummyButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 45, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 )
@@ -732,6 +744,13 @@ private void selectorRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//G
 		if(seenSNAP)
 			closeMessage = true;
 		seenGCode = true;
+	}else if(evt.getSource() == fromSDCardRadioButton)
+	{
+//		enableGLoad();
+//		if(seenSNAP)
+//			closeMessage = true;
+//		seenGCode = true;
+
 	}
 	try {
 		org.reprap.Preferences.saveGlobal();
@@ -967,6 +986,7 @@ private void enableSLoad()
 		JOptionPane.showMessageDialog(null, e.toString());
 	}	
 	toGCodeRepRapRadioButton.setSelected(false);
+	fromSDCardRadioButton.setSelected(false);
 	gCodeToFileRadioButton.setSelected(true);
 }
 
@@ -989,6 +1009,7 @@ private void enableGLoad()
 		JOptionPane.showMessageDialog(null, e.toString());
 	}
 	toGCodeRepRapRadioButton.setSelected(true);
+	fromSDCardRadioButton.setSelected(false);
 	gCodeToFileRadioButton.setSelected(false);
 }
 
@@ -1043,6 +1064,7 @@ private void enableGLoad()
     private javax.swing.JLabel progressLabel;
  
     private javax.swing.JRadioButton toGCodeRepRapRadioButton;
+    private javax.swing.JRadioButton fromSDCardRadioButton;
     //private javax.swing.JRadioButton toSNAPRepRapRadioButton;
     // End of variables declaration//GEN-END:variables
     private boolean SLoadOK = false;
