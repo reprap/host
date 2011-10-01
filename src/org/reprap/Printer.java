@@ -596,4 +596,16 @@ public interface Printer {
 	 * @return
 	 */
 	public String getOutputFilename();
+
+	/**
+	 * Get the list of files on the RepRap's SD card (if any)
+	 * @return
+	 */
+	public String[] getSDFiles();
+
+	/**
+	 * Print a file on the machie's SD card
+	 * @param string
+	 */
+	public void printSDFile(String string);
 }

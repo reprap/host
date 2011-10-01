@@ -39,6 +39,7 @@ public class GCodeReaderAndWriter
 	private static final long allSentOK = -1;
 	private double eTemp;
 	private double bTemp;
+	private String[] sdFiles = new String[0];
 	private double x, y, z, e;
 	private RrGraphics simulationPlot = null;
 	private String lastResp;
@@ -543,6 +544,31 @@ public class GCodeReaderAndWriter
 	}
 	
 	/**
+	 * Pick up a list of comma-separated names and transliterate them to lower-case
+	 * This code allows file names to have spaces in, but this is ***highly*** depricated.
+	 * @param s
+	 * @param cue
+	 * @return
+	 */
+	private String[] parseReturnedNames(String s, String cue)
+	{
+		int i = s.indexOf(cue);
+		if(i < 0)
+			return new String[0];
+		i += cue.length();
+		String ss = s.substring(i);
+		int j = ss.indexOf(",}");
+		if(j < 0)
+			ss = ss.substring(0,ss.indexOf("}"));  // Must end in "name}"
+		else
+			ss = ss.substring(0,j);    // Must end in "name,}"
+		String[] result = ss.split(",");
+		for(i = 0; i < result.length; i++)
+			result[i] = result[i].toLowerCase();
+		return result;
+	}
+	
+	/**
 	 * If the machine has just returned an extruder temperature, return its value
 	 * @return
 	 */
@@ -579,6 +605,18 @@ public class GCodeReaderAndWriter
 		}
 		return bTemp;
 	}
+	
+	public String[] getSDFileNames()
+	{
+		if(serialOutStream == null)
+		{
+			nonRunningWarning("getSDFileNames() from ");
+			return sdFiles;
+		}
+		if(sdFiles.length <= 0)
+			Debug.e("GCodeReaderAndWriter.getSDFileNames() - no value stored!");
+		return sdFiles;
+	}	
 	
 	/**
 	 * If the machine has just returned an x coordinate, return its value
@@ -755,10 +793,11 @@ public class GCodeReaderAndWriter
 						result = lineNumber; // Try to send the last line again
 					}
 					
-					// Have we got temperatures and/or coordinates?
+					// Have we got temperatures and/or coordinates and/or filenames?
 					
 					eTemp = parseReturnedValue(resp, " T:");
 					bTemp = parseReturnedValue(resp, " B:");
+					sdFiles = parseReturnedNames(resp, " Files: {");
 					if(resp.indexOf(" C:") >= 0)
 					{
 						x = parseReturnedValue(resp, " X:");

@@ -40,6 +40,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
     private boolean stlLoaded = false;
     private boolean gcodeLoaded = false;
     private boolean printing = false;
+    private boolean sdCard = false;
     private Thread printerFilePlay;
     /** Creates new form PrintTabFrame */
     public PrintTabFrame(boolean pref) {
@@ -337,7 +338,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         });
 
         buttonGroup1.add(gCodeToFileRadioButton);
-        gCodeToFileRadioButton.setText("Slice to GCode file");
+        gCodeToFileRadioButton.setText("Slice to G-Code file");
         gCodeToFileRadioButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 selectorRadioButtonMousePressed(evt);
@@ -345,7 +346,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         });
         
         buttonGroup1.add(fromSDCardRadioButton);
-        fromSDCardRadioButton.setText("Print from SD card");
+        fromSDCardRadioButton.setText("Print SD card G-Codes");
         fromSDCardRadioButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 selectorRadioButtonMousePressed(evt);
@@ -362,7 +363,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         });
 
         buttonGroup1.add(toGCodeRepRapRadioButton);
-        toGCodeRepRapRadioButton.setText("Print G-Code file");
+        toGCodeRepRapRadioButton.setText("Print computer G-Codes");
         toGCodeRepRapRadioButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 selectorRadioButtonMousePressed(evt);
@@ -621,6 +622,11 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt)
     	}
     }
 
+    if(sdCard)
+    {
+    	printer.printSDFile(loadedFiles);
+    	return;
+    }
 
 	if((printerFilePlay = printer.filePlay()) != null)
 	{
@@ -737,6 +743,7 @@ private void selectorRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//G
 		if(seenSNAP)
 			closeMessage = true;
 		seenGCode = true;
+		sdCard = false;
 	} else if(evt.getSource() == gCodeToFileRadioButton)
 	{
 
@@ -744,13 +751,14 @@ private void selectorRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//G
 		if(seenSNAP)
 			closeMessage = true;
 		seenGCode = true;
+		sdCard = false;
 	}else if(evt.getSource() == fromSDCardRadioButton)
 	{
-//		enableGLoad();
-//		if(seenSNAP)
-//			closeMessage = true;
-//		seenGCode = true;
-
+		enableGLoad();
+		if(seenSNAP)
+			closeMessage = true;
+		seenGCode = true;
+		sdCard = true;
 	}
 	try {
 		org.reprap.Preferences.saveGlobal();
@@ -820,7 +828,7 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 		return;
 	if(seenSNAP)
 	{
-		JOptionPane.showMessageDialog(null, "Sorry.  Sending G Codes to SNAP RepRap machines is not yet implemented.");
+		JOptionPane.showMessageDialog(null, "Sorry.  Sending G Codes to SNAP RepRap machines is not implemented.");
 		return;
 	}
 
@@ -863,7 +871,32 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 			return;
 		loadedFiles = "";
 	}
-	loadedFiles = printer.loadGCodeFileForMaking();
+	
+	if(sdCard)
+	{
+		String[] files = printer.getSDFiles();
+		if(files.length > 0)
+		{	
+			loadedFiles = (String)JOptionPane.showInputDialog(
+					this,
+					"Select the SD file to print:",
+					"Customized Dialog",
+					JOptionPane.PLAIN_MESSAGE,
+					null,
+					files,
+					files[0]);
+
+			if(loadedFiles != null)
+				if (loadedFiles.length() <= 0) 
+					loadedFiles = null;
+		} else
+		{
+			JOptionPane.showMessageDialog(null, "There are no SD files available.");
+			loadedFiles = null;
+		}
+	} else
+		loadedFiles = printer.loadGCodeFileForMaking();
+
 	if(loadedFiles == null)
 	{
 		JOptionPane.showMessageDialog(null, "No GCode was loaded.");

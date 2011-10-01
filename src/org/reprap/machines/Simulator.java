@@ -179,4 +179,16 @@ public class Simulator extends GenericRepRap {
 	}
 	
 	public String getOutputFilename() { return "RepRapSimulatorOutput"; }
+
+	@Override
+	public String[] getSDFiles() 
+	{
+		return new String[0];
+	}
+
+	@Override
+	public void printSDFile(String string) {
+		// TODO Auto-generated method stub
+		
+	}
 }

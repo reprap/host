@@ -700,6 +700,67 @@ public class GCodeRepRap extends GenericRepRap {
 	}
 	
 	/**
+	 * Get the RepRap's SD card (if any) online
+	 */
+	public void initialiseSD()
+	{
+		String s = "M21";
+		if(Debug.d())
+			s += " ; Initialise SD card";
+		try {
+			gcode.queue(s);
+		} catch (Exception e) {
+			Debug.e("GCodeRepRap.initialiseSD() has thrown:");
+			e.printStackTrace();
+		}		
+	}
+	
+	/**
+	 * Get the file list from the machine's SD card
+	 * @return
+	 */
+	public String[] getSDFiles()
+	{
+		initialiseSD();
+		String s = "M20";
+		if(Debug.d())
+			s += " ; get file list";
+		try {
+			gcode.queue(s);
+		} catch (Exception e) {
+			Debug.e("GCodeRepRap.getSDFiles() has thrown:");
+			e.printStackTrace();
+		}
+		return gcode.getSDFileNames();	
+	}
+	
+	/**
+	 * Print a file on the SD card
+	 * @param filename
+	 */
+	public void printSDFile(String filename)
+	{
+		String s = "M23 " + filename;
+		if(Debug.d())
+			s += " ; Send SD name to print";
+		try {
+			gcode.queue(s);
+		} catch (Exception e) {
+			Debug.e("GCodeRepRap.printSDFile() has thrown:");
+			e.printStackTrace();
+		}
+		s = "M24";
+		if(Debug.d())
+			s += " ; Start print from SD";
+		try {
+			gcode.queue(s);
+		} catch (Exception e) {
+			Debug.e("GCodeRepRap.printSDFile() has thrown:");
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * Get X, Y, Z and E (if supported) coordinates in an array
 	 * @return
 	 * @throws Exception 
