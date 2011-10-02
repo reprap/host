@@ -911,12 +911,12 @@ public class GCodeReaderAndWriter
 		}
 
 		//arduino bootloader skip.
-		Debug.d("Attempting to initialize Arduino/Sanguino");
+		//Debug.d("Attempting to initialize Arduino/Sanguino");
         try {Thread.sleep(1000);} catch (Exception e) {}
-        for(int i = 0; i < 10; i++)
-                serialOutStream.write('0');
+        //for(int i = 0; i < 10; i++)
+        //        serialOutStream.write('0');
         try {Thread.sleep(1000);} catch (Exception e) {}
-        
+        //serialOutStream.write('\n');
         return;
 	}
 	

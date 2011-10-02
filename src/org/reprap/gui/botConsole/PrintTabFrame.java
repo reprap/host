@@ -874,6 +874,7 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 	
 	if(sdCard)
 	{
+		parentBotConsoleFrame.suspendPolling();
 		String[] files = printer.getSDFiles();
 		if(files.length > 0)
 		{	
@@ -894,6 +895,7 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 			JOptionPane.showMessageDialog(null, "There are no SD files available.");
 			loadedFiles = null;
 		}
+		parentBotConsoleFrame.resumePolling();
 	} else
 		loadedFiles = printer.loadGCodeFileForMaking();
 
