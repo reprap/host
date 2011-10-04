@@ -144,8 +144,8 @@ public class STLObject
     private BranchGroup top = null;     // The thing that links us to the world
     private BranchGroup handle = null;  // Internal handle for the mouse to grab
     private TransformGroup trans = null;// Static transform for when the mouse is away
-    private BranchGroup stl = null;     // The actual STL geometry
-    private Vector3d extent = null;       // X, Y and Z extent
+    private BranchGroup stl = null;     // The actual STL geometry; a tree duplicated flat in the list contents
+    private Vector3d extent = null;     // X, Y and Z extent
     private BoundingBox bbox = null;    // Temporary storage for the bounding box while loading
     private Vector3d rootOffset = null; // Offset of the first-loaded STL under stl
     private List<Contents> contents = null;
@@ -214,6 +214,8 @@ public class STLObject
      */
     public Attributes addSTL(String location, Vector3d offset, Appearance app, STLObject lastPicked) 
     {
+    	// TODO: check location for an identically-named file with a .csg extension
+    	// and load that too. ?? Ask user, or do it anyway??
     	Attributes att = new Attributes(null, this, null, app);
     	BranchGroup child = loadSingleSTL(location, att, offset, lastPicked);
     	if(child == null)

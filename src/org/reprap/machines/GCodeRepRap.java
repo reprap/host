@@ -738,8 +738,12 @@ public class GCodeRepRap extends GenericRepRap {
 	 * Print a file on the SD card
 	 * @param filename
 	 */
-	public void printSDFile(String filename)
+	public boolean printSDFile(String filename)
 	{
+		if(filename == null)
+			return false;
+		if(filename.length() <= 0)
+			return false;
 		String s = "M23 " + filename;
 		if(Debug.d())
 			s += " ; Send SD name to print";
@@ -748,6 +752,7 @@ public class GCodeRepRap extends GenericRepRap {
 		} catch (Exception e) {
 			Debug.e("GCodeRepRap.printSDFile() has thrown:");
 			e.printStackTrace();
+			return false;
 		}
 		s = "M24";
 		if(Debug.d())
@@ -757,7 +762,9 @@ public class GCodeRepRap extends GenericRepRap {
 		} catch (Exception e) {
 			Debug.e("GCodeRepRap.printSDFile() has thrown:");
 			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 	
 	/**

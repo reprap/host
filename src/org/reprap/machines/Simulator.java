@@ -187,7 +187,8 @@ public class Simulator extends GenericRepRap {
 	}
 
 	@Override
-	public void printSDFile(String string) {
+	public boolean printSDFile(String string) {
+		return true;
 		// TODO Auto-generated method stub
 		
 	}

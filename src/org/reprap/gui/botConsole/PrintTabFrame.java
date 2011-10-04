@@ -574,8 +574,8 @@ public void printLive()
 private void restorePrintButton()
 {
 	printing = false;
-	printButton.setText("Print");
-	printButton.setBackground(Color.green); 
+	printButton.setText("Print/slice");
+	printButton.setBackground(new java.awt.Color(51, 204, 0)); 
 	printerFilePlay = null;	
 }
 
@@ -602,7 +602,9 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt)
     org.reprap.Main.gui.mouseToWorld();
     if(gCodeToFileRadioButton.isSelected())
     {
-    	int sp = loadedFiles.length();
+    	int sp = -1;
+    	if(loadedFiles != null)
+    		sp = loadedFiles.length();
     	if(sp <= 0)
     	{
     		JOptionPane.showMessageDialog(null, "There are no STLs/RFOs loaded to print to file.");
@@ -624,7 +626,11 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt)
 
     if(sdCard)
     {
-    	printer.printSDFile(loadedFiles);
+    	if(!printer.printSDFile(loadedFiles))
+    	{
+    		JOptionPane.showMessageDialog(null, "Error printing SD file.");
+    		restorePrintButton();
+    	}
     	return;
     }
 

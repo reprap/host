@@ -606,6 +606,7 @@ public interface Printer {
 	/**
 	 * Print a file on the machie's SD card
 	 * @param string
+	 * * @return true if success; false otherwise
 	 */
-	public void printSDFile(String string);
+	public boolean printSDFile(String string);
 }
