@@ -52,6 +52,8 @@ package org.reprap.geometry.polyhedra;
 
 import java.util.ArrayList;
 
+import javax.vecmath.Matrix4d;
+
 import org.reprap.CSGOp;
 import org.reprap.utilities.Debug;
 import org.reprap.geometry.polygons.Interval;
@@ -361,6 +363,42 @@ public class CSG3D
 		result.comp = this;
 		
 		return comp;
+	}
+	
+	/**
+	 * Move somewhere else...
+	 * @return
+	 */
+	public CSG3D transform(Matrix4d m)
+	{				
+		CSG3D result;
+		
+		switch(op)
+		{
+		case LEAF:
+			result = new CSG3D(hp.transform(m));
+			break;
+			
+		case NULL:
+			return universe();
+			
+		case UNIVERSE:
+			return nothing();
+			
+		case UNION:
+			result = union(c1.transform(m), c2.transform(m));
+			break;
+			
+		case INTERSECTION:
+			result = intersection(c1.transform(m), c2.transform(m));
+			break;
+			
+		default:
+			Debug.e("transform(): invalid operator.");
+			return nothing();
+		}
+		
+		return result;
 	}
 	
 	/**

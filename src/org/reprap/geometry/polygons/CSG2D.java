@@ -53,6 +53,8 @@ package org.reprap.geometry.polygons;
 import java.util.ArrayList;
 
 import org.reprap.CSGOp;
+import org.reprap.geometry.polyhedra.CSG3D;
+import org.reprap.geometry.polyhedra.Point3D;
 import org.reprap.utilities.Debug;
 
 /**
@@ -140,6 +142,16 @@ public class CSG2D
 //		super.finalize();
 //	}
 	
+	private CSG2D()
+	{
+		hp = null;
+		op = CSGOp.LEAF;
+		c1 = null;
+		c2 = null;
+		comp = null;
+		complexity = 1;
+	}	
+	
 	/**
 	 * Make a leaf from a single half-plane
 	 * @param h
@@ -216,6 +228,55 @@ public class CSG2D
 		
 		op = c.op;
 		complexity = c.complexity;
+	}
+	
+	public static CSG2D slice(CSG3D t, double z)
+	{
+		CSG2D r = new CSG2D();	
+		
+		switch(t.operator())
+		{
+		case LEAF:
+			r.op = CSGOp.LEAF;
+			r.complexity = 1;
+			try 
+			{
+				r.hp = new HalfPlane(t.plane(), z);
+			} catch (ParallelException e) 
+			{
+				if(t.plane().value(new Point3D(0,0,z)) <= 0)
+					return universe();
+				else
+					return nothing();
+			}
+			break;
+			
+		case NULL:
+				Debug.e("CSG2D constructor from CSG3D: null set in tree!");
+			break;
+			
+		case UNIVERSE:
+				Debug.e("CSG2D constructor from CSG3D: universal set in tree!");
+			break;
+			
+		case UNION:
+			r.op = CSGOp.UNION;
+			r.c1 = slice(t.c_1(), z);
+			r.c2 = slice(t.c_2(), z);
+			r.complexity = r.c1.complexity() + r.c2.complexity();
+			break;
+			
+		case INTERSECTION:
+			r.op = CSGOp.INTERSECTION;
+			r.c1 = slice(t.c_1(), z);
+			r.c2 = slice(t.c_2(), z);
+			r.complexity = r.c1.complexity() + r.c2.complexity();			
+			break;
+			
+		default:
+			Debug.e("CSG2D constructor from CSG3D: invalid operator " + t.operator());
+		}
+		return r;
 	}
 	
 	/**

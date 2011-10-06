@@ -148,14 +148,16 @@ public class STLObject
     private Vector3d extent = null;     // X, Y and Z extent
     private BoundingBox bbox = null;    // Temporary storage for the bounding box while loading
     private Vector3d rootOffset = null; // Offset of the first-loaded STL under stl
-    private List<Contents> contents = null;
-    
+    private ArrayList<Contents> contents = null;
+    private ArrayList<CSG3D> csgs = null;
 
     public STLObject()
     {
     	stl = new BranchGroup();
     	
     	contents = new ArrayList<Contents>();
+    	csgs = new ArrayList<CSG3D>();
+    	
         
         // No mouse yet
         
@@ -214,16 +216,23 @@ public class STLObject
      */
     public Attributes addSTL(String location, Vector3d offset, Appearance app, STLObject lastPicked) 
     {
-    	// TODO: check location for an identically-named file with a .csg extension
-    	// and load that too. ?? Ask user, or do it anyway??
     	Attributes att = new Attributes(null, this, null, app);
     	BranchGroup child = loadSingleSTL(location, att, offset, lastPicked);
+    	CSGReader csgr = new CSGReader(location);
+    	CSG3D csg = null;
+    	if(csgr.csgAvailable())
+    		csg = csgr.csg();
     	if(child == null)
     		return null;
     	if(lastPicked == null)
+    	{
     		contents.add(new Contents(location, child, att));
-    	else
+    		csgs.add(csg);
+    	} else
+    	{
     		lastPicked.contents.add(new Contents(location, child, att));
+    		lastPicked.csgs.add(csg);
+    	}
     	return att;
     }
 
@@ -664,14 +673,35 @@ public class STLObject
     
     // Get one of the the actual objects
     
-//    public BranchGroup getSTL(int i)
-//    {
-//    	return (BranchGroup)(stl.getChild(i));
-//    }
     public BranchGroup getSTL()
     {
     	return stl;
     }
+    
+    public BranchGroup getSTL(int i)
+    {
+    	return contents.get(i).stl;
+    }
+    
+    public int getCount()
+    {
+    	return contents.size();
+    }
+    
+    /**
+     * get the csgs (if any)
+     * @return
+     */
+    public ArrayList<CSG3D> getCSGs()
+    {
+    	return csgs;
+    }
+    
+    public CSG3D getCSG(int i)
+    {
+    	return csgs.get(i);
+    }
+    
     // Get the number of objects
     
     public int numChildren()

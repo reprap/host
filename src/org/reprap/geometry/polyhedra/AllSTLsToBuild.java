@@ -26,6 +26,7 @@ import javax.media.j3d.Group;
 import javax.media.j3d.SceneGraphObject;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
+import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Tuple3d;
 
@@ -407,7 +408,7 @@ public class AllSTLsToBuild
 	
 	/**
 	 * Write everything to an OpenSCAD program.
-	 * @param s the directory to write into
+	 * @param fn the directory to write into
 	 */
 	public void saveSCAD(String fn)
 	{
@@ -500,8 +501,9 @@ public class AllSTLsToBuild
 		{
 			STLObject stl = stls.get(i);
 			Transform3D trans = stl.getTransform();
-
+			
 			BranchGroup bg = stl.getSTL();
+			
 			java.util.Enumeration<?> enumKids = bg.getAllChildren();
 
 			while(enumKids.hasMoreElements())
@@ -1218,61 +1220,98 @@ public class AllSTLsToBuild
 		PolygonList pgl = new PolygonList();
 		int extruderID;
 		
-		// Bin the edges by extruder ID.
+		// Bin the edges and CSGs (if any) by extruder ID.
 		
 		ArrayList<LineSegment>[] edges = new ArrayList[extruders.length];
+		ArrayList<CSG3D>[] csgs = new ArrayList[extruders.length];
+		Attributes[] atts = new Attributes[extruders.length];
 		
 		for(extruderID = 0; extruderID < extruders.length; extruderID++)
 		{
 			if(extruders[extruderID].getID() != extruderID)
 				Debug.e("AllSTLsToBuild.slice(): extruder " + extruderID + "out of sequence: " + extruders[extruderID].getID());
 			edges[extruderID] = new ArrayList<LineSegment>();
+			csgs[extruderID] = new ArrayList<CSG3D>();
 		}
 		
 		// Generate all the edges for STLObject i at this z
 		
 		STLObject stlObject = stls.get(stl);
 		Transform3D trans = stlObject.getTransform();
+		Matrix4d m4 = new Matrix4d();
+		trans.get(m4);
 
 		BranchGroup bg = stlObject.getSTL();
-		java.util.Enumeration<?> enumKids = bg.getAllChildren();
-
-		while(enumKids.hasMoreElements())
+		//ArrayList<CSG3D> csgs = stlObject.getCSGs();
+		//Attributes[] as = new Attributes[csgs.size()];
+		//CSG3D[] unions = new CSG3D[edges.length];
+//		java.util.Enumeration<?> enumKids = bg.getAllChildren();
+//
+//		int i = 0;
+//		while(enumKids.hasMoreElements())
+//		{
+//			Object ob = enumKids.nextElement();
+//			//as[i] = null;
+//			if(ob instanceof BranchGroup)
+//			{
+//				BranchGroup bg1 = (BranchGroup)ob;
+//				Attributes attr = (Attributes)(bg1.getUserData());
+//				//as[i] = attr;
+//				//if(csgs.get(i) == null)
+//					recursiveSetEdges(attr.getPart(), trans, z, attr, edges);
+//			}
+//			i++;
+//		}
+		
+		for(int i = 0; i < stlObject.getCount(); i++)
 		{
-			Object ob = enumKids.nextElement();
-
-			if(ob instanceof BranchGroup)
-			{
-				BranchGroup bg1 = (BranchGroup)ob;
-				Attributes attr = (Attributes)(bg1.getUserData());
+			BranchGroup bg1 = stlObject.getSTL(i);
+			Attributes attr = (Attributes)(bg1.getUserData());
+			CSG3D csg = stlObject.getCSG(i);
+			if(csg == null)
 				recursiveSetEdges(attr.getPart(), trans, z, attr, edges);
+			else
+			{
+				atts[attr.getExtruder().getID()] = attr;
+				csgs[attr.getExtruder().getID()].add(csg.transform(m4));
 			}
 		}
-
+		
+		//edges[att.getExtruder().getID()]
+		
 		// Turn them into lists of polygons, one for each extruder, then
 		// turn those into pixelmaps.
 		
 		for(extruderID = 0; extruderID < edges.length; extruderID++)
 		{
-			pgl = simpleCull(edges[extruderID]);
-			
-			if(pgl.size() > 0)
+			if(edges[extruderID].size() > 0)
 			{
-				// Remove wrinkles
+				pgl = simpleCull(edges[extruderID]);
 
-				pgl = pgl.simplify(Preferences.gridRes()*1.5);
+				if(pgl.size() > 0)
+				{
+					// Remove wrinkles
 
-				// Fix small radii
+					pgl = pgl.simplify(Preferences.gridRes()*1.5);
 
-				pgl = pgl.arcCompensate();
+					// Fix small radii
 
-				csgp = pgl.toCSG(Preferences.tiny());
+					pgl = pgl.arcCompensate();
 
-				// We use the plan rectangle of the entire stl object to store the bitmap, even though this slice may be
-				// much smaller than the whole.  This allows booleans on slices to be computed much more
-				// quickly as each is in the same rectangle so the bit patterns match exactly.  But it does use more memory.
-				
-				result.add(new BooleanGrid(csgp, rectangles.get(stl), pgl.polygon(0).getAttributes()));
+					csgp = pgl.toCSG(Preferences.tiny());
+
+					// We use the plan rectangle of the entire stl object to store the bitmap, even though this slice may be
+					// much smaller than the whole.  This allows booleans on slices to be computed much more
+					// quickly as each is in the same rectangle so the bit patterns match exactly.  But it does use more memory.
+
+					result.add(new BooleanGrid(csgp, rectangles.get(stl), pgl.polygon(0).getAttributes()));
+				}
+			}
+			
+			for(int i = 0; i < csgs[extruderID].size(); i++)
+			{
+				csgp = CSG2D.slice(csgs[extruderID].get(i), layerRules.getMachineZ());
+				result.add(new BooleanGrid(csgp, rectangles.get(stl), atts[extruderID]));
 			}
 		}
 		

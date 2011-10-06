@@ -55,6 +55,8 @@
 
 package org.reprap.geometry.polygons;
 
+import org.reprap.geometry.polyhedra.HalfSpace;
+
 //import java.util.ArrayList;
 //import java.util.List;
 
@@ -222,6 +224,28 @@ public class HalfPlane
 		p = new Line(a.p);
 		//crossings = new ArrayList<lineIntersection>(); // No point in deep copy -
 		                             // No pointers would match
+	}
+	
+	/**
+	 * Construct a plane from a 3D half-space
+	 * @param hs
+	 * @param z
+	 */
+	public HalfPlane(HalfSpace hs, double z) throws ParallelException
+	{
+		normal = new Point2D(hs.normal().x(), hs.normal().y());
+		if(normal.mod() < 1.0e-10)
+			throw new ParallelException("HalfPlane from HalfSpace - parallel");
+		normal.norm();
+		offset = hs.normal().z()*z + hs.offset();
+		Point2D p0, p1;
+		if(Math.abs(normal.x()) < 0.1)
+			p0 = new Point2D(0, -offset/normal.y());
+		else
+			p0 = new Point2D(-offset/normal.x(), 0);
+		p1 = Point2D.add(p0, normal.orthogonal());
+		p = new Line(p0, p1);
+		p.norm();
 	}
 	
 	/**

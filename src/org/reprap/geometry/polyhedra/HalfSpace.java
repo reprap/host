@@ -55,6 +55,8 @@
 
 package org.reprap.geometry.polyhedra;
 
+import javax.vecmath.Matrix4d;
+
 import org.reprap.geometry.polygons.Interval;
 
 
@@ -178,6 +180,23 @@ public class HalfSpace
 		HalfSpace r = new HalfSpace(this);
 		r.normal = r.normal.neg();
 		r.offset = -r.offset;
+		return r;
+	}
+	
+	/**
+	 * Move somewhere else
+	 * @param m
+	 * @return
+	 */
+	public HalfSpace transform(Matrix4d m)
+	{
+		HalfSpace r = new HalfSpace(this);
+		Point3D n = new Point3D(m.m00*r.normal.x() + m.m01*r.normal.y() + m.m02*r.normal.z() + m.m03*r.offset,
+				m.m10*r.normal.x() + m.m11*r.normal.y() + m.m12*r.normal.z() + m.m13*r.offset,
+				m.m20*r.normal.x() + m.m21*r.normal.y() + m.m22*r.normal.z() + m.m23*r.offset);
+		double o = m.m30*r.normal.x() + m.m31*r.normal.y() + m.m32*r.normal.z() + m.m33*r.offset;
+		r.normal = n;
+		r.offset = o;
 		return r;
 	}
 	
