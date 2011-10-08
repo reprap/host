@@ -107,28 +107,28 @@ public class CSG2D
 	 */
 	private boolean beingDestroyed = false;
 	
-	/**
-	 * Destroy me and all that I point to
-	 */
-	public void destroy() 
-	{
-		if(beingDestroyed) // Prevent infinite loop
-			return;
-		beingDestroyed = true;
-		if(c1 != null)
-			c1.destroy();
-		c1 = null;
-		if(c2 != null)
-			c2.destroy();
-		c2 = null;
-		if(comp != null)
-			comp.destroy();
-		comp = null;
-		if(hp != null)
-			hp.destroy();
-		hp = null;
-		beingDestroyed = false;
-	}
+//	/**
+//	 * Destroy me and all that I point to
+//	 */
+//	public void destroy() 
+//	{
+//		if(beingDestroyed) // Prevent infinite loop
+//			return;
+//		beingDestroyed = true;
+//		if(c1 != null)
+//			c1.destroy();
+//		c1 = null;
+//		if(c2 != null)
+//			c2.destroy();
+//		c2 = null;
+//		if(comp != null)
+//			comp.destroy();
+//		comp = null;
+//		if(hp != null)
+//			hp.destroy();
+//		hp = null;
+//		beingDestroyed = false;
+//	}
 	
 	/**
 	 * Destroy just me
@@ -241,10 +241,10 @@ public class CSG2D
 			r.complexity = 1;
 			try 
 			{
-				r.hp = new HalfPlane(t.plane(), z);
+				r.hp = new HalfPlane(t.hSpace(), z);
 			} catch (ParallelException e) 
 			{
-				if(t.plane().value(new Point3D(0,0,z)) <= 0)
+				if(t.hSpace().value(new Point3D(0,0,z)) <= 0)
 					return universe();
 				else
 					return nothing();
@@ -259,19 +259,11 @@ public class CSG2D
 				Debug.e("CSG2D constructor from CSG3D: universal set in tree!");
 			break;
 			
-		case UNION:
-			r.op = CSGOp.UNION;
-			r.c1 = slice(t.c_1(), z);
-			r.c2 = slice(t.c_2(), z);
-			r.complexity = r.c1.complexity() + r.c2.complexity();
-			break;
+		case UNION:  
+			return CSG2D.union(slice(t.c_1(), z), slice(t.c_2(), z));
 			
 		case INTERSECTION:
-			r.op = CSGOp.INTERSECTION;
-			r.c1 = slice(t.c_1(), z);
-			r.c2 = slice(t.c_2(), z);
-			r.complexity = r.c1.complexity() + r.c2.complexity();			
-			break;
+			return CSG2D.intersection(slice(t.c_1(), z), slice(t.c_2(), z));			
 			
 		default:
 			Debug.e("CSG2D constructor from CSG3D: invalid operator " + t.operator());
@@ -286,7 +278,7 @@ public class CSG2D
 	public CSG2D c_1() { return c1; }
 	public CSG2D c_2() { return c2; }
 	public CSGOp operator() { return op; }
-	public HalfPlane plane() { return hp; }
+	public HalfPlane hPlane() { return hp; }
 	public int complexity() { return complexity; }
 	
 	/**
@@ -336,7 +328,7 @@ public class CSG2D
 	 */
 	public String toString()
 	{
-		String result = "RrCSG: complexity = " + 
+		String result = "2D RrCSG: complexity = " + 
 			Integer.toString(complexity) + "\n";
 		result = toString_r(result, " ");
 		return result;
@@ -494,7 +486,7 @@ public class CSG2D
 	 */
 	private CSG2D categorise(CSG2D leafA)
 	{
-		HalfPlane a = leafA.plane();
+		HalfPlane a = leafA.hPlane();
 		Point2D an = a.normal();
 		Point2D x = Point2D.add(a.pLine().origin(), an);
 		if(value(x) <= 0)
@@ -513,8 +505,8 @@ public class CSG2D
 	 */
 	private CSG2D crossCategorise(CSG2D leafA, CSG2D leafB)
 	{
-		HalfPlane a = leafA.plane();
-		HalfPlane b = leafB.plane();
+		HalfPlane a = leafA.hPlane();
+		HalfPlane b = leafB.hPlane();
 		Point2D an = a.normal();
 		Point2D bn = b.normal();
 		Point2D v02 = Point2D.add(an, bn);

@@ -119,13 +119,15 @@ public class STLObject
 	{
 	    private String sourceFile = null;   // The STL file I was loaded from
 	    private BranchGroup stl = null;     // The actual STL geometry
+	    private CSG3D csg = null;           // CSG if available
 	    private Attributes att = null;		// The attributes associated with it
 	    private int unique = 0;
 	    
-	    Contents(String s, BranchGroup st, Attributes a)
+	    Contents(String s, BranchGroup st, CSG3D c, Attributes a)
 	    {
 	    	sourceFile = s;
 	    	stl = st;
+	    	csg = c;
 	    	att = a;
 	    }
 	    
@@ -149,14 +151,12 @@ public class STLObject
     private BoundingBox bbox = null;    // Temporary storage for the bounding box while loading
     private Vector3d rootOffset = null; // Offset of the first-loaded STL under stl
     private ArrayList<Contents> contents = null;
-    private ArrayList<CSG3D> csgs = null;
 
     public STLObject()
     {
     	stl = new BranchGroup();
     	
     	contents = new ArrayList<Contents>();
-    	csgs = new ArrayList<CSG3D>();
     	
         
         // No mouse yet
@@ -217,22 +217,13 @@ public class STLObject
     public Attributes addSTL(String location, Vector3d offset, Appearance app, STLObject lastPicked) 
     {
     	Attributes att = new Attributes(null, this, null, app);
-    	BranchGroup child = loadSingleSTL(location, att, offset, lastPicked);
-    	CSGReader csgr = new CSGReader(location);
-    	CSG3D csg = null;
-    	if(csgr.csgAvailable())
-    		csg = csgr.csg();
+    	Contents child = loadSingleSTL(location, att, offset, lastPicked);
     	if(child == null)
     		return null;
     	if(lastPicked == null)
-    	{
-    		contents.add(new Contents(location, child, att));
-    		csgs.add(csg);
-    	} else
-    	{
-    		lastPicked.contents.add(new Contents(location, child, att));
-    		lastPicked.csgs.add(csg);
-    	}
+    		contents.add(child);
+    	else
+    		lastPicked.contents.add(child);
     	return att;
     }
 
@@ -248,20 +239,24 @@ public class STLObject
      * @param lastPicked
      * @return
      */
-    private BranchGroup loadSingleSTL(String location, Attributes att, Vector3d offset, STLObject lastPicked)
+    private Contents loadSingleSTL(String location, Attributes att, Vector3d offset, STLObject lastPicked)
     {
-    	BranchGroup result = null;
+    	BranchGroup bgResult = null;
+    	CSG3D csgResult = null;
         STLLoader loader = new STLLoader();
         Scene scene;
         try 
         {
             scene = loader.load(location);
+        	CSGReader csgr = new CSGReader(location);
+        	if(csgr.csgAvailable())
+        		csgResult = csgr.csg();
             if (scene != null) 
             {
-                result = scene.getSceneGroup();
-                result.setCapability(Node.ALLOW_BOUNDS_READ);
-                result.setCapability(Group.ALLOW_CHILDREN_READ);
-                result.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE);
+                bgResult = scene.getSceneGroup();
+                bgResult.setCapability(Node.ALLOW_BOUNDS_READ);
+                bgResult.setCapability(Group.ALLOW_CHILDREN_READ);
+                bgResult.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE);
                 
 
                 
@@ -285,23 +280,23 @@ public class STLObject
                     }
                 }
                 
-                att.setPart(result);
-                result.setUserData(att);
+                att.setPart(bgResult);
+                bgResult.setUserData(att);
                 Offsets off;
                 if(lastPicked != null)
                 {
                 	// Add this object to lastPicked
-                	setOffset(result, lastPicked.rootOffset);
-                	lastPicked.stl.addChild(result);
+                	csgResult = setOffset(bgResult, csgResult, lastPicked.rootOffset);
+                	lastPicked.stl.addChild(bgResult);
                 	lastPicked.setAppearance(lastPicked.getAppearance());
                 	lastPicked.updateBox(bbox);
                 } else
                 {
                 	// New independent object.
-                	stl.addChild(result);
-                	off = getOffsets(result, offset);
+                	stl.addChild(bgResult);
+                	off = getOffsets(bgResult, offset);
                 	rootOffset = off.centreToOrigin;
-                	setOffset(stl, rootOffset);
+                	csgResult = setOffset(stl, csgResult, rootOffset);
                 	Transform3D temp_t = new Transform3D();
                     temp_t.set(off.bottomLeftShift);
                 	trans.setTransform(temp_t);
@@ -315,7 +310,7 @@ public class STLObject
                     + location);
             e.printStackTrace();
         }
-        return result;
+        return new Contents(location, bgResult, csgResult, att);
     }
     
     private void updateBox(BoundingBox bb)
@@ -588,9 +583,17 @@ public class STLObject
         }
     }
     
-    private void setOffset(BranchGroup bg, Vector3d p)
+    private CSG3D setOffset(BranchGroup bg, CSG3D c, Vector3d p)
     {
     	recursiveSetOffset(bg, p);
+    	if(c == null)
+    		return null;
+    	Matrix4d m = new Matrix4d();
+    	m.setIdentity();
+    	m.m03 = p.x;
+    	m.m13 = p.y;
+    	m.m23 = p.z;
+    	return c.transform(m);
     }
     
     // Shift a Shape3D permanently by p
@@ -692,14 +695,14 @@ public class STLObject
      * get the csgs (if any)
      * @return
      */
-    public ArrayList<CSG3D> getCSGs()
-    {
-    	return csgs;
-    }
+//    public ArrayList<CSG3D> getCSGs()
+//    {
+//    	return contents.csgs;
+//    }
     
     public CSG3D getCSG(int i)
     {
-    	return csgs.get(i);
+    	return contents.get(i).csg;
     }
     
     // Get the number of objects

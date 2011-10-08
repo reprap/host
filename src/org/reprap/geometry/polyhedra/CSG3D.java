@@ -188,7 +188,7 @@ public class CSG3D
 	public CSG3D c_1() { return c1; }
 	public CSG3D c_2() { return c2; }
 	public CSGOp operator() { return op; }
-	public HalfSpace plane() { return hp; }
+	public HalfSpace hSpace() { return hp; }
 	public int complexity() { return complexity; }
 	
 	/**
@@ -238,7 +238,7 @@ public class CSG3D
 	 */
 	public String toString()
 	{
-		String result = "RrCSG: complexity = " + 
+		String result = "3D RrCSG: complexity = " + 
 			Integer.toString(complexity) + "\n";
 		result = toString_r(result, " ");
 		return result;
@@ -366,31 +366,31 @@ public class CSG3D
 	}
 	
 	/**
-	 * Move somewhere else...
+	 * Move somewhere else.  Note - this expects the inverse transform
 	 * @return
 	 */
-	public CSG3D transform(Matrix4d m)
+	private CSG3D xform(Matrix4d iM)
 	{				
 		CSG3D result;
 		
 		switch(op)
 		{
 		case LEAF:
-			result = new CSG3D(hp.transform(m));
+			result = new CSG3D(hp.transform(iM));
 			break;
 			
 		case NULL:
-			return universe();
-			
-		case UNIVERSE:
 			return nothing();
 			
+		case UNIVERSE:
+			return universe();
+			
 		case UNION:
-			result = union(c1.transform(m), c2.transform(m));
+			result = union(c1.xform(iM), c2.xform(iM));
 			break;
 			
 		case INTERSECTION:
-			result = intersection(c1.transform(m), c2.transform(m));
+			result = intersection(c1.xform(iM), c2.xform(iM));
 			break;
 			
 		default:
@@ -399,6 +399,18 @@ public class CSG3D
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Go somewhere else
+	 * @param m
+	 * @return
+	 */
+	public CSG3D transform(Matrix4d m)
+	{
+		Matrix4d iM = new Matrix4d(m);
+		iM.invert();
+		return xform(iM);
 	}
 	
 	/**

@@ -156,28 +156,28 @@ public class HalfPlane
 	/**
 	 * Destroy me and all that I point to
 	 */
-	public void destroy() 
-	{
-		if(beingDestroyed) // Prevent infinite loop
-			return;
-		beingDestroyed = true;
-		if(normal != null)
-			normal.destroy();
-		normal = null;
-		if(p != null)
-			p.destroy();
-		p = null;
-//		if(crossings != null)
-//		{
-//			for(int i = 0; i < size(); i++)
-//			{
-//				crossings.get(i).destroy();
-//				crossings.set(i, null);
-//			}
-//		}
-//		crossings = null;
-		beingDestroyed = false;
-	}
+//	public void destroy() 
+//	{
+//		if(beingDestroyed) // Prevent infinite loop
+//			return;
+//		beingDestroyed = true;
+//		if(normal != null)
+//			normal.destroy();
+//		normal = null;
+//		if(p != null)
+//			p.destroy();
+//		p = null;
+////		if(crossings != null)
+////		{
+////			for(int i = 0; i < size(); i++)
+////			{
+////				crossings.get(i).destroy();
+////				crossings.set(i, null);
+////			}
+////		}
+////		crossings = null;
+//		beingDestroyed = false;
+//	}
 	
 	/**
 	 * Destroy just me
@@ -227,17 +227,18 @@ public class HalfPlane
 	}
 	
 	/**
-	 * Construct a plane from a 3D half-space
+	 * Construct a half-plane from a 3D half-space cutting across a z plane
 	 * @param hs
 	 * @param z
 	 */
 	public HalfPlane(HalfSpace hs, double z) throws ParallelException
 	{
 		normal = new Point2D(hs.normal().x(), hs.normal().y());
-		if(normal.mod() < 1.0e-10)
-			throw new ParallelException("HalfPlane from HalfSpace - parallel");
-		normal.norm();
-		offset = hs.normal().z()*z + hs.offset();
+		double m = normal.mod();
+		if(m < 1.0e-10)
+			throw new ParallelException("HalfPlane from HalfSpace - z parallel");
+		offset = (hs.normal().z()*z + hs.offset())/m;
+		normal = Point2D.div(normal, m);
 		Point2D p0, p1;
 		if(Math.abs(normal.x()) < 0.1)
 			p0 = new Point2D(0, -offset/normal.y());

@@ -57,6 +57,8 @@
 
 package org.reprap.geometry.polyhedra;
 
+import javax.vecmath.Matrix4d;
+
 /**
  * Class for (x, y, z) points and vectors
  */
@@ -123,6 +125,20 @@ public class Point3D
 	public Point3D neg()
 	{
 		return new Point3D(-x, -y, -z);
+	}
+	
+	/**
+	 * Go somewhere else
+	 * @param m
+	 * @return
+	 */
+	public Point3D transform(Matrix4d m)
+	{
+		Point3D result = new Point3D(m.m00*x + m.m01*y + m.m02*z + m.m03,
+				m.m10*x + m.m11*y + m.m12*z + m.m13,
+				m.m20*x + m.m21*y + m.m22*z + m.m23);
+		double d = m.m30*x + m.m31*y + m.m32*z + m.m33;
+		return Point3D.div(result, d);
 	}
 	
 	

@@ -93,7 +93,7 @@ public class HalfSpace
 	public HalfSpace(Point3D n, Point3D a)
 	{
 		normal = n.norm();
-		offset = Point3D.mul(normal, a);
+		offset = -Point3D.mul(normal, a);
 	}  
 	
 	/**
@@ -104,7 +104,7 @@ public class HalfSpace
 	public HalfSpace(Point3D n, double a)
 	{
 		normal = n.norm();
-		offset = a;
+		offset = -a;
 	}  
 	
 	/**
@@ -184,20 +184,21 @@ public class HalfSpace
 	}
 	
 	/**
-	 * Move somewhere else
-	 * @param m
+	 * Move somewhere else.  NOTE THIS EXPECTS THE INVERSE OF THE TRANSFORM
+	 * @param iM
 	 * @return
 	 */
-	public HalfSpace transform(Matrix4d m)
+	public HalfSpace transform(Matrix4d iM)
 	{
-		HalfSpace r = new HalfSpace(this);
-		Point3D n = new Point3D(m.m00*r.normal.x() + m.m01*r.normal.y() + m.m02*r.normal.z() + m.m03*r.offset,
-				m.m10*r.normal.x() + m.m11*r.normal.y() + m.m12*r.normal.z() + m.m13*r.offset,
-				m.m20*r.normal.x() + m.m21*r.normal.y() + m.m22*r.normal.z() + m.m23*r.offset);
-		double o = m.m30*r.normal.x() + m.m31*r.normal.y() + m.m32*r.normal.z() + m.m33*r.offset;
-		r.normal = n;
-		r.offset = o;
-		return r;
+		Point3D n = new Point3D(iM.m00*normal.x() + iM.m10*normal.y() + iM.m20*normal.z() + iM.m30*offset,
+				iM.m01*normal.x() + iM.m11*normal.y() + iM.m21*normal.z() + iM.m31*offset,
+				iM.m02*normal.x() + iM.m12*normal.y() + iM.m22*normal.z() + iM.m32*offset);
+		double o = iM.m03*normal.x() + iM.m13*normal.y() + iM.m23*normal.z() + iM.m33*offset;
+		double d = n.mod();
+		HalfSpace result = new HalfSpace(this);
+		result.normal = Point3D.div(n, d);
+		result.offset = o/d;
+		return result;
 	}
 	
 	/**

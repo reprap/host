@@ -1311,6 +1311,8 @@ public class AllSTLsToBuild
 			for(int i = 0; i < csgs[extruderID].size(); i++)
 			{
 				csgp = CSG2D.slice(csgs[extruderID].get(i), layerRules.getMachineZ());
+				//System.out.println("-3-\n" + csgs[extruderID].get(i).toString());
+				//System.out.println("-2-\n" + csgp.toString()+ "-0-");
 				result.add(new BooleanGrid(csgp, rectangles.get(stl), atts[extruderID]));
 			}
 		}
