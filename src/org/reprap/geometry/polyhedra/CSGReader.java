@@ -17,6 +17,15 @@ public class CSGReader
 		private static final String cube = "cube(";
 		private static final String cylinder = "cylinder(";
 		
+		private static final String[] starts = {
+			"{",
+			difference,
+			union,
+			multmatrix,
+			cube,
+			cylinder
+		};
+		
 		private static final String[] cubeArgs = {
 			"size=", "center="
 		};
@@ -244,19 +253,19 @@ public class CSGReader
 			model = model.substring(1);
 			Matrix4d m = new Matrix4d();
 			double[] v = parseV(4);
-			model = model.substring(1); // Dump "'"
+			model = model.substring(1); // Dump ","
 			m.m00 = v[0];
 			m.m01 = v[1];
 			m.m02 = v[2];
 			m.m03 = v[3];
 			v = parseV(4);
-			model = model.substring(1); // Dump "'"
+			model = model.substring(1); // Dump ","
 			m.m10 = v[0];
 			m.m11 = v[1];
 			m.m12 = v[2];
 			m.m13 = v[3];
 			v = parseV(4);
-			model = model.substring(1); // Dump "'"
+			model = model.substring(1); // Dump ","
 			m.m20 = v[0];
 			m.m21 = v[1];
 			m.m22 = v[2];
@@ -270,6 +279,14 @@ public class CSGReader
 				Debug.e("CSGReader.parseMatrix() - syntax error: " + printABit() + "...");
 			model = model.substring(2);
 			return m;
+		}
+		
+		private boolean startNext()
+		{
+			for(int i = 0; i < starts.length; i++)
+				if(model.startsWith(starts[i]))
+					return true;
+			return false;
 		}
 		
 		private CSG3D parseModel()
@@ -286,19 +303,27 @@ public class CSGReader
 			{
 				model = model.substring(1);
 				return pop();
-			} else if(model.startsWith(difference)) // Must deal with 0 or multiple args
+			} else if(model.startsWith(difference)) 
 			{
 				model = model.substring(difference.length());
 				csga = parseModel();
-				csgb = parseModel();
-				return CSG3D.difference(csga, csgb);
+				while(startNext())
+				{
+					csgb = parseModel();
+					csga = CSG3D.difference(csga, csgb);
+				}
+				return csga;
 			} else if(model.startsWith(union))
 			{
-				model = model.substring(union.length()); // Must deal with 0 or multiple args
+				model = model.substring(union.length()); 
 				csga = parseModel();
-				csgb = parseModel();
-				return CSG3D.union(csga, csgb);
-			} else if(model.startsWith(multmatrix)) // Must deal with 0 or multiple args
+				while(startNext())
+				{
+					csgb = parseModel();
+					csga = CSG3D.union(csga, csgb);
+				}
+				return csga;
+			} else if(model.startsWith(multmatrix)) 
 			{
 				transform = parseMatrix();
 				csga = parseModel();

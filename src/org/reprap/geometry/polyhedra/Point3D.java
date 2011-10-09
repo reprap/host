@@ -134,10 +134,10 @@ public class Point3D
 	 */
 	public Point3D transform(Matrix4d m)
 	{
-		Point3D result = new Point3D(m.m00*x + m.m01*y + m.m02*z + m.m03,
-				m.m10*x + m.m11*y + m.m12*z + m.m13,
-				m.m20*x + m.m21*y + m.m22*z + m.m23);
-		double d = m.m30*x + m.m31*y + m.m32*z + m.m33;
+		Point3D result = new Point3D(m.m00*x + m.m10*y + m.m20*z + m.m30,
+				m.m01*x + m.m11*y + m.m21*z + m.m31,
+				m.m02*x + m.m12*y + m.m22*z + m.m32);
+		double d = m.m03*x + m.m13*y + m.m23*z + m.m33;
 		return Point3D.div(result, d);
 	}
 	
