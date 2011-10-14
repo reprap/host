@@ -44,6 +44,8 @@ public class CSGReader
 		private CSG3D stack[] = new CSG3D[stackTop];
 		private int sp = 0;
 		
+		private CSG3D CSGModel = null;
+		
 		private boolean csgAvailable;
 		
 		/**
@@ -146,7 +148,7 @@ public class CSGReader
 		 * parse an integer terminated by a ","
 		 * @return
 		 */
-		private int parseDCI()
+		private int parseIC()
 		{
 			int c = model.indexOf(",");
 			if(c <= 0)
@@ -256,7 +258,40 @@ public class CSGReader
 		 */
 		private CSG3D parseCylinder()
 		{
-			return null;
+			subString(cylinder.length());
+			if(!model.startsWith(cylinderArgs[0]))
+				Debug.e("CSGReader.parseCylinder() - syntax error 1: " + printABit() + "...");
+			subString(cylinderArgs[0].length());
+			int fn = parseIC();
+			if(!model.startsWith(cylinderArgs[1]))
+				Debug.e("CSGReader.parseCylinder() - syntax error 2: " + printABit() + "...");
+			subString(cylinderArgs[1].length());
+			double fa = parseDC();
+			if(!model.startsWith(cylinderArgs[2]))
+				Debug.e("CSGReader.parseCylinder() - syntax error 3: " + printABit() + "...");
+			subString(cylinderArgs[2].length());
+			double fs = parseDC();
+			if(!model.startsWith(cylinderArgs[3]))
+				Debug.e("CSGReader.parseCylinder() - syntax error 4: " + printABit() + "...");
+			subString(cylinderArgs[3].length());
+			double h = parseDC();
+			if(!model.startsWith(cylinderArgs[4]))
+				Debug.e("CSGReader.parseCylinder() - syntax error 5: " + printABit() + "...");
+			subString(cylinderArgs[4].length());
+			double r1 = parseDC();
+			if(!model.startsWith(cylinderArgs[5]))
+				Debug.e("CSGReader.parseCylinder() - syntax error 6: " + printABit() + "...");
+			subString(cylinderArgs[5].length());
+			double r2 = parseDC();
+			if(!model.startsWith(cylinderArgs[6]))
+				Debug.e("CSGReader.parseCylinder() - syntax error 7: " + printABit() + "...");
+			subString(cylinderArgs[6].length());
+			boolean c = parseBoolean();
+			if(!model.startsWith(");"))
+				Debug.e("CSGReader.parseCylinder() - syntax error 8: " + printABit() + "...");
+			subString(2);
+			
+			return Primitives.cylinder(fn, fa, fs, h, r1, r2, c);
 		}
 		
 		/**
@@ -337,7 +372,6 @@ public class CSGReader
 		
 		private CSG3D parseModel()
 		{	
-			System.out.println("Parsing: " + printABit());
 			if(model.startsWith("{"))
 			{
 				subString(1);
@@ -395,7 +429,9 @@ public class CSGReader
 		
 		public CSG3D csg()
 		{
-			return parseModel();
+			if(CSGModel == null)
+				CSGModel = parseModel();
+			return CSGModel;
 		}
 
 }
