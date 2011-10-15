@@ -66,7 +66,8 @@ public enum CSGOp
     NULL("NULL SET"), 
     UNIVERSE("UNIVERSAL SET"), 
     UNION("UNION"), 
-    INTERSECTION("INTERSECTION");
+    INTERSECTION("INTERSECTION"),
+    DIFFERENCE("DIFFERENCE");  // ONLY ever used by CSGReader.  Should NEVER appear in a CSG tree
     
     /**
      * 

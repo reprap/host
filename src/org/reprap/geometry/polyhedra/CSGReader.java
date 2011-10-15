@@ -10,6 +10,13 @@ import javax.vecmath.Matrix4d;
 import org.reprap.CSGOp;
 import org.reprap.utilities.Debug;
 
+/**
+ * This class reads in an OpenSCAD (http://openscad.org) CSG expression, parses it, and uses the result to
+ * build a CSG3D model.
+ * 
+ * @author ensab
+ *
+ */
 public class CSGReader 
 {	
 		private static final String group = "group()";
@@ -18,6 +25,7 @@ public class CSGReader
 		private static final String multmatrix = "multmatrix(";
 		private static final String cube = "cube(";
 		private static final String cylinder = "cylinder(";
+		private static final String sphere = "sphere(";
 		
 		private static final String[] starts = {
 			"{",
@@ -26,7 +34,8 @@ public class CSGReader
 			union,
 			multmatrix,
 			cube,
-			cylinder
+			cylinder,
+			sphere
 		};
 		
 		private static final String[] cubeArgs = {
@@ -37,8 +46,12 @@ public class CSGReader
 			"$fn=", "$fa=", "$fs=", "h=", "r1=", "r2=", "center=" 
 		};
 		
-		private String model;
-		private String laggingModel;
+		private static final String[] sphereArgs = {
+			"$fn=", "$fa=", "$fs=", "r=" 
+		};
+		
+		private String model="";
+		private String laggingModel="";
 		
 		private static final int stackTop = 1000;
 		private CSG3D stack[] = new CSG3D[stackTop];
@@ -46,7 +59,70 @@ public class CSGReader
 		
 		private CSG3D CSGModel = null;
 		
-		private boolean csgAvailable;
+		private boolean csgAvailable = false;
+		
+
+		/**
+		 * The constructor just checks the file and loads the CSG expression into a String.
+		 * @param fileName
+		 */
+		public CSGReader(String fileName)
+		{
+			csgAvailable = readModel(fileName);
+		}
+		
+		/**
+		 * Check if the constructor found a model.
+		 * @return
+		 */
+		public boolean csgAvailable()
+		{
+			return csgAvailable;
+		}
+		
+		/**
+		 * Return the model found by the constructor.  Do lazy 
+		 * evaluation as far as parsing is concerned.
+		 * @return
+		 */
+		public CSG3D csg()
+		{
+			if(CSGModel == null)
+			{
+				CSGModel = parseModel();
+			}
+			return CSGModel;
+		}
+		
+		/**
+		 * For a given STL file, find if there's a CSG file for it
+		 * in the same directory that we can read.  
+		 * @param STLfileName
+		 * @return
+		 */
+		public static String CSGFileExists(String STLfileName)
+		{
+			String fileName = new String(STLfileName);
+			if(fileName.toLowerCase().endsWith(".stl"))
+				fileName = fileName.substring(0, fileName.length()-4) + ".csg";
+			else
+				return null;
+
+			if(fileName.startsWith("file:"))
+				fileName = fileName.substring(5, fileName.length());
+			BufferedReader inputStream;
+			try 
+			{
+				inputStream = new BufferedReader(new FileReader(fileName));
+				return fileName;
+			} catch (FileNotFoundException e) 
+			{
+				return null;
+			} catch (IOException e) 
+			{
+				return null;
+			}
+		}
 		
 		/**
 		 * Stack of CSG expressions
@@ -78,17 +154,16 @@ public class CSGReader
 		/**
 		 * Read a CSG model from OpenSCAD into a string.
 		 * Remove the line numbers ("n12:" etc), and all white space.
-		 * @param fileName
+		 * @param STLfileName
 		 * @return
 		 */
-		private boolean readModel(String fileName)
+		private boolean readModel(String STLfileName)
 		{
-			model = new String();
+			String fileName = CSGFileExists(STLfileName);
+			if(fileName == null)
+				return false;
 			
-			if(fileName.toLowerCase().endsWith(".stl"))
-				fileName = fileName.substring(0, fileName.length()-4) + ".csg";
-			if(fileName.startsWith("file:"))
-				fileName = fileName.substring(5, fileName.length());
+			model = new String();
 			
 			try 
 			{
@@ -104,13 +179,6 @@ public class CSGReader
 						line = line.substring(cs+1);
 					}
 					line = line.replaceAll("^\\s+", "");  // kill more leading white space
-//					if(line.startsWith("group()")) // kill group()
-//					{
-//						int cs = line.indexOf(")");
-//						line = line.substring(cs+1);
-//					}
-					line = line.replaceAll("^\\s+", "");  // kill more leading white space
-					
 					model += line;
 				}
 			} catch (FileNotFoundException e) 
@@ -123,9 +191,16 @@ public class CSGReader
 
 			model = model.replaceAll("\\s+", "");  // kill all remaining white space
 			laggingModel = new String(model);
+			Debug.d("CSGReader: read CSG model from: " + fileName);
 			return true;
 		}
 		
+		/**
+		 * The equivalent of the String.substring() function, but
+		 * it also maintains a lagging string with a few prior characters in
+		 * for error messages.
+		 * @param n
+		 */
 		private void subString(int n)
 		{
 			if(laggingModel.length() - model.length() > 10)
@@ -133,12 +208,19 @@ public class CSGReader
 			model = model.substring(n);
 		}
 		
+		/**
+		 * Does what it says on the tin for "{"
+		 */
 		private void eatOpenBracket()
 		{
 			if(model.startsWith("{"))
 				subString(1);
 		}
 		
+		/**
+		 * String for a bit of the model around where we are parsing
+		 * @return
+		 */
 		private String printABit()
 		{
 			return laggingModel.substring(0, Math.min(50, laggingModel.length()));
@@ -153,7 +235,7 @@ public class CSGReader
 			int c = model.indexOf(",");
 			if(c <= 0)
 			{
-				Debug.e("CSGReader.parseDCI() - syntax error: " + printABit() + "...");
+				Debug.e("CSGReader.parseDCI() - expecting ,: " + printABit() + "...");
 				return 0;
 			}
 			String i = model.substring(0, c);
@@ -170,7 +252,7 @@ public class CSGReader
 			int c = model.indexOf(",");
 			if(c <= 0)
 			{
-				Debug.e("CSGReader.parseDC() - syntax error: " + printABit() + "...");
+				Debug.e("CSGReader.parseDC() - expecting ,: " + printABit() + "...");
 				return 0;
 			}
 			String d = model.substring(0, c);
@@ -187,7 +269,24 @@ public class CSGReader
 			int c = model.indexOf("]");
 			if(c <= 0)
 			{
-				Debug.e("CSGReader.parseDB() - syntax error: " + printABit() + "...");
+				Debug.e("CSGReader.parseDB() - expecting ]: " + printABit() + "...");
+				return 0;
+			}
+			String d = model.substring(0, c);
+			subString(c+1);
+			return Double.valueOf(d);
+		}
+		
+		/**
+		 * parse a double terminated by a ")"
+		 * @return
+		 */
+		private double parseDb()
+		{
+			int c = model.indexOf(")");
+			if(c <= 0)
+			{
+				Debug.e("CSGReader.parseDB() - expecting ): " + printABit() + "...");
 				return 0;
 			}
 			String d = model.substring(0, c);
@@ -218,7 +317,7 @@ public class CSGReader
 		{
 			double[] r = new double[e];
 			if(!model.startsWith("["))
-				Debug.e("CSGReader.parseV() - syntax error: " + printABit() + "...");
+				Debug.e("CSGReader.parseV() - expecting [ : " + printABit() + "...");
 			subString(1);
 			for(int i = 0; i < e-1 ; i++)
 				r[i] = parseDC();
@@ -235,16 +334,16 @@ public class CSGReader
 		{
 			subString(cube.length());
 			if(!model.startsWith(cubeArgs[0]))
-				Debug.e("CSGReader.parseCube() - syntax error 1: " + printABit() + "...");
+				Debug.e("CSGReader.parseCuber() - expecting: " + cubeArgs[0] + ", got: " + printABit() + "...");
 			subString(cubeArgs[0].length());
 			double [] s = parseV(3);
 			subString(1); // get rid of ","
 			if(!model.startsWith(cubeArgs[1]))
-				Debug.e("CSGReader.parseCube() - syntax error 2: " + printABit() + "...");
+				Debug.e("CSGReader.parseCube() - expecting: " + cubeArgs[1] + ", got: " + printABit() + "...");
 			subString(cubeArgs[1].length());
 			boolean c = parseBoolean();
 			if(!model.startsWith(");"))
-				Debug.e("CSGReader.parseCube() - syntax error 3: " + printABit() + "...");
+				Debug.e("CSGReader.parseCube() - syntax error: " + printABit() + "...");
 			subString(2);
 			
 			return Primitives.cube(s[0], s[1], s[2], c);
@@ -260,39 +359,74 @@ public class CSGReader
 		{
 			subString(cylinder.length());
 			if(!model.startsWith(cylinderArgs[0]))
-				Debug.e("CSGReader.parseCylinder() - syntax error 1: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[0] + ", got: " + printABit() + "...");
 			subString(cylinderArgs[0].length());
 			int fn = parseIC();
 			if(!model.startsWith(cylinderArgs[1]))
-				Debug.e("CSGReader.parseCylinder() - syntax error 2: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[1] + ", got: " + printABit() + "...");
 			subString(cylinderArgs[1].length());
 			double fa = parseDC();
 			if(!model.startsWith(cylinderArgs[2]))
-				Debug.e("CSGReader.parseCylinder() - syntax error 3: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[2] + ", got: " + printABit() + "...");
 			subString(cylinderArgs[2].length());
 			double fs = parseDC();
 			if(!model.startsWith(cylinderArgs[3]))
-				Debug.e("CSGReader.parseCylinder() - syntax error 4: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[3] + ", got: " + printABit() + "...");
 			subString(cylinderArgs[3].length());
 			double h = parseDC();
 			if(!model.startsWith(cylinderArgs[4]))
-				Debug.e("CSGReader.parseCylinder() - syntax error 5: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[4] + ", got: " + printABit() + "...");
 			subString(cylinderArgs[4].length());
 			double r1 = parseDC();
 			if(!model.startsWith(cylinderArgs[5]))
-				Debug.e("CSGReader.parseCylinder() - syntax error 6: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[5] + ", got: " + printABit() + "...");
 			subString(cylinderArgs[5].length());
 			double r2 = parseDC();
 			if(!model.startsWith(cylinderArgs[6]))
-				Debug.e("CSGReader.parseCylinder() - syntax error 7: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[6] + ", got: " + printABit() + "...");
 			subString(cylinderArgs[6].length());
 			boolean c = parseBoolean();
 			if(!model.startsWith(");"))
-				Debug.e("CSGReader.parseCylinder() - syntax error 8: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - syntax error: " + printABit() + "...");
 			subString(2);
 			
 			return Primitives.cylinder(fn, fa, fs, h, r1, r2, c);
 		}
+		
+		
+		/**
+		 * Parse a sphere of the form:
+		 * sphere($fn=0,$fa=12,$fs=1,r=10);
+		 * 
+		 */
+		private CSG3D parseSphere()
+		{
+			subString(sphere.length());
+			if(!model.startsWith(sphereArgs[0]))
+				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[0] + ", got: " + printABit() + "...");
+			subString(sphereArgs[0].length());
+			int fn = parseIC();
+			if(!model.startsWith(sphereArgs[1]))
+				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[1] + ", got: " + printABit() + "...");
+			subString(sphereArgs[1].length());
+			double fa = parseDC();
+			if(!model.startsWith(sphereArgs[2]))
+				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[2] + ", got: " + printABit() + "...");
+			subString(sphereArgs[2].length());
+			double fs = parseDC();
+			if(!model.startsWith(sphereArgs[3]))
+				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[3] + ", got: " + printABit() + "...");
+			subString(sphereArgs[3].length());
+			double r = parseDb();
+			if(!model.startsWith(";"))
+				Debug.e("CSGReader.parseSphere() - syntax error: " + printABit() + "...");
+			subString(1);
+			
+			return Primitives.sphere(fn, fa, fs, r);
+		}
+		
+		
+		
 		
 		/**
 		 * Parse a matrix of the form:
@@ -303,7 +437,7 @@ public class CSGReader
 		{
 			subString(multmatrix.length());
 			if(!model.startsWith("["))
-				Debug.e("CSGReader.parseMatrix() - syntax error 1: " + printABit() + "...");
+				Debug.e("CSGReader.parseMatrix() - expecting [: " + printABit() + "...");
 			subString(1);
 			Matrix4d m = new Matrix4d();
 			double[] v = parseV(4);
@@ -330,11 +464,15 @@ public class CSGReader
 			m.m32 = v[2];
 			m.m33 = v[3];
 			if(!model.startsWith("])"))
-				Debug.e("CSGReader.parseMatrix() - syntax error 2: " + printABit() + "...");
+				Debug.e("CSGReader.parseMatrix() - expecting ]: " + printABit() + "...");
 			subString(2);
 			return m;
 		}
 		
+		/**
+		 * Find out if the next thing is a valid starter for a sub-model
+		 * @return
+		 */
 		private boolean startNext()
 		{
 			for(int i = 0; i < starts.length; i++)
@@ -343,6 +481,10 @@ public class CSGReader
 			return false;
 		}
 		
+		/**
+		 * Transform a CSG object
+		 * @return
+		 */
 		private CSG3D parseTransform()
 		{
 			CSG3D csga;
@@ -353,6 +495,12 @@ public class CSGReader
 			return csga.transform(transform);
 		}
 		
+		/**
+		 * OpenSCAD allows operators to have arbitrarily many second operands.
+		 * This deals with them all to correct the right object.
+		 * @param operator
+		 * @return
+		 */
 		private CSG3D parseList(CSGOp operator)
 		{
 			eatOpenBracket();
@@ -370,6 +518,11 @@ public class CSGReader
 			return csga;
 		}
 		
+		/**
+		 * The master parsing function that does a recursive descent through 
+		 * the model, parsing it all and returning the final CSG object.
+		 * @return
+		 */
 		private CSG3D parseModel()
 		{	
 			if(model.startsWith("{"))
@@ -383,7 +536,7 @@ public class CSGReader
 					Debug.e("CSGReader.parseModel() - group() not follwed by { : " + printABit() + "...");
 				else
 					subString(1);
-				push(parseModel()); // List(U)???
+				push(parseModel()); // Should we treat this as a Union???
 			} else if(model.startsWith("}"))
 			{
 				subString(1);
@@ -391,7 +544,7 @@ public class CSGReader
 			} else if(model.startsWith(difference)) 
 			{
 				subString(difference.length());
-				push(parseList(CSGOp.INTERSECTION)); //FIXME - OK but should be DIFFERENCE to be clearer
+				push(parseList(CSGOp.DIFFERENCE));
 			} else if(model.startsWith(union))
 			{
 				subString(union.length());
@@ -409,29 +562,15 @@ public class CSGReader
 				push(parseCylinder());
 				if(model.startsWith("}"))
 					subString(1);
+			}else if(model.startsWith(sphere))
+			{
+				push(parseSphere());
+				if(model.startsWith("}"))
+					subString(1);
 			} else
 			{
 				Debug.e("CSGReader.parseModel() - syntax error: " + printABit() + "...");
 			}
 			return pop();
 		}
-		
-		
-		public CSGReader(String fileName)
-		{
-			csgAvailable = readModel(fileName);
-		}
-		
-		public boolean csgAvailable()
-		{
-			return csgAvailable;
-		}
-		
-		public CSG3D csg()
-		{
-			if(CSGModel == null)
-				CSGModel = parseModel();
-			return CSGModel;
-		}
-
 }

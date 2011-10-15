@@ -35,6 +35,8 @@ import javax.vecmath.Matrix4d;
 //import javax.vecmath.Vector3d;
 
 import org.reprap.geometry.polyhedra.AllSTLsToBuild;
+import org.reprap.geometry.polyhedra.CSG3D;
+import org.reprap.geometry.polyhedra.CSGReader;
 import org.reprap.geometry.polyhedra.STLObject;
 import org.reprap.utilities.Debug;
 
@@ -560,6 +562,15 @@ public class RFO
 					String un = astltb.get(i).fileItCameFrom(subMod1);
 					copyFile(s, rfod + un);
 					uniqueNames.add(un);
+
+					String csgFile = CSGReader.CSGFileExists(s);
+					if(csgFile != null)
+					{
+						int sepIndex = csgFile.lastIndexOf(File.separator);
+						String justFile = csgFile.substring(sepIndex + 1, csgFile.length());
+						copyFile(csgFile, rfod + justFile);
+					}
+
 					u++;
 				}
 			}

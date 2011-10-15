@@ -6,7 +6,7 @@ import javax.vecmath.Vector3d;
 
 public class Primitives 
 {
-	static CSG3D cube(double x, double y, double z, boolean centre)
+	public static CSG3D cube(double x, double y, double z, boolean centre)
 	{
 		CSG3D result;
 		if(centre)
@@ -43,12 +43,17 @@ public class Primitives
             return (int)Math.ceil(Math.max(Math.min(360.0 / fa, r*Math.PI / fs), 5));
     }
 	
-	//cylinder($fn=20,$fa=12,$fs=1,h=3,r1=2,r2=2,center=false)
-	//fa is the minimum angle for a fragment.
-	//fs is the minimum size of a fragment.
-	//fn is usually 0. When this variable has a value greater than zero, the other two variables are ignored 
-	//and full circle is rendered using this number of fragments.
-	static CSG3D cylinder(int fn, double fa, double fs, double h, double r1, double r2, boolean centre)
+	/**
+	 * A cylinder without the top and the bottom
+	 * @param fn
+	 * @param fa
+	 * @param fs
+	 * @param h
+	 * @param r1
+	 * @param r2
+	 * @return
+	 */
+	private static CSG3D openCylinder(int fn, double fa, double fs, double h, double r1, double r2)
 	{
 		fn = getFragmentsFromR(Math.min(r1,r2), fn, fs, fa);
 		Point3D p1 = new Point3D(r1,0,0);
@@ -59,23 +64,64 @@ public class Primitives
 		Matrix4d m = new Matrix4d();
 		m.setIdentity();
 		m.set(new AxisAngle4d(0, 0, 1, a));
-		
 		CSG3D result = CSG3D.universe();
 		for(int i = 0; i < fn; i++)
 		{
 			result = CSG3D.intersection(result, s);
 			s = s.transform(m);
 		}
-		p3 = new Point3D(0,0,h);
-		result = CSG3D.intersection(result, new CSG3D(new HalfSpace(p3,p3)));
-		p2 = new Point3D(0,0,0);
-		result = CSG3D.intersection(result, new CSG3D(new HalfSpace(p3.neg(),p2)));
+		return result;
+	}
+	
+	//cylinder($fn=20,$fa=12,$fs=1,h=3,r1=2,r2=2,center=false)
+	//fa is the minimum angle for a fragment.
+	//fs is the minimum size of a fragment.
+	//fn is usually 0. When this variable has a value greater than zero, the other two variables are ignored 
+	//and full circle is rendered using this number of fragments.
+	public static CSG3D cylinder(int fn, double fa, double fs, double h, double r1, double r2, boolean centre)
+	{	
+		CSG3D result = openCylinder(fn, fa, fs, h, r1, r2);
+		Point3D p1 = new Point3D(0,0,h);
+		result = CSG3D.intersection(result, new CSG3D(new HalfSpace(p1,p1)));
+		Point3D p2 = new Point3D(0,0,0);
+		result = CSG3D.intersection(result, new CSG3D(new HalfSpace(p1.neg(),p2)));
 		if(centre)
 		{
+			Matrix4d m = new Matrix4d();
 			m.setIdentity();
 			m.setTranslation(new Vector3d(0, 0, -h/2));
 			result = result.transform(m);
 		}
+		return result;
+	}
+	
+	static CSG3D sphere(int fn, double fa, double fs, double r)
+	{
+		int fnl = getFragmentsFromR(r, fn, fs, fa);
+		double a = 2.0*Math.PI/(double)fnl;
+		Matrix4d m = new Matrix4d();
+		m.setIdentity();
+		CSG3D result = CSG3D.universe();
+		CSG3D cyl;
+		double ang = 0;
+		double angp = a;
+		for(int i = 0; i < fnl/4; i++)
+		{
+			cyl = openCylinder(fn, fa, fs, r*(Math.sin(angp) - Math.sin(ang)), r*Math.cos(ang), r*Math.cos(angp));
+			m.setTranslation(new Vector3d(0, 0, Math.sin(ang)));
+			cyl = cyl.transform(m);
+			result = CSG3D.intersection(result,cyl);
+			cyl = openCylinder(fn, fa, fs, r*(Math.sin(angp) - Math.sin(ang)), r*Math.cos(angp), r*Math.cos(ang));
+			m.setTranslation(new Vector3d(0, 0, -Math.sin(angp)));
+			cyl = cyl.transform(m);
+			result = CSG3D.intersection(result,cyl);
+			ang = angp;
+			angp += a;
+		}
+		Point3D p1 = new Point3D(0,0,r);
+		result = CSG3D.intersection(result, new CSG3D(new HalfSpace(p1,p1)));
+		p1 = new Point3D(0,0,-r);
+		result = CSG3D.intersection(result, new CSG3D(new HalfSpace(p1,p1)));
 		return result;
 	}
 }

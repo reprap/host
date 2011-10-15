@@ -211,7 +211,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         pauseButton.setText("Pause");       
         stopButton.setText("STOP !");       
         exitButton.setText("Exit");       
-        loadSTL.setText("Load STL");
+        loadSTL.setText("Load STL/CSG");
         loadGCode.setText("Load GCode"); 
         loadRFO.setText("Load RFO");         
         saveRFO.setText("Save RFO");
@@ -433,13 +433,13 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                        	.add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)	
-                            .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(saveSCAD, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(loadGCode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        	.add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)	
+                            .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(saveSCAD, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(loadGCode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                .add(loadRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .add(loadSTL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 120, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                .add(loadRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(loadSTL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             //.add(toSNAPRepRapRadioButton)

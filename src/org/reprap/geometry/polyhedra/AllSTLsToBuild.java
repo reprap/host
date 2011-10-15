@@ -1181,13 +1181,13 @@ public class AllSTLsToBuild
 	 * Generate a set of pixel-map representations, one for each extruder, for
 	 * STLObject stl at height z.
 	 * 
-	 * @param stl
+	 * @param stlIndex
 	 * @param z
 	 * @param extruders
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private BooleanGridList slice(int stl, int layer, LayerRules layerRules)
+	private BooleanGridList slice(int stlIndex, int layer, LayerRules layerRules)
 	{
 		if(!frozen)
 		{
@@ -1200,7 +1200,7 @@ public class AllSTLsToBuild
 		
 		// Is the result in the cache?  If so, just use that.
 		
-		BooleanGridList result = cache.getSlice(layer, stl);
+		BooleanGridList result = cache.getSlice(layer, stlIndex);
 		if(result != null)
 			return result;
 		
@@ -1208,7 +1208,7 @@ public class AllSTLsToBuild
 		
 		// Anything there?
 		
-		if(rectangles.get(stl) == null)
+		if(rectangles.get(stlIndex) == null)
 			return new BooleanGridList();
 		
 		// Probably...
@@ -1236,32 +1236,13 @@ public class AllSTLsToBuild
 		
 		// Generate all the edges for STLObject i at this z
 		
-		STLObject stlObject = stls.get(stl);
+		STLObject stlObject = stls.get(stlIndex);
 		Transform3D trans = stlObject.getTransform();
 		Matrix4d m4 = new Matrix4d();
 		trans.get(m4);
 
 		BranchGroup bg = stlObject.getSTL();
-		//ArrayList<CSG3D> csgs = stlObject.getCSGs();
-		//Attributes[] as = new Attributes[csgs.size()];
-		//CSG3D[] unions = new CSG3D[edges.length];
-//		java.util.Enumeration<?> enumKids = bg.getAllChildren();
-//
-//		int i = 0;
-//		while(enumKids.hasMoreElements())
-//		{
-//			Object ob = enumKids.nextElement();
-//			//as[i] = null;
-//			if(ob instanceof BranchGroup)
-//			{
-//				BranchGroup bg1 = (BranchGroup)ob;
-//				Attributes attr = (Attributes)(bg1.getUserData());
-//				//as[i] = attr;
-//				//if(csgs.get(i) == null)
-//					recursiveSetEdges(attr.getPart(), trans, z, attr, edges);
-//			}
-//			i++;
-//		}
+
 		
 		for(int i = 0; i < stlObject.getCount(); i++)
 		{
@@ -1276,8 +1257,6 @@ public class AllSTLsToBuild
 				csgs[attr.getExtruder().getID()].add(csg.transform(m4));
 			}
 		}
-		
-		//edges[att.getExtruder().getID()]
 		
 		// Turn them into lists of polygons, one for each extruder, then
 		// turn those into pixelmaps.
@@ -1304,7 +1283,7 @@ public class AllSTLsToBuild
 					// much smaller than the whole.  This allows booleans on slices to be computed much more
 					// quickly as each is in the same rectangle so the bit patterns match exactly.  But it does use more memory.
 
-					result.add(new BooleanGrid(csgp, rectangles.get(stl), pgl.polygon(0).getAttributes()));
+					result.add(new BooleanGrid(csgp, rectangles.get(stlIndex), pgl.polygon(0).getAttributes()));
 				}
 			}
 			
@@ -1313,13 +1292,13 @@ public class AllSTLsToBuild
 				csgp = CSG2D.slice(csgs[extruderID].get(i), layerRules.getMachineZ());
 				//System.out.println("-3-\n" + csgs[extruderID].get(i).toString());
 				//System.out.println("-2-\n" + csgp.toString()+ "-0-");
-				result.add(new BooleanGrid(csgp, rectangles.get(stl), atts[extruderID]));
+				result.add(new BooleanGrid(csgp, rectangles.get(stlIndex), atts[extruderID]));
 			}
 		}
 		
 		// We may need this later...
 		
-		cache.setSlice(result, layer, stl);
+		cache.setSlice(result, layer, stlIndex);
 		
 		return result;
 	}
