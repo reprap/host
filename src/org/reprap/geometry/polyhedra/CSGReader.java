@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Matrix4d;
 
@@ -19,17 +21,16 @@ import org.reprap.utilities.Debug;
  */
 public class CSGReader 
 {	
-		private static final String group = "group()";
-		private static final String difference = "difference()";
-		private static final String union = "union()";
-		private static final String intersection = "intersection()";
+		private static final String group = "group(){";
+		private static final String difference = "difference(){";
+		private static final String union = "union(){";
+		private static final String intersection = "intersection(){";
 		private static final String multmatrix = "multmatrix(";
 		private static final String cube = "cube(";
 		private static final String cylinder = "cylinder(";
 		private static final String sphere = "sphere(";
 		
 		private static final String[] starts = {
-			"{",
 			group,
 			difference,
 			union,
@@ -55,9 +56,9 @@ public class CSGReader
 		private String model="";
 		private String laggingModel="";
 		
-		private static final int stackTop = 1000;
-		private CSG3D stack[] = new CSG3D[stackTop];
-		private int sp = 0;
+		//private static final int stackTop = 1000;
+		//private CSG3D stack[] = new CSG3D[stackTop];
+		//private int sp = 0;
 		
 		private CSG3D CSGModel = null;
 		
@@ -89,9 +90,21 @@ public class CSGReader
 		 */
 		public CSG3D csg()
 		{
+			ArrayList<CSG3D> c;
+			
 			if(CSGModel == null)
 			{
-				CSGModel = parseModel();
+				//while(model.startsWith(group))
+					//subString(group.length());
+				if(model.startsWith("{"))
+				{
+					Debug.e("CSGReader.csg() - model starts with {.");
+					subString(1);	
+				}
+				c = parseModel();
+				if(c.size() != 1)
+					Debug.e("CSGReader.csg() - model contains " + c.size() + " elements.");
+				CSGModel = c.get(0);
 			}
 			return CSGModel;
 		}
@@ -471,9 +484,9 @@ public class CSGReader
 			m.m31 = v[1];
 			m.m32 = v[2];
 			m.m33 = v[3];
-			if(!model.startsWith("])"))
-				Debug.e("CSGReader.parseMatrix() - expecting ]) ...got: " + printABit() + "...");
-			subString(2);
+			if(!model.startsWith("]){"))
+				Debug.e("CSGReader.parseMatrix() - expecting ]){ ...got: " + printABit() + "...");
+			subString(3);
 			return m;
 		}
 		
@@ -493,59 +506,68 @@ public class CSGReader
 		 * Transform a CSG object
 		 * @return
 		 */
-		private CSG3D parseTransform()
+		private ArrayList<CSG3D> parseTransform()
 		{
 			Matrix4d transform;
 			transform = parseMatrix();
-			return parseModel().transform(transform);
+			ArrayList<CSG3D> r1 = parseModel();
+			ArrayList<CSG3D> result = new ArrayList<CSG3D>();
+			for(int i = 0; i < r1.size(); i++)
+				result.add(r1.get(i).transform(transform));
+			if(!model.startsWith("}"))
+				Debug.e("CSGReader.parseTransform() - { block not follwed by } ...got: " + printABit() + "...");
+			return result;
 		}
 		
-		/**
-		 * OpenSCAD allows boolean operators to have arbitrarily many second operands.
-		 * This deals with them unioned.
-		 * @param  leftOperand
-		 * @return
-		 */
-		private CSG3D parseListUnioned(CSG3D leftOperand)
+		
+		private CSG3D parseCSGOperation(CSGOp operator)
 		{
-			while(startNext())
+			CSG3D leftOperand;
+			ArrayList<CSG3D> c, rightOperand;
+			c = parseModel();
+			if(c.size() != 1)
+				Debug.e("CSGReader.parseModel() " + operator + " - first operand is not a singleton ...got: " + printABit() + "...");
+			leftOperand = c.get(0);
+			rightOperand = parseMultipleOperands();
+			switch(operator)
 			{
-				CSG3D csgb = parseModel();
-				leftOperand = CSG3D.union(leftOperand, csgb);
+			case UNION:
+				for(int i = 0; i < rightOperand.size(); i++)
+					leftOperand = CSG3D.union(leftOperand, rightOperand.get(i));
+				break;
+			case INTERSECTION:
+				for(int i = 0; i < rightOperand.size(); i++)
+					leftOperand = CSG3D.intersection(leftOperand, rightOperand.get(i));
+				break;
+			case DIFFERENCE:
+				for(int i = 0; i < rightOperand.size(); i++)
+					leftOperand = CSG3D.difference(leftOperand, rightOperand.get(i));
+				break;
+			default:
+				Debug.e("CSGReader.parseCSGOperator() illegal operator: " + operator);
 			}
+			if(!model.startsWith("}"))
+				Debug.e("CSGReader.parseCSGOperation() " + operator + "{ - expecting } ...got: " + printABit() + "...");
+			else
+				subString(1);
 			return leftOperand;
 		}
 		
 		/**
-		 * OpenSCAD allows boolean operators to have arbitrarily many second operands.
-		 * This deals with them intersected.
-		 * @param operator
+		 * get a whole list of things (including none)
 		 * @return
 		 */
-		private CSG3D parseListIntersected(CSG3D leftOperand)
+		private ArrayList<CSG3D> parseMultipleOperands()
 		{
+			ArrayList<CSG3D> result = new ArrayList<CSG3D>();
+			ArrayList<CSG3D> c;
 			while(startNext())
 			{
-				CSG3D csgb = parseModel();
-				leftOperand = CSG3D.intersection(leftOperand, csgb);
+				c = parseModel();
+				for(int i = 0; i < c.size(); i++)
+					result.add(c.get(i));
 			}
-			return leftOperand;
-		}
-		
-		/**
-		 * OpenSCAD allows boolean operators to have arbitrarily many second operands.
-		 * This deals with them differenced.
-		 * @param operator
-		 * @return
-		 */
-		private CSG3D parseListDifferenced(CSG3D leftOperand)
-		{
-			while(startNext())
-			{
-				CSG3D csgb = parseModel();
-				leftOperand = CSG3D.difference(leftOperand, csgb);
-			}
-			return leftOperand;
+			return result;
 		}
 		
 		/**
@@ -553,52 +575,61 @@ public class CSGReader
 		 * the model, parsing it all and returning the final CSG object.
 		 * @return
 		 */
-		private CSG3D parseModel()
+		private ArrayList<CSG3D> parseModel()
 		{	
+			System.out.println("parsing: " + model.substring(0, Math.min(50, model.length())));
+			ArrayList<CSG3D> result = new ArrayList<CSG3D>();
 			if(model.startsWith("{"))
 			{
+				Debug.e("CSGReader.parseModel() - unattached { encountered: " + printABit() + "...");
 				subString(1);
-				CSG3D c1 = parseModel();
-				if(!model.startsWith("}"))
-					Debug.e("CSGReader.parseModel() - { block not follwed by } ...got: " + printABit() + "...");
-				else
-					subString(1);
-				return c1;
+				return result;
 			} else if(model.startsWith(group))
 			{
 				subString(group.length());
-				return parseModel();
+				result = parseMultipleOperands();
+				if(!model.startsWith("}"))
+					Debug.e("CSGReader.parseModel() - group(){ block not follwed by } ...got: " + printABit() + "...");
+				else
+					subString(1);
+				return result;
 			} else if(model.startsWith("}"))
 			{
 				subString(1);
 				Debug.e("CSGReader.parseModel() - unexpected } encountered: " + printABit() + "...");
-				return CSG3D.nothing();
+				return result;
 			} else if(model.startsWith(difference)) 
 			{
 				subString(difference.length());
-				return parseListDifferenced(parseModel());
+				result.add(parseCSGOperation(CSGOp.DIFFERENCE)); 
+				return result;
 			} else if(model.startsWith(union))
 			{
 				subString(union.length());
-				return parseListUnioned(parseModel());
+				result.add(parseCSGOperation(CSGOp.UNION));				
+				return result;
 			} else if(model.startsWith(intersection))
 			{
 				subString(intersection.length());
-				return parseListIntersected(parseModel());
+				result.add(parseCSGOperation(CSGOp.INTERSECTION));
+				return result;
 			} else if(model.startsWith(multmatrix)) 
 			{
 				return parseTransform();
 			} else if(model.startsWith(cube))
 			{
-				return parseCube();
+				result.add(parseCube());
+				return result;
 			} else if(model.startsWith(cylinder))
 			{
-				return parseCylinder();
+				result.add(parseCylinder());
+				return result;
 			} else if(model.startsWith(sphere))
 			{
-				return parseSphere();
+				result.add(parseSphere());
+				return result;
 			} 
 			Debug.e("CSGReader.parseModel() - unsupported item: " + printABit() + "...");
-			return CSG3D.nothing();
+			return result;
 		}
 }
