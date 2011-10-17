@@ -82,7 +82,7 @@ public class HalfSpace
 	public HalfSpace(Point3D a, Point3D b, Point3D c)
 	{
 		normal = Point3D.op(Point3D.sub(b, a), Point3D.sub(c, a)).norm();
-		offset = Point3D.mul(normal, a);
+		offset = -Point3D.mul(normal, a);
 	}   
 	
 	/**

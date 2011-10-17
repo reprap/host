@@ -22,6 +22,7 @@ public class CSGReader
 		private static final String group = "group()";
 		private static final String difference = "difference()";
 		private static final String union = "union()";
+		private static final String intersection = "intersection()";
 		private static final String multmatrix = "multmatrix(";
 		private static final String cube = "cube(";
 		private static final String cylinder = "cylinder(";
@@ -32,6 +33,7 @@ public class CSGReader
 			group,
 			difference,
 			union,
+			intersection,
 			multmatrix,
 			cube,
 			cylinder,
@@ -124,32 +126,32 @@ public class CSGReader
 			}
 		}
 		
-		/**
-		 * Stack of CSG expressions
-		 * @param csg
-		 */
-		private void push(CSG3D csg)
-		{
-			stack[sp] = csg;
-			sp++;
-			if(sp >= stackTop)
-				Debug.e("CSGReader.push() - stack overflow!");
-		}
-		
-		/**
-		 * Stack of CSG expressions
-		 * @return
-		 */
-		private CSG3D pop()
-		{
-			sp--;
-			if(sp < 0)
-			{
-				Debug.e("CSGReader.pop() - stack underflow!");
-				return CSG3D.nothing();
-			}
-			return stack[sp];
-		}
+//		/**
+//		 * Stack of CSG expressions
+//		 * @param csg
+//		 */
+//		private void push(CSG3D csg)
+//		{
+//			stack[sp] = csg;
+//			sp++;
+//			if(sp >= stackTop)
+//				Debug.e("CSGReader.push() - stack overflow!");
+//		}
+//		
+//		/**
+//		 * Stack of CSG expressions
+//		 * @return
+//		 */
+//		private CSG3D pop()
+//		{
+//			sp--;
+//			if(sp < 0)
+//			{
+//				Debug.e("CSGReader.pop() - stack underflow!");
+//				return CSG3D.nothing();
+//			}
+//			return stack[sp];
+//		}
 		
 		/**
 		 * Read a CSG model from OpenSCAD into a string.
@@ -208,14 +210,20 @@ public class CSGReader
 			model = model.substring(n);
 		}
 		
-		/**
-		 * Does what it says on the tin for "{"
-		 */
-		private void eatOpenBracket()
-		{
-			if(model.startsWith("{"))
-				subString(1);
-		}
+//		/**
+//		 * Does what it says on the tin for "{"
+//		 */
+//		private void eatOpenBracket()
+//		{
+//			if(model.startsWith("{"))
+//				subString(1);
+//		}
+//		
+//		private void eatAllClosedBracket()
+//		{
+//			while(model.startsWith("}"))
+//				subString(1);
+//		}
 		
 		/**
 		 * String for a bit of the model around where we are parsing
@@ -487,35 +495,61 @@ public class CSGReader
 		 */
 		private CSG3D parseTransform()
 		{
-			CSG3D csga;
 			Matrix4d transform;
 			transform = parseMatrix();
-			eatOpenBracket();
-			csga = parseModel();
-			return csga.transform(transform);
+			if(!model.startsWith("{"))
+				Debug.e("CSGReader.parseTransform() - multmatrix(...) not follwed by { : " + printABit() + "...");
+			else
+				subString(1);
+			return parseModel().transform(transform);
 		}
 		
 		/**
-		 * OpenSCAD allows operators to have arbitrarily many second operands.
-		 * This deals with them all to correct the right object.
+		 * OpenSCAD allows boolean operators to have arbitrarily many second operands.
+		 * This deals with them unioned.
+		 * @param  leftOperand
+		 * @return
+		 */
+		private CSG3D parseListUnioned(CSG3D leftOperand)
+		{
+			while(startNext())
+			{
+				CSG3D csgb = parseModel();
+				leftOperand = CSG3D.union(leftOperand, csgb);
+			}
+			return leftOperand;
+		}
+		
+		/**
+		 * OpenSCAD allows boolean operators to have arbitrarily many second operands.
+		 * This deals with them intersected.
 		 * @param operator
 		 * @return
 		 */
-		private CSG3D parseList(CSGOp operator)
+		private CSG3D parseListIntersected(CSG3D leftOperand)
 		{
-			eatOpenBracket();
-			CSG3D csga = parseModel();
-			CSG3D csgb;
 			while(startNext())
 			{
-				eatOpenBracket();
-				csgb = parseModel();
-				if(operator == CSGOp.UNION)
-					csga = CSG3D.union(csga, csgb);
-				else
-					csga = CSG3D.difference(csga, csgb);
+				CSG3D csgb = parseModel();
+				leftOperand = CSG3D.intersection(leftOperand, csgb);
 			}
-			return csga;
+			return leftOperand;
+		}
+		
+		/**
+		 * OpenSCAD allows boolean operators to have arbitrarily many second operands.
+		 * This deals with them differenced.
+		 * @param operator
+		 * @return
+		 */
+		private CSG3D parseListDifferenced(CSG3D leftOperand)
+		{
+			while(startNext())
+			{
+				CSG3D csgb = parseModel();
+				leftOperand = CSG3D.difference(leftOperand, csgb);
+			}
+			return leftOperand;
 		}
 		
 		/**
@@ -528,49 +562,59 @@ public class CSGReader
 			if(model.startsWith("{"))
 			{
 				subString(1);
-				push(parseModel());
-			}else if(model.startsWith(group))
-			{
-				subString(group.length());
-				if(!model.startsWith("{"))
-					Debug.e("CSGReader.parseModel() - group() not follwed by { : " + printABit() + "...");
+				CSG3D c1 = parseModel();
+				if(!model.startsWith("}"))
+					Debug.e("CSGReader.parseModel() - block not follwed by } : " + printABit() + "...");
 				else
 					subString(1);
-				push(parseModel()); // Should we treat this as a Union???
+				return c1;
+			} else if(model.startsWith(group))
+			{
+				subString(group.length());
+				return parseModel();
 			} else if(model.startsWith("}"))
 			{
 				subString(1);
-				return pop();
+				Debug.e("CSGReader.parseModel() - uneaten } encountered: " + printABit() + "...");
+				return CSG3D.nothing();
 			} else if(model.startsWith(difference)) 
 			{
 				subString(difference.length());
-				push(parseList(CSGOp.DIFFERENCE));
+				if(!model.startsWith("{"))
+					Debug.e("CSGReader.parseModel() - difference() not follwed by { : " + printABit() + "...");
+				else
+					subString(1);
+				return parseListDifferenced(parseModel());
 			} else if(model.startsWith(union))
 			{
 				subString(union.length());
-				push(parseList(CSGOp.UNION));
+				if(!model.startsWith("{"))
+					Debug.e("CSGReader.parseModel() - union() not follwed by { : " + printABit() + "...");
+				else
+					subString(1);
+				return parseListUnioned(parseModel());
+			} else if(model.startsWith(intersection))
+			{
+				subString(intersection.length());
+				if(!model.startsWith("{"))
+					Debug.e("CSGReader.parseModel() - intersection() not follwed by { : " + printABit() + "...");
+				else
+					subString(1);
+				return parseListIntersected(parseModel());
 			} else if(model.startsWith(multmatrix)) 
 			{
-				push(parseTransform());
+				return parseTransform();
 			} else if(model.startsWith(cube))
 			{
-				push(parseCube());
-				if(model.startsWith("}"))
-					subString(1);
+				return parseCube();
 			} else if(model.startsWith(cylinder))
 			{
-				push(parseCylinder());
-				if(model.startsWith("}"))
-					subString(1);
-			}else if(model.startsWith(sphere))
+				return parseCylinder();
+			} else if(model.startsWith(sphere))
 			{
-				push(parseSphere());
-				if(model.startsWith("}"))
-					subString(1);
-			} else
-			{
-				Debug.e("CSGReader.parseModel() - syntax error: " + printABit() + "...");
-			}
-			return pop();
+				return parseSphere();
+			} 
+			Debug.e("CSGReader.parseModel() - syntax error: " + printABit() + "...");
+			return CSG3D.nothing();
 		}
 }

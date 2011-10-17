@@ -6,6 +6,15 @@ import javax.vecmath.Vector3d;
 
 public class Primitives 
 {
+	
+	/**
+	 * This should really be called cuboid, but let's not be pedantic...
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param centre
+	 * @return
+	 */
 	public static CSG3D cube(double x, double y, double z, boolean centre)
 	{
 		CSG3D result;
@@ -57,8 +66,8 @@ public class Primitives
 	{
 		fn = getFragmentsFromR(Math.min(r1,r2), fn, fs, fa);
 		Point3D p1 = new Point3D(r1,0,0);
-		Point3D p2 = new Point3D(r2,0,h);
-		Point3D p3 = new Point3D(r1,10,0);
+		Point3D p2 = new Point3D(r1,10,0);
+		Point3D p3 = new Point3D(r2,0,h);
 		CSG3D s = new CSG3D(new HalfSpace(p1,p2,p3));
 		double a = 2.0*Math.PI/(double)fn;
 		Matrix4d m = new Matrix4d();
@@ -73,11 +82,20 @@ public class Primitives
 		return result;
 	}
 	
-	//cylinder($fn=20,$fa=12,$fs=1,h=3,r1=2,r2=2,center=false)
-	//fa is the minimum angle for a fragment.
-	//fs is the minimum size of a fragment.
-	//fn is usually 0. When this variable has a value greater than zero, the other two variables are ignored 
-	//and full circle is rendered using this number of fragments.
+	
+	/**
+	 * Cylinder with ends
+	 *
+	 * @param fn is usually 0. When this variable has a value greater than zero, the other two variables are ignored
+	 *              and full circle is rendered using this number of fragments.
+	 * @param fa is the minimum angle for a fragment.
+	 * @param fs is the minimum size of a fragment.
+	 * @param h length in Z
+	 * @param r1 bottom (low Z) radius of frustum 
+	 * @param r2 top radius
+	 * @param centre Z goes from -h/2 to + h/2; or 0 to h
+	 * @return
+	 */
 	public static CSG3D cylinder(int fn, double fa, double fs, double h, double r1, double r2, boolean centre)
 	{	
 		CSG3D result = openCylinder(fn, fa, fs, h, r1, r2);
@@ -95,6 +113,14 @@ public class Primitives
 		return result;
 	}
 	
+	/**
+	 * Sphere.  The f arguments do the same as for Cylinder
+	 * @param fn
+	 * @param fa
+	 * @param fs
+	 * @param r
+	 * @return
+	 */
 	static CSG3D sphere(int fn, double fa, double fs, double r)
 	{
 		int fnl = getFragmentsFromR(r, fn, fs, fa);
@@ -112,7 +138,7 @@ public class Primitives
 			cyl = cyl.transform(m);
 			result = CSG3D.intersection(result,cyl);
 			cyl = openCylinder(fn, fa, fs, r*(Math.sin(angp) - Math.sin(ang)), r*Math.cos(angp), r*Math.cos(ang));
-			m.setTranslation(new Vector3d(0, 0, -Math.sin(angp)));
+			m.setTranslation(new Vector3d(0, 0, -Math.sin(ang)));
 			cyl = cyl.transform(m);
 			result = CSG3D.intersection(result,cyl);
 			ang = angp;

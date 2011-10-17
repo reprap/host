@@ -237,6 +237,15 @@ public class RrGraphics
 		pos = new Point2D(width*0.5, height*0.5);
 	}
 	
+	private void plotBar()
+	{
+		g2d.setColor(boxes);
+		Point2D p = new Point2D(scaledBox.ne().x() - 12, scaledBox.sw().y() + 5);
+		move(p);
+		p = new Point2D(scaledBox.ne().x() - 2, scaledBox.sw().y() + 5);
+		plot(p);	
+	}
+	
 	/**
 	 * @param b
 	 */
@@ -490,7 +499,7 @@ public class RrGraphics
 	 */
 	private void plot()
 	{
-		
+		plotBar();
 		if(bg != null)
 		{
 			fillBG(bg);
