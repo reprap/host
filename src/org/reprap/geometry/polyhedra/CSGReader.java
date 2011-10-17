@@ -243,7 +243,7 @@ public class CSGReader
 			int c = model.indexOf(",");
 			if(c <= 0)
 			{
-				Debug.e("CSGReader.parseDCI() - expecting ,: " + printABit() + "...");
+				Debug.e("CSGReader.parseDCI() - expecting , ...got: " + printABit() + "...");
 				return 0;
 			}
 			String i = model.substring(0, c);
@@ -260,7 +260,7 @@ public class CSGReader
 			int c = model.indexOf(",");
 			if(c <= 0)
 			{
-				Debug.e("CSGReader.parseDC() - expecting ,: " + printABit() + "...");
+				Debug.e("CSGReader.parseDC() - expecting , ...got: " + printABit() + "...");
 				return 0;
 			}
 			String d = model.substring(0, c);
@@ -277,7 +277,7 @@ public class CSGReader
 			int c = model.indexOf("]");
 			if(c <= 0)
 			{
-				Debug.e("CSGReader.parseDB() - expecting ]: " + printABit() + "...");
+				Debug.e("CSGReader.parseDB() - expecting ] ...got: " + printABit() + "...");
 				return 0;
 			}
 			String d = model.substring(0, c);
@@ -294,7 +294,7 @@ public class CSGReader
 			int c = model.indexOf(")");
 			if(c <= 0)
 			{
-				Debug.e("CSGReader.parseDB() - expecting ): " + printABit() + "...");
+				Debug.e("CSGReader.parseDb() - expecting ) ...got: " + printABit() + "...");
 				return 0;
 			}
 			String d = model.substring(0, c);
@@ -325,7 +325,7 @@ public class CSGReader
 		{
 			double[] r = new double[e];
 			if(!model.startsWith("["))
-				Debug.e("CSGReader.parseV() - expecting [ : " + printABit() + "...");
+				Debug.e("CSGReader.parseV() - expecting [ ...got: " + printABit() + "...");
 			subString(1);
 			for(int i = 0; i < e-1 ; i++)
 				r[i] = parseDC();
@@ -342,16 +342,16 @@ public class CSGReader
 		{
 			subString(cube.length());
 			if(!model.startsWith(cubeArgs[0]))
-				Debug.e("CSGReader.parseCuber() - expecting: " + cubeArgs[0] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseCuber() - expecting: " + cubeArgs[0] + " ...got: " + printABit() + "...");
 			subString(cubeArgs[0].length());
 			double [] s = parseV(3);
 			subString(1); // get rid of ","
 			if(!model.startsWith(cubeArgs[1]))
-				Debug.e("CSGReader.parseCube() - expecting: " + cubeArgs[1] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseCube() - expecting: " + cubeArgs[1] + " ...got: " + printABit() + "...");
 			subString(cubeArgs[1].length());
 			boolean c = parseBoolean();
 			if(!model.startsWith(");"))
-				Debug.e("CSGReader.parseCube() - syntax error: " + printABit() + "...");
+				Debug.e("CSGReader.parseCube() - expecting ); ...got: " + printABit() + "...");
 			subString(2);
 			
 			return Primitives.cube(s[0], s[1], s[2], c);
@@ -367,35 +367,35 @@ public class CSGReader
 		{
 			subString(cylinder.length());
 			if(!model.startsWith(cylinderArgs[0]))
-				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[0] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[0] + " ...got: " + printABit() + "...");
 			subString(cylinderArgs[0].length());
 			int fn = parseIC();
 			if(!model.startsWith(cylinderArgs[1]))
-				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[1] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[1] + " ...got: " + printABit() + "...");
 			subString(cylinderArgs[1].length());
 			double fa = parseDC();
 			if(!model.startsWith(cylinderArgs[2]))
-				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[2] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[2] + " ...got: " + printABit() + "...");
 			subString(cylinderArgs[2].length());
 			double fs = parseDC();
 			if(!model.startsWith(cylinderArgs[3]))
-				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[3] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[3] + " ...got: " + printABit() + "...");
 			subString(cylinderArgs[3].length());
 			double h = parseDC();
 			if(!model.startsWith(cylinderArgs[4]))
-				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[4] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[4] + " ...got: " + printABit() + "...");
 			subString(cylinderArgs[4].length());
 			double r1 = parseDC();
 			if(!model.startsWith(cylinderArgs[5]))
-				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[5] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[5] + " ...got: " + printABit() + "...");
 			subString(cylinderArgs[5].length());
 			double r2 = parseDC();
 			if(!model.startsWith(cylinderArgs[6]))
-				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[6] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting: " + cylinderArgs[6] + " ...got: " + printABit() + "...");
 			subString(cylinderArgs[6].length());
 			boolean c = parseBoolean();
 			if(!model.startsWith(");"))
-				Debug.e("CSGReader.parseCylinder() - syntax error: " + printABit() + "...");
+				Debug.e("CSGReader.parseCylinder() - expecting ); ...got: " + printABit() + "...");
 			subString(2);
 			
 			return Primitives.cylinder(fn, fa, fs, h, r1, r2, c);
@@ -411,23 +411,23 @@ public class CSGReader
 		{
 			subString(sphere.length());
 			if(!model.startsWith(sphereArgs[0]))
-				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[0] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[0] + " ...got: " + printABit() + "...");
 			subString(sphereArgs[0].length());
 			int fn = parseIC();
 			if(!model.startsWith(sphereArgs[1]))
-				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[1] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[1] + " ...got: " + printABit() + "...");
 			subString(sphereArgs[1].length());
 			double fa = parseDC();
 			if(!model.startsWith(sphereArgs[2]))
-				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[2] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[2] + " ...got: " + printABit() + "...");
 			subString(sphereArgs[2].length());
 			double fs = parseDC();
 			if(!model.startsWith(sphereArgs[3]))
-				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[3] + ", got: " + printABit() + "...");
+				Debug.e("CSGReader.parseSphere() - expecting: " + sphereArgs[3] + " ...got: " + printABit() + "...");
 			subString(sphereArgs[3].length());
 			double r = parseDb();
 			if(!model.startsWith(";"))
-				Debug.e("CSGReader.parseSphere() - syntax error: " + printABit() + "...");
+				Debug.e("CSGReader.parseSphere() - expecting ; ...got: " + printABit() + "...");
 			subString(1);
 			
 			return Primitives.sphere(fn, fa, fs, r);
@@ -445,7 +445,7 @@ public class CSGReader
 		{
 			subString(multmatrix.length());
 			if(!model.startsWith("["))
-				Debug.e("CSGReader.parseMatrix() - expecting [: " + printABit() + "...");
+				Debug.e("CSGReader.parseMatrix() - expecting [ ...got: " + printABit() + "...");
 			subString(1);
 			Matrix4d m = new Matrix4d();
 			double[] v = parseV(4);
@@ -472,7 +472,7 @@ public class CSGReader
 			m.m32 = v[2];
 			m.m33 = v[3];
 			if(!model.startsWith("])"))
-				Debug.e("CSGReader.parseMatrix() - expecting ]: " + printABit() + "...");
+				Debug.e("CSGReader.parseMatrix() - expecting ]) ...got: " + printABit() + "...");
 			subString(2);
 			return m;
 		}
@@ -497,10 +497,6 @@ public class CSGReader
 		{
 			Matrix4d transform;
 			transform = parseMatrix();
-			if(!model.startsWith("{"))
-				Debug.e("CSGReader.parseTransform() - multmatrix(...) not follwed by { : " + printABit() + "...");
-			else
-				subString(1);
 			return parseModel().transform(transform);
 		}
 		
@@ -564,7 +560,7 @@ public class CSGReader
 				subString(1);
 				CSG3D c1 = parseModel();
 				if(!model.startsWith("}"))
-					Debug.e("CSGReader.parseModel() - block not follwed by } : " + printABit() + "...");
+					Debug.e("CSGReader.parseModel() - { block not follwed by } ...got: " + printABit() + "...");
 				else
 					subString(1);
 				return c1;
@@ -575,31 +571,19 @@ public class CSGReader
 			} else if(model.startsWith("}"))
 			{
 				subString(1);
-				Debug.e("CSGReader.parseModel() - uneaten } encountered: " + printABit() + "...");
+				Debug.e("CSGReader.parseModel() - unexpected } encountered: " + printABit() + "...");
 				return CSG3D.nothing();
 			} else if(model.startsWith(difference)) 
 			{
 				subString(difference.length());
-				if(!model.startsWith("{"))
-					Debug.e("CSGReader.parseModel() - difference() not follwed by { : " + printABit() + "...");
-				else
-					subString(1);
 				return parseListDifferenced(parseModel());
 			} else if(model.startsWith(union))
 			{
 				subString(union.length());
-				if(!model.startsWith("{"))
-					Debug.e("CSGReader.parseModel() - union() not follwed by { : " + printABit() + "...");
-				else
-					subString(1);
 				return parseListUnioned(parseModel());
 			} else if(model.startsWith(intersection))
 			{
 				subString(intersection.length());
-				if(!model.startsWith("{"))
-					Debug.e("CSGReader.parseModel() - intersection() not follwed by { : " + printABit() + "...");
-				else
-					subString(1);
 				return parseListIntersected(parseModel());
 			} else if(model.startsWith(multmatrix)) 
 			{
@@ -614,7 +598,7 @@ public class CSGReader
 			{
 				return parseSphere();
 			} 
-			Debug.e("CSGReader.parseModel() - syntax error: " + printABit() + "...");
+			Debug.e("CSGReader.parseModel() - unsupported item: " + printABit() + "...");
 			return CSG3D.nothing();
 		}
 }
