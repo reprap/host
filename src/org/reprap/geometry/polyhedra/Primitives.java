@@ -134,11 +134,11 @@ public class Primitives
 		for(int i = 0; i < fnl/4; i++)
 		{
 			cyl = openCylinder(fn, fa, fs, r*(Math.sin(angp) - Math.sin(ang)), r*Math.cos(ang), r*Math.cos(angp));
-			m.setTranslation(new Vector3d(0, 0, Math.sin(ang)));
+			m.setTranslation(new Vector3d(0, 0, r*Math.sin(ang)));
 			cyl = cyl.transform(m);
 			result = CSG3D.intersection(result,cyl);
 			cyl = openCylinder(fn, fa, fs, r*(Math.sin(angp) - Math.sin(ang)), r*Math.cos(angp), r*Math.cos(ang));
-			m.setTranslation(new Vector3d(0, 0, -Math.sin(ang)));
+			m.setTranslation(new Vector3d(0, 0, -r*Math.sin(ang)));
 			cyl = cyl.transform(m);
 			result = CSG3D.intersection(result,cyl);
 			ang = angp;
