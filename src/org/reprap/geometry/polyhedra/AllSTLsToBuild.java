@@ -1241,21 +1241,19 @@ public class AllSTLsToBuild
 		Matrix4d m4 = new Matrix4d();
 		trans.get(m4);
 
-		BranchGroup bg = stlObject.getSTL();
+		//BranchGroup bg = stlObject.getSTL();
 
 		
 		for(int i = 0; i < stlObject.getCount(); i++)
 		{
 			BranchGroup bg1 = stlObject.getSTL(i);
 			Attributes attr = (Attributes)(bg1.getUserData());
+			atts[attr.getExtruder().getID()] = attr;
 			CSG3D csg = stlObject.getCSG(i);
-			if(csg == null)
-				recursiveSetEdges(attr.getPart(), trans, z, attr, edges);
-			else
-			{
-				atts[attr.getExtruder().getID()] = attr;
+			if(csg != null)
 				csgs[attr.getExtruder().getID()].add(csg.transform(m4));
-			}
+			else
+				recursiveSetEdges(attr.getPart(), trans, z, attr, edges);
 		}
 		
 		// Turn them into lists of polygons, one for each extruder, then
@@ -1263,6 +1261,16 @@ public class AllSTLsToBuild
 		
 		for(extruderID = 0; extruderID < edges.length; extruderID++)
 		{
+			// Deal with CSG shapes (much simpler and faster).
+			
+			for(int i = 0; i < csgs[extruderID].size(); i++)
+			{
+				csgp = CSG2D.slice(csgs[extruderID].get(i), z);
+				result.add(new BooleanGrid(csgp, rectangles.get(stlIndex), atts[extruderID]));
+			}
+			
+			// Deal with STL-generated edges
+			
 			if(edges[extruderID].size() > 0)
 			{
 				pgl = simpleCull(edges[extruderID]);
@@ -1285,14 +1293,6 @@ public class AllSTLsToBuild
 
 					result.add(new BooleanGrid(csgp, rectangles.get(stlIndex), pgl.polygon(0).getAttributes()));
 				}
-			}
-			
-			for(int i = 0; i < csgs[extruderID].size(); i++)
-			{
-				csgp = CSG2D.slice(csgs[extruderID].get(i), layerRules.getMachineZ());
-				//System.out.println("-3-\n" + csgs[extruderID].get(i).toString());
-				//System.out.println("-2-\n" + csgp.toString()+ "-0-");
-				result.add(new BooleanGrid(csgp, rectangles.get(stlIndex), atts[extruderID]));
 			}
 		}
 		

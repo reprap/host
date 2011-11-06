@@ -476,8 +476,13 @@ public class CSGReader
 				Debug.e("CSGReader.parseTransform() - expecting ){ ...got: " + printABit() + "...");
 			else
 				subString(2);
-			ArrayList<CSG3D> r1 = parseModel();
 			ArrayList<CSG3D> result = new ArrayList<CSG3D>();
+			if(model.startsWith("}")) // Nothing there?
+			{
+				subString(1);
+				return result;
+			}
+			ArrayList<CSG3D> r1 = parseModel();
 			for(int i = 0; i < r1.size(); i++)
 				result.add(r1.get(i).transform(transform));
 			if(!model.startsWith("}"))

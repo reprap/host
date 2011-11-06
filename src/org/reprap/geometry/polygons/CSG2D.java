@@ -230,6 +230,12 @@ public class CSG2D
 		complexity = c.complexity;
 	}
 	
+	/**
+	 * Compute a 2D slice of a 3D CSG at a given Z value
+	 * @param t
+	 * @param z
+	 * @return
+	 */
 	public static CSG2D slice(CSG3D t, double z)
 	{
 		CSG2D r = new CSG2D();	
