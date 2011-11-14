@@ -482,7 +482,7 @@ public class CSGReader
 				subString(1);
 				return result;
 			}
-			ArrayList<CSG3D> r1 = parseModel();
+			ArrayList<CSG3D> r1 = parseMultipleOperands(); //Should be parseModel(), but the user can be dumb sometimes; protect him.
 			for(int i = 0; i < r1.size(); i++)
 				result.add(r1.get(i).transform(transform));
 			if(!model.startsWith("}"))
@@ -502,12 +502,19 @@ public class CSGReader
 		private CSG3D parseCSGOperation(CSGOp operator)
 		{
 			CSG3D leftOperand;
-			ArrayList<CSG3D> c, rightOperand;
+			ArrayList<CSG3D> c, rightOperand, temp;
 			c = parseModel();
-			if(c.size() != 1)
-				Debug.e("CSGReader.parseModel() " + operator + " - first operand is not a singleton ...got: " + printABitAbout() + "...");
 			leftOperand = c.get(0);
-			rightOperand = parseMultipleOperands();
+			rightOperand = new ArrayList<CSG3D>();
+			if(c.size() != 1)
+			{
+				Debug.e("CSGReader.parseModel() " + operator + " - first operand is not a singleton ...got: " + printABitAbout() + "...");
+				for(int i = 1; i < c.size(); i++)
+					rightOperand.add(c.get(i));
+			}
+			temp = parseMultipleOperands();
+			for(int i = 0; i < temp.size(); i++)
+				rightOperand.add(temp.get(i));
 			switch(operator)
 			{
 			case UNION:

@@ -160,7 +160,7 @@ public class AllSTLsToBuild
 		private int[] layerNumber;
 		private int ringPointer;
 		private final int noLayer = Integer.MIN_VALUE;
-		private final int ringSize = 5;
+		private final int ringSize = 10;
 		
 		public SliceCache()
 		{
@@ -745,11 +745,13 @@ public class AllSTLsToBuild
 		// But it's only going to be subtracted from other shapes, so what it's made
 		// from doesn't matter.
 		
-		int layer = layerConditions.getMachineLayer();
-		BooleanGridList thisLayer = slice(stl, layerConditions.getModelLayer(), layerConditions);
+		int layer = layerConditions.getModelLayer();
+		
+		BooleanGridList thisLayer = slice(stl, layer, layerConditions);
 		
 		BooleanGrid unionOfThisLayer;
 		Attributes a;
+		System.out.println("model layer: " + layer + " this layer size: " + thisLayer.size());
 		if(thisLayer.size() > 0)
 		{
 			unionOfThisLayer = thisLayer.get(0);
@@ -767,8 +769,9 @@ public class AllSTLsToBuild
 		
 		BooleanGridList allThis = new BooleanGridList();
 		allThis.add(unionOfThisLayer);
-		allThis = allThis.offset(layerConditions, true, 3);  // 3 is a bit of a hack...
-		
+		System.out.println("model layer: " + layer + " allThis size before offset: " + allThis.size());
+		allThis = allThis.offset(layerConditions, true, 2);  // 2 is a bit of a hack...
+		System.out.println("model layer: " + layer + " allThis size after offset: " + allThis.size());
 		if(allThis.size() > 0)
 			unionOfThisLayer = allThis.get(0);
 		else
@@ -778,6 +781,10 @@ public class AllSTLsToBuild
 		// support on the next layer down.
 		
 		BooleanGridList previousSupport = cache.getSupport(layer+1, stl);
+		if(previousSupport != null)
+			System.out.println("model layer: " + layer + " previous support size: " + previousSupport.size());
+		else
+			System.out.println("model layer: " + layer + " previous support size: 0");
 		cache.setSupport(BooleanGridList.unions(previousSupport, thisLayer), layer, stl);
 		
 		// Now we subtract the union of this layer from all the stuff requiring support in the layer above.
@@ -799,6 +806,7 @@ public class AllSTLsToBuild
 		// Now force the attributes of the support pattern to be the support extruders
 		// for all the materials in it.
 		
+		System.out.println("model layer: " + layer + " current support size: " + support.size());
 		for(int i = 0; i < support.size(); i++)
 		{
 			Extruder e = support.attribute(i).getExtruder().getSupportExtruder();
@@ -812,7 +820,9 @@ public class AllSTLsToBuild
 		
 		// Finally compute the support hatch.
 		
-		return support.hatch(layerConditions, false, null);
+		PolygonList result = support.hatch(layerConditions, false, null);
+		System.out.println("model layer: " + layer + " support size: " + result.size());
+		return result;
 	}
 	
 	/**
@@ -1012,12 +1022,13 @@ public class AllSTLsToBuild
 		
 		// Where are we and what does the current slice look like?
 		
-		int layer = layerConditions.getMachineLayer();
-		BooleanGridList slice = slice(stl, layerConditions.getModelLayer(), layerConditions);
+		int layer = layerConditions.getModelLayer();
+		
+		BooleanGridList slice = slice(stl, layer, layerConditions);
 		
 		// Get the bottom and top out of the way - no fancy calculations needed.
 		
-		if(layerConditions.getModelLayer() < 2 || layerConditions.getModelLayer() > layerConditions.getModelLayerMax() - 3)
+		if(layer < 2 || layer > layerConditions.getModelLayerMax() - 3)
 		{
 			slice = slice.offset(layerConditions, false, -1);
 			infill.hatchedPolygons = slice.hatch(layerConditions, true, null);
