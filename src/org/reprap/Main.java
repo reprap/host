@@ -124,7 +124,7 @@ public class Main {
 
 
         
-        JMenu manipMenu = new JMenu("Manipulate");
+        JMenu manipMenu = new JMenu("Edit");
         manipMenu.setMnemonic(KeyEvent.VK_M);
         menubar.add(manipMenu);
 
@@ -159,6 +159,14 @@ public class Main {
 				oninToMM();
 			}});
         manipMenu.add(inToMM);
+        
+        JMenuItem changeMaterial = new JMenuItem("Change material", KeyEvent.VK_M);
+        changeMaterial.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK));
+        changeMaterial.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				onChangeMaterial();
+			}});
+        manipMenu.add(changeMaterial);
         
         JMenuItem nextP = new JMenuItem("Select next object that will be built", KeyEvent.VK_N);
         nextP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
@@ -443,6 +451,10 @@ public class Main {
     private void oninToMM() {
     	  builder.inToMM();
       } 
+    
+    private void onChangeMaterial() {
+  	  builder.changeMaterial();
+    } 
     
     private void onNextPicked()
     {

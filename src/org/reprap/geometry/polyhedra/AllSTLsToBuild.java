@@ -751,7 +751,7 @@ public class AllSTLsToBuild
 		
 		BooleanGrid unionOfThisLayer;
 		Attributes a;
-		System.out.println("model layer: " + layer + " this layer size: " + thisLayer.size());
+		//System.out.println("model layer: " + layer + " this layer size: " + thisLayer.size());
 		if(thisLayer.size() > 0)
 		{
 			unionOfThisLayer = thisLayer.get(0);
@@ -769,9 +769,9 @@ public class AllSTLsToBuild
 		
 		BooleanGridList allThis = new BooleanGridList();
 		allThis.add(unionOfThisLayer);
-		System.out.println("model layer: " + layer + " allThis size before offset: " + allThis.size());
+		//System.out.println("model layer: " + layer + " allThis size before offset: " + allThis.size());
 		allThis = allThis.offset(layerConditions, true, 2);  // 2 is a bit of a hack...
-		System.out.println("model layer: " + layer + " allThis size after offset: " + allThis.size());
+		//System.out.println("model layer: " + layer + " allThis size after offset: " + allThis.size());
 		if(allThis.size() > 0)
 			unionOfThisLayer = allThis.get(0);
 		else
@@ -781,10 +781,10 @@ public class AllSTLsToBuild
 		// support on the next layer down.
 		
 		BooleanGridList previousSupport = cache.getSupport(layer+1, stl);
-		if(previousSupport != null)
-			System.out.println("model layer: " + layer + " previous support size: " + previousSupport.size());
-		else
-			System.out.println("model layer: " + layer + " previous support size: 0");
+//		if(previousSupport != null)
+//			System.out.println("model layer: " + layer + " previous support size: " + previousSupport.size());
+//		else
+//			System.out.println("model layer: " + layer + " previous support size: 0");
 		cache.setSupport(BooleanGridList.unions(previousSupport, thisLayer), layer, stl);
 		
 		// Now we subtract the union of this layer from all the stuff requiring support in the layer above.
@@ -806,7 +806,7 @@ public class AllSTLsToBuild
 		// Now force the attributes of the support pattern to be the support extruders
 		// for all the materials in it.
 		
-		System.out.println("model layer: " + layer + " current support size: " + support.size());
+		//System.out.println("model layer: " + layer + " current support size: " + support.size());
 		for(int i = 0; i < support.size(); i++)
 		{
 			Extruder e = support.attribute(i).getExtruder().getSupportExtruder();
@@ -821,7 +821,7 @@ public class AllSTLsToBuild
 		// Finally compute the support hatch.
 		
 		PolygonList result = support.hatch(layerConditions, false, null);
-		System.out.println("model layer: " + layer + " support size: " + result.size());
+		//System.out.println("model layer: " + layer + " support size: " + result.size());
 		return result;
 	}
 	

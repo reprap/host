@@ -160,9 +160,9 @@ class MaterialRadioButtons extends JPanel {
 	    jLabel2.setText(" Number of copies of the object just loaded to print: ");
 		jLabel2.setHorizontalAlignment(SwingConstants.CENTER);
 		copies = new JTextField("1");
-		radioPanel.add(copies);
+	    copies.setSize(20, 10);
 		copies.setHorizontalAlignment(SwingConstants.CENTER);
-		
+		radioPanel.add(copies);
 		
 		JLabel jLabel1 = new JLabel();
 		radioPanel.add(jLabel1);
@@ -172,20 +172,32 @@ class MaterialRadioButtons extends JPanel {
 		try
 		{
 			names = Preferences.allMaterials();
-			att.setMaterial(names[0]);
+			String matname = att.getMaterial();
+			if(matname == null)
+				matname = "";
+			int matnumber = -1;
 			for(int i = 0; i < names.length; i++)
 			{
+				if(matname.contentEquals(names[i]))
+					matnumber = i;
 				JRadioButton b = new JRadioButton(names[i]);
 		        b.setActionCommand(names[i]);
 		        b.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						att.setMaterial(e.getActionCommand());
 					}});
-		        if(i == 0)
+		        if(i == matnumber)
 		        	b.setSelected(true);
 		        bGroup.add(b);
 		        radioPanel.add(b);
 			}
+			if(matnumber < 0)
+			{
+				att.setMaterial(names[0]);
+				JRadioButton b = (JRadioButton)bGroup.getElements().nextElement();
+				b.setSelected(true);
+			} else
+				copies.setEnabled(false);  // If it's already loaded, don't make multiple copies (FUTURE: why not...?)
 			
 			JButton okButton = new JButton();
 			radioPanel.add(okButton);
@@ -235,7 +247,24 @@ class MaterialRadioButtons extends JPanel {
         dialog.pack();
         dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
         dialog.setVisible(true);
-    }	   
+    }	 
+    
+    public static void createAndShowGUI(Attributes a, RepRapBuild r, STLObject lastPicked) 
+    {
+    	if(lastPicked == null)
+    		return;
+    	int index = -1;
+		for(int i = 0; i < r.getSTLs().size(); i++)
+		{
+			if(r.getSTLs().get(i) == lastPicked)
+			{
+				index = i;
+				break;
+			}
+		}
+		if (index >= 0) 
+			createAndShowGUI(a, r, index);
+    }
 	
 }
 
@@ -447,6 +476,13 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 			}
 			MaterialRadioButtons.createAndShowGUI(att, this, stls.size() - 1);
 		}
+	}
+	
+	public void changeMaterial()
+	{
+		if(lastPicked == null)
+			return;
+		MaterialRadioButtons.createAndShowGUI(lastPicked.attributes(0), this, lastPicked);
 	}
 	
 	// Callback for when the user selects an RFO file to load
