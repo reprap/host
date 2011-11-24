@@ -228,7 +228,7 @@ public class GerberGCode {
 			RrGraphics simulationPlot1 = new RrGraphics("PCB from gerber");
 			//				if(currentPolygon != null)
 			//					thePattern.add(new RrPolygon(currentPolygon));
-			simulationPlot1.init(pcb.box(), false, 0);
+			simulationPlot1.init(pcb.box(), false, "0");
 			simulationPlot1.add(pcb);
 		}
 

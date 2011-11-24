@@ -177,7 +177,7 @@ public class PCB {
 			RrGraphics simulationPlot2 = new RrGraphics("PCB pen plotlines");
 			//				if(currentPolygon != null)
 			//					thePattern.add(new RrPolygon(currentPolygon));
-			simulationPlot2.init(penPaths.getBox(), false, 0);
+			simulationPlot2.init(penPaths.getBox(), false, "0");
 			simulationPlot2.add(penPaths);
 		}
 

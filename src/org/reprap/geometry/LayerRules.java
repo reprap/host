@@ -466,35 +466,34 @@ public class LayerRules
 	 *
 	 * @param e
 	 */
-	public void stepMachine(Extruder e)
+	public void stepMachine()
 	{
-		double sZ = e.getExtrusionHeight();
 		int ld;
 		
 		if(topDown)
 		{
 			//machineZ -= (sZ + addToStep);
 			machineLayer--;
-			machineZ = sZ*machineLayer + addToStep;
-			ld = getFoundationLayers() - getMachineLayer();
-			if(ld == 2)
-				addToStep = sZ*(1 - e.getSeparationFraction());
-			else if(ld == 1)
-				addToStep = -sZ*(1 - e.getSeparationFraction());
-			else
-				addToStep = 0;
+			machineZ = zStep*machineLayer + addToStep;
+//			ld = getFoundationLayers() - getMachineLayer();
+//			if(ld == 2)
+//				addToStep = zStep*(1 - e.getSeparationFraction());
+//			else if(ld == 1)
+//				addToStep = -zStep*(1 - e.getSeparationFraction());
+//			else
+//				addToStep = 0;
 		} else
 		{
 			//machineZ += (sZ + addToStep);
 			machineLayer++;
-			machineZ = sZ*machineLayer + addToStep;
-			ld = getFoundationLayers() - getMachineLayer();
-			if(ld == 2)
-				addToStep = -sZ*(1 - e.getSeparationFraction());
-			else if(ld == 1)
-				addToStep = sZ*(1 - e.getSeparationFraction());
-			else
-				addToStep = 0;
+			machineZ = zStep*machineLayer + addToStep;
+//			ld = getFoundationLayers() - getMachineLayer();
+//			if(ld == 2)
+//				addToStep = -zStep*(1 - e.getSeparationFraction());
+//			else if(ld == 1)
+//				addToStep = zStep*(1 - e.getSeparationFraction());
+//			else
+//				addToStep = 0;
 		}
 	}
 	
@@ -513,9 +512,8 @@ public class LayerRules
 	 * Move both the model and the machine up/down a layer
 	 * @param e
 	 */
-	public void step(Extruder e)
+	public void step()
 	{		
-		double sZ = e.getExtrusionHeight();
 		if(topDown)
 		{
 			//modelZ -= (sZ + addToStep);
@@ -525,9 +523,9 @@ public class LayerRules
 			//modelZ += (sZ + addToStep);
 			modelLayer++;
 		}
-		modelZ = modelLayer*sZ + addToStep;
+		modelZ = modelLayer*zStep + addToStep;
 		addToStep = 0;
-		stepMachine(e);
+		stepMachine();
 	}
 	
 	public void setFractionDone()

@@ -215,7 +215,7 @@ public class Producer {
 			fillFoundationRectangle(reprap, gp);		
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
-			layerRules.stepMachine(reprap.getExtruder());
+			layerRules.stepMachine();
 		}
 	}
 	
@@ -344,8 +344,16 @@ public class Producer {
 					}
 			}
 			
+			int polstoplot = 0;
 			for(int i = 0; i < allPolygons.length; i++)
+			{
 				allPolygons[i] = allPolygons[i].clean();
+				if(allPolygons[i].size() > 0)
+					polstoplot++;
+			}
+			
+			if(polstoplot <= 0)
+				Debug.e("Nothing to plot on layer: " + layerRules.getMachineLayer());
 			
 			layerRules.setFirstAndLast(allPolygons);
 
@@ -363,7 +371,7 @@ public class Producer {
 
 			allSTLs.destroyLayer();
 
-			layerRules.step(reprap.getExtruder());
+			layerRules.step();
 			
 		}
 		

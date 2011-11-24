@@ -121,7 +121,7 @@ public class RrGraphics
 	/**
 	 * The layer being built
 	 */
-	private int layerNumber;
+	private String layerNumber;
 	
 	/**
 	 * 
@@ -184,7 +184,7 @@ public class RrGraphics
 		p_list = null;
 		hp = null;
 		title = t;
-		init(b, false, 0);
+		init(b, false, "0");
 	}
 	
 	/**
@@ -198,10 +198,10 @@ public class RrGraphics
 		hp = null;
 		title = t;
 		initialised = false;
-		layerNumber = 0;
+		layerNumber = "0";
 	}
 	
-	public void cleanPolygons(int ln)
+	public void cleanPolygons(String ln)
 	{
 		p_list = null;
 		hp = null;
@@ -249,7 +249,7 @@ public class RrGraphics
 	/**
 	 * @param b
 	 */
-	public void init(Rectangle b, boolean waitTillDone, int ln)
+	public void init(Rectangle b, boolean waitTillDone, String ln)
 	{
 		originalBox = b;
 		setScales(b);
@@ -323,7 +323,7 @@ public class RrGraphics
 				if(!isInitialised())
 				{
 					Debug.d("RrGraphics.add(G Codes) - plot area not initialized.");
-					init(box, false, 0);
+					init(box, false, "0");
 				}
 			}
 			return;
@@ -331,7 +331,7 @@ public class RrGraphics
 		if(gCode.startsWith(";#!LAYER:"))
 		{
 			int l = Integer.parseInt(gCode.substring(gCode.indexOf(" ") + 1, gCode.indexOf("/")));
-			cleanPolygons(l);
+			cleanPolygons("" + l);
 		}
 		if(gCode.startsWith(";#!RECTANGLE:"))
 		{
@@ -342,7 +342,7 @@ public class RrGraphics
 			double y0 = Double.parseDouble(ys.substring(ys.indexOf("l:") + 1, ys.indexOf(",")));
 			double y1 = Double.parseDouble(ys.substring(ys.indexOf("h:") + 1, ys.indexOf("]")));
 			box = new Rectangle(new Interval(x0, x1), new Interval(y0, y1));
-			init(box, false, 0);
+			init(box, false, "0");
 		}
 	}
 	
@@ -516,7 +516,7 @@ public class RrGraphics
 					plot(p_list.polygon(i).getBox());
 			} 
 		}
-		jframe.setTitle(title + ", layer: " + Integer.toString(layerNumber));
+		jframe.setTitle(title + ", layer: " + layerNumber);
 	}
 	
 	class myKB implements KeyListener

@@ -795,9 +795,7 @@ public class AllSTLsToBuild
 		
 		BooleanGridList allThis = new BooleanGridList();
 		allThis.add(unionOfThisLayer);
-		//System.out.println("model layer: " + layer + " allThis size before offset: " + allThis.size());
 		allThis = allThis.offset(layerRules, true, 2);  // 2 is a bit of a hack...
-		//System.out.println("model layer: " + layer + " allThis size after offset: " + allThis.size());
 		if(allThis.size() > 0)
 			unionOfThisLayer = allThis.get(0);
 		else
@@ -807,10 +805,7 @@ public class AllSTLsToBuild
 		// support on the next layer down.
 		
 		BooleanGridList previousSupport = cache.getSupport(layer+1, stl);
-//		if(previousSupport != null)
-//			System.out.println("model layer: " + layer + " previous support size: " + previousSupport.size());
-//		else
-//			System.out.println("model layer: " + layer + " previous support size: 0");
+
 		cache.setSupport(BooleanGridList.unions(previousSupport, thisLayer), layer, stl);
 		
 		// Now we subtract the union of this layer from all the stuff requiring support in the layer above.
@@ -823,16 +818,19 @@ public class AllSTLsToBuild
 			{
 				BooleanGrid above = previousSupport.get(i);
 				a = above.attribute();
-				if(a.getExtruder().getSupportExtruder() != null)
-					support.add(BooleanGrid.difference(above, unionOfThisLayer, a));
+				Extruder e = a.getExtruder().getSupportExtruder();
+				if(e != null)
+				{
+					if(layerRules.extruderActiveThisLayer(e.getID()))
+						support.add(BooleanGrid.difference(above, unionOfThisLayer, a));
+				}
 			}
 			support = support.unionDuplicates();
 		}
 		
 		// Now force the attributes of the support pattern to be the support extruders
-		// for all the materials in it.
+		// for all the materials in it.  If the material isn't active in this layer, remove it from the list
 		
-		//System.out.println("model layer: " + layer + " current support size: " + support.size());
 		for(int i = 0; i < support.size(); i++)
 		{
 			Extruder e = support.attribute(i).getExtruder().getSupportExtruder();
@@ -847,7 +845,7 @@ public class AllSTLsToBuild
 		// Finally compute the support hatch.
 		
 		PolygonList result = support.hatch(layerRules, false, null);
-		//System.out.println("model layer: " + layer + " support size: " + result.size());
+		
 		return result;
 	}
 	
@@ -1061,6 +1059,19 @@ public class AllSTLsToBuild
 		
 		BooleanGridList slice = slice(stl, layer);
 		
+		// Pick out the ones that need to be dealt with at this height (if any)
+		
+		BooleanGridList neededSlice = new BooleanGridList();
+		for(int i = 0; i < slice.size(); i++)
+		{
+			Extruder e = slice.get(i).attribute().getExtruder().getInfillExtruder();
+			if(layerRules.extruderActiveThisLayer(e.getID()))
+				neededSlice.add(slice.get(i));
+		}
+		slice = neededSlice;
+		if(slice.size() <= 0)
+			return new PolygonList();
+		
 		// Get the bottom and top out of the way - no fancy calculations needed.
 		
 		if(layer < 2 || layer > layerRules.getModelLayerMax() - 3)
@@ -1189,6 +1200,19 @@ public class AllSTLsToBuild
 		// The shapes to outline.
 		
 		BooleanGridList slice = slice(stl, layerRules.getModelLayer());
+		
+		// Pick out the ones we need to do at this height
+		
+		BooleanGridList neededSlice = new BooleanGridList();
+		for(int i = 0; i < slice.size(); i++)
+		{
+			Extruder e = slice.get(i).attribute().getExtruder();
+			if(layerRules.extruderActiveThisLayer(e.getID()))
+				neededSlice.add(slice.get(i));
+		}
+		slice = neededSlice;
+		if(slice.size() <= 0)
+			return new PolygonList();
 		
 		PolygonList borderPolygons;
 		
