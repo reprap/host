@@ -160,10 +160,13 @@ public class AllSTLsToBuild
 		private int[] layerNumber;
 		private int ringPointer;
 		private final int noLayer = Integer.MIN_VALUE;
-		private final int ringSize = 10;
+		private int ringSize = 10;
 		
-		public SliceCache()
+		public SliceCache(LayerRules lr)
 		{
+			if(lr == null)
+				Debug.e("SliceCache(): null LayerRules!");
+			ringSize = lr.sliceCacheSize();
 			sliceRing = new BooleanGridList[ringSize][stls.size()];
 			supportRing = new BooleanGridList[ringSize][stls.size()];
 			layerNumber = new int[ringSize];
@@ -251,6 +254,11 @@ public class AllSTLsToBuild
 	private List<STLObject> stls;
 	
 	/**
+	 * The building layer rules
+	 */
+	private LayerRules layerRules = null;
+	
+	/**
 	 * A plan box round each item
 	 */
 	private List<Rectangle> rectangles;
@@ -294,6 +302,7 @@ public class AllSTLsToBuild
 		Zrange = null;
 		frozen = false;
 		cache = null;
+		layerRules = null;
 	}
 	
 	/**
@@ -481,20 +490,17 @@ public class AllSTLsToBuild
 	}
 	
 	/**
-	 * Freeze the list - no more editing.
-	 * Also compute the XY box round everything.
-	 * Also compute the individual plan boxes round each STLObject.
+	 * Scan everything loaded and set up the bounding boxes
 	 */
-	private void freeze()
+	public void setBoxes()
 	{
-		if(frozen)
-			return;
-		frozen = true;
+		//if(XYZbox != null) // Already done?
+		//	return;
+		
 		rectangles = new ArrayList<Rectangle>();
 		for(int i = 0; i < stls.size(); i++)
-			rectangles.add(null);		
-		if(cache == null)
-			cache = new SliceCache();
+			rectangles.add(null);	
+		
 		BoundingBox s;
 		
 		for(int i = 0; i < stls.size(); i++)
@@ -537,7 +543,25 @@ public class AllSTLsToBuild
 			}
 			if(rectangles.get(i) == null)
 				Debug.e("AllSTLsToBuild:ObjectPlanRectangle(): object " + i + " is empty");
-		}		
+		}				
+	}
+	
+	/**
+	 * Freeze the list - no more editing.
+	 * Also compute the XY box round everything.
+	 * Also compute the individual plan boxes round each STLObject.
+	 */
+	private void freeze()
+	{
+		if(frozen)
+			return;
+		if(layerRules == null)
+			Debug.e("AllSTLsToBuild.freeze(): layerRules not set!");
+		frozen = true;
+			
+		if(cache == null)
+			cache = new SliceCache(layerRules);
+		setBoxes();
 	}
 	
 	/**
@@ -613,7 +637,8 @@ public class AllSTLsToBuild
 	 */
 	public Rectangle ObjectPlanRectangle()
 	{
-		freeze();
+		if(XYZbox == null)
+			Debug.e("AllSTLsToBuild.ObjectPlanRectangle(): null XYZbox!");
 		return XYZbox.XYbox;
 	}
 	
@@ -624,7 +649,8 @@ public class AllSTLsToBuild
 	 */
 	public double maxZ()
 	{
-		freeze();
+		if(XYZbox == null)
+			Debug.e("AllSTLsToBuild.maxZ(): null XYZbox!");
 		return XYZbox.Zint.high();
 	}
 	
@@ -732,7 +758,7 @@ public class AllSTLsToBuild
 	 * @param layerConditions
 	 * @return
 	 */
-	public PolygonList computeSupport(int stl, LayerRules layerConditions)
+	public PolygonList computeSupport(int stl)
 	{
 		// No more additions or movements, please
 		
@@ -745,9 +771,9 @@ public class AllSTLsToBuild
 		// But it's only going to be subtracted from other shapes, so what it's made
 		// from doesn't matter.
 		
-		int layer = layerConditions.getModelLayer();
+		int layer = layerRules.getModelLayer();
 		
-		BooleanGridList thisLayer = slice(stl, layer, layerConditions);
+		BooleanGridList thisLayer = slice(stl, layer);
 		
 		BooleanGrid unionOfThisLayer;
 		Attributes a;
@@ -770,7 +796,7 @@ public class AllSTLsToBuild
 		BooleanGridList allThis = new BooleanGridList();
 		allThis.add(unionOfThisLayer);
 		//System.out.println("model layer: " + layer + " allThis size before offset: " + allThis.size());
-		allThis = allThis.offset(layerConditions, true, 2);  // 2 is a bit of a hack...
+		allThis = allThis.offset(layerRules, true, 2);  // 2 is a bit of a hack...
 		//System.out.println("model layer: " + layer + " allThis size after offset: " + allThis.size());
 		if(allThis.size() > 0)
 			unionOfThisLayer = allThis.get(0);
@@ -820,7 +846,7 @@ public class AllSTLsToBuild
 		
 		// Finally compute the support hatch.
 		
-		PolygonList result = support.hatch(layerConditions, false, null);
+		PolygonList result = support.hatch(layerRules, false, null);
 		//System.out.println("model layer: " + layer + " support size: " + result.size());
 		return result;
 	}
@@ -1004,13 +1030,22 @@ public class AllSTLsToBuild
 	}
 	
 	/**
+	 * Set the building layer rules as soon as we know them
+	 * @param lr
+	 */
+	public void setLayerRules(LayerRules lr)
+	{
+		layerRules = lr;
+	}
+	
+	/**
 	 * Compute the infill hatching polygons for this set of patterns
 	 * @param stl
 	 * @param layerConditions
 	 * @param startNearHere
 	 * @return
 	 */
-	public PolygonList computeInfill(int stl, LayerRules layerConditions) 
+	public PolygonList computeInfill(int stl) 
 	{
 		// Where the result will be stored.
 		
@@ -1022,16 +1057,16 @@ public class AllSTLsToBuild
 		
 		// Where are we and what does the current slice look like?
 		
-		int layer = layerConditions.getModelLayer();
+		int layer = layerRules.getModelLayer();
 		
-		BooleanGridList slice = slice(stl, layer, layerConditions);
+		BooleanGridList slice = slice(stl, layer);
 		
 		// Get the bottom and top out of the way - no fancy calculations needed.
 		
-		if(layer < 2 || layer > layerConditions.getModelLayerMax() - 3)
+		if(layer < 2 || layer > layerRules.getModelLayerMax() - 3)
 		{
-			slice = slice.offset(layerConditions, false, -1);
-			infill.hatchedPolygons = slice.hatch(layerConditions, true, null);
+			slice = slice.offset(layerRules, false, -1);
+			infill.hatchedPolygons = slice.hatch(layerRules, true, null);
 			return infill.hatchedPolygons;
 		}
 		
@@ -1040,13 +1075,13 @@ public class AllSTLsToBuild
 		
 		// The intersection of the slices above does not need surface infill...
 		
-		BooleanGridList above = slice(stl, layer+2, layerConditions);
-		above = BooleanGridList.intersections(slice(stl, layer+1, layerConditions), above);
+		BooleanGridList above = slice(stl, layer+2);
+		above = BooleanGridList.intersections(slice(stl, layer+1), above);
 		
 		// ...nor does the intersection of those below.
 		
-		BooleanGridList below = slice(stl, layer-2, layerConditions);
-		below = BooleanGridList.intersections(slice(stl, layer-1, layerConditions), below);
+		BooleanGridList below = slice(stl, layer-2);
+		below = BooleanGridList.intersections(slice(stl, layer-1), below);
 	
 		// The bit of the slice with nothing above it needs fine infill...
 		
@@ -1079,7 +1114,7 @@ public class AllSTLsToBuild
 		// This will make them interpenetrate at their ends/sides to give
 		// bridge landing areas.
 		
-		infill.bridges = infill.bridges.offset(layerConditions, false, 2);
+		infill.bridges = infill.bridges.offset(layerRules, false, 2);
 		infill.bridges = BooleanGridList.intersections(infill.bridges, slice);
 		
 		// Find the landing areas as a separate set of shapes that go with the bridges.
@@ -1089,9 +1124,9 @@ public class AllSTLsToBuild
 		// Shapes will be outlined, and so need to be shrunk to allow for that.  But they
 		// must not also shrink from each other internally.  So initially expand them so they overlap
 		
-		infill.bridges = infill.bridges.offset(layerConditions, false, 1);
-		infill.insides = infill.insides.offset(layerConditions, false, 1);
-		infill.surfaces = infill.surfaces.offset(layerConditions, false, 1);
+		infill.bridges = infill.bridges.offset(layerRules, false, 1);
+		infill.insides = infill.insides.offset(layerRules, false, 1);
+		infill.surfaces = infill.surfaces.offset(layerRules, false, 1);
 		
 		// Now intersect them with the slice so the outer edges are back where they should be.
 		
@@ -1103,16 +1138,16 @@ public class AllSTLsToBuild
 		// be put round the outside.  The inner joins should now shrink back to be
 		// adjacent to each other as they should be.
 		
-		infill.bridges = infill.bridges.offset(layerConditions, false, -1);
-		infill.insides = infill.insides.offset(layerConditions, false, -1);
-		infill.surfaces = infill.surfaces.offset(layerConditions, false, -1);
+		infill.bridges = infill.bridges.offset(layerRules, false, -1);
+		infill.insides = infill.insides.offset(layerRules, false, -1);
+		infill.surfaces = infill.surfaces.offset(layerRules, false, -1);
 		
 		// Generate the infill patterns.  We do the bridges first, as each bridge subtracts its
 		// lands from the other two sets of shapes.  We want that, so they don't get infilled twice.
 		
-		infill = bridgeHatch(infill, lands, layerConditions);
-		infill.hatchedPolygons.add(infill.insides.hatch(layerConditions, false, null));
-		infill.hatchedPolygons.add(infill.surfaces.hatch(layerConditions, true, null));
+		infill = bridgeHatch(infill, lands, layerRules);
+		infill.hatchedPolygons.add(infill.insides.hatch(layerRules, false, null));
+		infill.hatchedPolygons.add(infill.surfaces.hatch(layerRules, true, null));
 		
 	
 		return infill.hatchedPolygons;
@@ -1145,7 +1180,7 @@ public class AllSTLsToBuild
 	 * @param shield
 	 * @return
 	 */
-	public PolygonList computeOutlines(int stl, LayerRules layerConditions, PolygonList hatchedPolygons, boolean shield)
+	public PolygonList computeOutlines(int stl, PolygonList hatchedPolygons, boolean shield)
 	{
 		// No more additions or movements, please
 		
@@ -1153,18 +1188,18 @@ public class AllSTLsToBuild
 		
 		// The shapes to outline.
 		
-		BooleanGridList slice = slice(stl, layerConditions.getModelLayer(), layerConditions);
+		BooleanGridList slice = slice(stl, layerRules.getModelLayer());
 		
 		PolygonList borderPolygons;
 		
 		// Are we building the raft under things?  If so, there is no border.
 		
-		if(layerConditions.getLayingSupport())
+		if(layerRules.getLayingSupport())
 		{
 			borderPolygons = null;
 		} else
 		{
-			BooleanGridList offBorder = slice.offset(layerConditions, true, -1);
+			BooleanGridList offBorder = slice.offset(layerRules, true, -1);
 			borderPolygons = offBorder.borders();
 		}
 
@@ -1175,7 +1210,7 @@ public class AllSTLsToBuild
 		
 		if(borderPolygons != null && borderPolygons.size() > 0)
 		{
-			borderPolygons.middleStarts(hatchedPolygons, layerConditions, slice);
+			borderPolygons.middleStarts(hatchedPolygons, layerRules, slice);
 			try
 			{
 				if(shield && Preferences.loadGlobalBool("Shield"))
@@ -1198,7 +1233,7 @@ public class AllSTLsToBuild
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private BooleanGridList slice(int stlIndex, int layer, LayerRules layerRules)
+	private BooleanGridList slice(int stlIndex, int layer)
 	{
 		if(!frozen)
 		{

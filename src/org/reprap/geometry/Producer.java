@@ -47,24 +47,13 @@ public class Producer {
 		bld = builder;
 		
 		allSTLs = bld.getSTLs();
+		layerRules = new LayerRules(pr, allSTLs, true);
 		
-		Rectangle gp = allSTLs.ObjectPlanRectangle();
-		gp = new Rectangle(new Point2D(gp.x().low() - 6, gp.y().low() - 6), 
-		new Point2D(gp.x().high() + 6, gp.y().high() + 6));
 		if(Preferences.simulate())
 		{
 			simulationPlot = new RrGraphics("RepRap building simulation");
 		} else
 			simulationPlot = null;
-		
-		double modZMax = allSTLs.maxZ();
-		double stepZ = pr.getExtruders()[0].getExtrusionHeight();
-		int foundationLayers = Math.max(0, pr.getFoundationLayers());
-		
-		int modLMax = (int)(modZMax/stepZ);
-		
-		layerRules = new LayerRules(pr, modZMax, modZMax + foundationLayers*stepZ,
-				modLMax, modLMax + foundationLayers, true, gp);
 	}
 	
 	/**
@@ -269,6 +258,7 @@ public class Producer {
 		
 		boolean firstTimeRound = true;
 		
+		
 		while(layerRules.getModelLayer() >= 0 ) 
 		{
 			if(layerRules.getModelLayer() == 0)
@@ -296,11 +286,11 @@ public class Producer {
 			Point2D startNearHere = new Point2D(0, 0);
 			for(int stl = 0; stl < allSTLs.size(); stl++)
 			{
-					PolygonList fills = allSTLs.computeInfill(stl, layerRules);
-					PolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
+					PolygonList fills = allSTLs.computeInfill(stl);
+					PolygonList borders = allSTLs.computeOutlines(stl, fills, shield);
 					fills = fills.cullShorts();
 					shield = false;
-					PolygonList support = allSTLs.computeSupport(stl, layerRules);
+					PolygonList support = allSTLs.computeSupport(stl);
 					
 					for(int physicalExtruder = 0; physicalExtruder < allPolygons.length; physicalExtruder++)
 					{

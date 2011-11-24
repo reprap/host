@@ -12,6 +12,7 @@ import org.reprap.geometry.polygons.HalfPlane;
 import org.reprap.geometry.polygons.Rectangle;
 import org.reprap.geometry.polygons.Point2D;
 import org.reprap.geometry.polygons.PolygonList;
+import org.reprap.geometry.polyhedra.AllSTLsToBuild;
 import org.reprap.Preferences;
 import org.reprap.utilities.Debug;
 
@@ -62,12 +63,12 @@ public class LayerRules
 	private String [] layerFileNames;
 	
 	/**
-	 * 
+	 * Are we reversing the layer orders?
 	 */
 	private boolean reversing;
 	
 	/**
-	 * Flag to remember if we have reversed the layer ot=rder in the output file
+	 * Flag to remember if we have reversed the layer order in the output file
 	 */
 	private boolean alreadyReversed;
 	
@@ -122,9 +123,14 @@ public class LayerRules
 	private boolean layingSupport;
 	
 	/**
-	 * The step height of all the extruders
+	 * The smallest step height of all the extruders
 	 */
 	private double zStep;
+	
+	/**
+	 * The biggest step height of all the extruders
+	 */
+	private double thickestZStep;
 	
 	/**
 	 * If we take a short step, remember it and add it on next time
@@ -142,21 +148,6 @@ public class LayerRules
 	private boolean notStartedYet;
 	
 	/**
-	 * layers above and below where we are for infill and support calculations
-	 */
-	//private RrCSGPolygonList [] layerRecord;
-	
-	/**
-	 * The machineLayer value for each entry in layerRecord
-	 */
-	private int [] recordNumber;
-	
-	/**
-	 * index into layerRecord
-	 */
-	private int layerPointer;
-	
-	/**
 	 * The XY rectangle that bounds the build
 	 */
 	private Rectangle bBox;
@@ -170,21 +161,69 @@ public class LayerRules
 	 * @param macLMax
 	 * @param found
 	 */
-	public LayerRules(Printer p, double modZMax, double macZMax,
-			int modLMax, int macLMax, boolean found, Rectangle bb)
+	public LayerRules(Printer p, AllSTLsToBuild astls, boolean found)
 	{
 		printer = p;
 		reversing = false;
 		alreadyReversed = false;
-		bBox = new Rectangle(bb);	
 		notStartedYet = true;
-
+		
+		astls.setBoxes();
+		astls.setLayerRules(this);
+		
+		Rectangle gp = astls.ObjectPlanRectangle();
+		bBox =  new Rectangle(new Point2D(gp.x().low() - 6, gp.y().low() - 6), 
+		new Point2D(gp.x().high() + 6, gp.y().high() + 6));
+		
+		modelZMax = astls.maxZ();
+		
 		topDown = printer.getTopDown();
+		if(!topDown)
+		{
+			Debug.e("LayerRules(): Bottom-up slice calculations no longer supported.");
+			topDown = true;
+		}
+		
+		
 
-		modelZMax = modZMax;
-		machineZMax = macZMax;
-		modelLayerMax = modLMax;
-		machineLayerMax = macLMax;
+		// Run through the extruders checking their layer heights
+		
+		layingSupport = found;
+		Extruder[] es = printer.getExtruders();
+		zStep = es[0].getExtrusionHeight();
+		thickestZStep = zStep;
+		int fineLayers = es[0].getLowerFineLayers();
+		if(es.length > 1)
+		{
+			for(int i = 1; i < es.length; i++)
+			{
+				if(es[i].getLowerFineLayers() > fineLayers)
+					fineLayers = es[i].getLowerFineLayers();
+				if(es[i].getExtrusionHeight() > thickestZStep)
+					thickestZStep = es[i].getExtrusionHeight();
+				if(es[i].getExtrusionHeight() < zStep)
+					zStep = es[i].getExtrusionHeight();
+				/*
+				if(Math.abs(es[i].getExtrusionHeight() - zStep) > Preferences.tiny())
+					Debug.e("Not all extruders extrude the same height of filament: " + 
+							zStep + " and " + es[i].getExtrusionHeight());
+				*/
+			}
+		}
+		
+		long thick = Math.round(thickestZStep*1000.0);
+		for(int i = 0; i < es.length; i++)
+		{
+			long thin = Math.round(es[i].getExtrusionHeight()*1000.0);
+			if(thick%thin != 0)
+				Debug.e("LayerRules(): the layer height for extruder " + i + "(" + es[i].getLowerFineLayers() + 
+						") is not an integer divisor of the layer height for layer height " + thickestZStep);
+		}
+		
+		int foundationLayers = Math.max(0, printer.getFoundationLayers());
+		modelLayerMax = (int)(modelZMax/zStep);
+		machineLayerMax = modelLayerMax + foundationLayers;
+		machineZMax = modelZMax + foundationLayers*zStep;
 		if(topDown)
 		{
 			modelZ = modelZMax;
@@ -200,6 +239,8 @@ public class LayerRules
 		}
 		addToStep = 0;
 		
+// Set up the records of the layers for later reversing (top->down ==>> bottom->up)
+		
 		firstPoint = new Point2D[machineLayerMax+1];
 		firstExtruder = new int[machineLayerMax+1];
 		lastPoint = new Point2D[machineLayerMax+1];
@@ -210,25 +251,6 @@ public class LayerRules
 			layerFileNames[i] = null;
 		prologueFileName = null;
 		epilogueFileName = null;
-
-		layingSupport = found;
-		Extruder[] es = printer.getExtruders();
-		zStep = es[0].getExtrusionHeight();
-		int fineLayers = es[0].getLowerFineLayers();
-		if(es.length > 1)
-		{
-			for(int i = 1; i < es.length; i++)
-			{
-				if(es[i].getLowerFineLayers() > fineLayers)
-					fineLayers = es[i].getLowerFineLayers();
-				if(Math.abs(es[i].getExtrusionHeight() - zStep) > Preferences.tiny())
-					Debug.e("Not all extruders extrude the same height of filament: " + 
-							zStep + " and " + es[i].getExtrusionHeight());
-			}
-		}
-		
-		recordNumber = new int[fineLayers+1];
-		layerPointer = 0;
 	}
 	
 	public Rectangle getBox()
@@ -253,6 +275,20 @@ public class LayerRules
 	public double getMachineZ() { return machineZ; }
 	
 	public int getModelLayer() { return modelLayer; }
+	
+	public boolean extruderActiveThisLayer(int e)
+	{
+		Extruder[] es = printer.getExtruders();
+		double myHeight = es[e].getExtrusionHeight();
+		double eFraction = machineZ/myHeight;
+		double delta = myHeight*(eFraction - Math.floor(eFraction));
+		return (delta < zStep*0.5);
+	}
+	
+	public int sliceCacheSize()
+	{
+		return (int)Math.ceil(10.0*thickestZStep/zStep);
+	}
 	
 	public void setFirstAndLast(PolygonList[] pl)
 	{
