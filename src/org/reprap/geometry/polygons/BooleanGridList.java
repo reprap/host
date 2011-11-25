@@ -390,7 +390,7 @@ public class BooleanGridList
 		 * Return only those elements in the list that have no support material specified
 		 * @return
 		 */
-		public BooleanGridList cullNonNull()
+		public BooleanGridList cullNoSupport()
 		{
 			BooleanGridList result = new BooleanGridList();
 
@@ -405,7 +405,7 @@ public class BooleanGridList
 		 * Return only those elements in the list that have support material specified
 		 * @return
 		 */
-		public BooleanGridList cullNull()
+		public BooleanGridList cullSupport()
 		{
 			BooleanGridList result = new BooleanGridList();
 

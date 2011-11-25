@@ -161,5 +161,5 @@ public class GCodeExtruder extends GenericExtruder
 	public boolean isEmpty()
 	{
 		return false;
-	} 
+	}
 }

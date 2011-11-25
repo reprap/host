@@ -777,7 +777,7 @@ public class AllSTLsToBuild
 		
 		BooleanGrid unionOfThisLayer;
 		Attributes a;
-		//System.out.println("model layer: " + layer + " this layer size: " + thisLayer.size());
+		
 		if(thisLayer.size() > 0)
 		{
 			unionOfThisLayer = thisLayer.get(0);
@@ -795,7 +795,7 @@ public class AllSTLsToBuild
 		
 		BooleanGridList allThis = new BooleanGridList();
 		allThis.add(unionOfThisLayer);
-		allThis = allThis.offset(layerRules, true, 2);  // 2 is a bit of a hack...
+		allThis = allThis.offset(layerRules, true, 2);  // 2mm gap is a bit of a hack...
 		if(allThis.size() > 0)
 			unionOfThisLayer = allThis.get(0);
 		else
@@ -1037,6 +1037,32 @@ public class AllSTLsToBuild
 	}
 	
 	/**
+	 * Select from a slice (allLayer) just those parts of it that will be plotted this layer
+	 * @param allLayer
+	 * @param infill
+	 * @param support
+	 * @return
+	 */
+	private BooleanGridList neededThisLayer(BooleanGridList allLayer, boolean infill, boolean support)
+	{
+		BooleanGridList neededSlice = new BooleanGridList();
+		for(int i = 0; i < allLayer.size(); i++)
+		{
+			Extruder e;
+			if(infill)
+				e = allLayer.get(i).attribute().getExtruder().getInfillExtruder();
+			else if(support)
+				e = allLayer.get(i).attribute().getExtruder().getSupportExtruder();
+			else
+				e = allLayer.get(i).attribute().getExtruder();
+			if(e != null)
+				if(layerRules.extruderActiveThisLayer(e.getID()))
+					neededSlice.add(allLayer.get(i));
+		}
+		return neededSlice;
+	}
+	
+	/**
 	 * Compute the infill hatching polygons for this set of patterns
 	 * @param stl
 	 * @param layerConditions
@@ -1059,40 +1085,38 @@ public class AllSTLsToBuild
 		
 		BooleanGridList slice = slice(stl, layer);
 		
-		// Pick out the ones that need to be dealt with at this height (if any)
-		
-		BooleanGridList neededSlice = new BooleanGridList();
-		for(int i = 0; i < slice.size(); i++)
-		{
-			Extruder e = slice.get(i).attribute().getExtruder().getInfillExtruder();
-			if(layerRules.extruderActiveThisLayer(e.getID()))
-				neededSlice.add(slice.get(i));
-		}
-		slice = neededSlice;
-		if(slice.size() <= 0)
-			return new PolygonList();
-		
 		// Get the bottom and top out of the way - no fancy calculations needed.
 		
-		if(layer < 2 || layer > layerRules.getModelLayerMax() - 3)
-		{
-			slice = slice.offset(layerRules, false, -1);
-			infill.hatchedPolygons = slice.hatch(layerRules, true, null);
-			return infill.hatchedPolygons;
-		}
+//		if(layer < 2 || layer > layerRules.getModelLayerMax() - 3)
+//		{
+//			slice = slice.offset(layerRules, false, -1);
+//			infill.hatchedPolygons = slice.hatch(layerRules, true, null);
+//			return infill.hatchedPolygons;
+//		}
 		
 		// If we are solid but the slices above or below us weren't, we need some fine infill as
 		// we are (at least partly) surface.
 		
 		// The intersection of the slices above does not need surface infill...
+		// How many do we need to consider?
 		
-		BooleanGridList above = slice(stl, layer+2);
-		above = BooleanGridList.intersections(slice(stl, layer+1), above);
+		int surfaceLayers = 1;
+		for(int i = 0; i < slice.size(); i++)
+		{
+			Extruder e = slice.get(i).attribute().getExtruder();
+			if(e.getSurfaceLayers() > surfaceLayers)
+				surfaceLayers = e.getSurfaceLayers();
+		}
+				
+		BooleanGridList above = slice(stl, layer+1);
+		for(int i = 2; i <= surfaceLayers; i++)
+			above = BooleanGridList.intersections(slice(stl, layer+i), above);
 		
 		// ...nor does the intersection of those below.
 		
-		BooleanGridList below = slice(stl, layer-2);
-		below = BooleanGridList.intersections(slice(stl, layer-1), below);
+		BooleanGridList below = slice(stl, layer-1);
+		for(int i = 2; i <= surfaceLayers; i++)
+			below = BooleanGridList.intersections(slice(stl, layer-i), below);
 	
 		// The bit of the slice with nothing above it needs fine infill...
 		
@@ -1110,12 +1134,12 @@ public class AllSTLsToBuild
 		// Parts with nothing under them that have no support material
 		// need to have bridges constructed to do the best for in-air infill.
 		
-		infill.bridges = nothingbelow.cullNonNull();
+		infill.bridges = nothingbelow.cullNoSupport();
 		
 		// The remainder with nothing under them will be supported by support material
 		// and so needs no special treatment.
 		
-		nothingbelow = nothingbelow.cullNull();
+		nothingbelow = nothingbelow.cullSupport();
 		
 		// All the parts of this slice that need surface infill
 		
@@ -1157,7 +1181,9 @@ public class AllSTLsToBuild
 		// lands from the other two sets of shapes.  We want that, so they don't get infilled twice.
 		
 		infill = bridgeHatch(infill, lands, layerRules);
+		infill.insides = neededThisLayer(infill.insides, true, false);
 		infill.hatchedPolygons.add(infill.insides.hatch(layerRules, false, null));
+		infill.surfaces = neededThisLayer(infill.surfaces, false, false);
 		infill.hatchedPolygons.add(infill.surfaces.hatch(layerRules, true, null));
 		
 	
@@ -1203,14 +1229,8 @@ public class AllSTLsToBuild
 		
 		// Pick out the ones we need to do at this height
 		
-		BooleanGridList neededSlice = new BooleanGridList();
-		for(int i = 0; i < slice.size(); i++)
-		{
-			Extruder e = slice.get(i).attribute().getExtruder();
-			if(layerRules.extruderActiveThisLayer(e.getID()))
-				neededSlice.add(slice.get(i));
-		}
-		slice = neededSlice;
+		slice = neededThisLayer(slice, false, false);
+		
 		if(slice.size() <= 0)
 			return new PolygonList();
 		

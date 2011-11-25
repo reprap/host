@@ -153,6 +153,11 @@ public class LayerRules
 	private Rectangle bBox;
 	
 	/**
+	 * The maximum number of surface layers requested by any extruder
+	 */
+	private int maxSurfaceLayers = 2;
+	
+	/**
 	 * 
 	 * @param p
 	 * @param modZMax
@@ -203,6 +208,8 @@ public class LayerRules
 					thickestZStep = es[i].getExtrusionHeight();
 				if(es[i].getExtrusionHeight() < zStep)
 					zStep = es[i].getExtrusionHeight();
+				if(es[i].getSurfaceLayers() > maxSurfaceLayers)
+					maxSurfaceLayers = es[i].getSurfaceLayers();
 				/*
 				if(Math.abs(es[i].getExtrusionHeight() - zStep) > Preferences.tiny())
 					Debug.e("Not all extruders extrude the same height of filament: " + 
@@ -290,7 +297,7 @@ public class LayerRules
 	
 	public int sliceCacheSize()
 	{
-		return (int)Math.ceil(10.0*thickestZStep/zStep);
+		return (int)Math.ceil(2*(maxSurfaceLayers*2 + 1)*thickestZStep/zStep);
 	}
 	
 	public void setFirstAndLast(PolygonList[] pl)

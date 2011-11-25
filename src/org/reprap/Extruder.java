@@ -600,6 +600,13 @@ public interface Extruder
      * @param er
      */
     public void setExtrudeRatio(double er);
+    
+    /**
+     * This decides how many layers to fine-infill for areas that are upward- 
+     * or downward-facing surfaces of the object. 
+     * @return
+     */
+    public int getSurfaceLayers();
 	
 	
 }

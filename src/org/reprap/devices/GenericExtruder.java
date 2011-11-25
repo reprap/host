@@ -334,6 +334,14 @@ public abstract class GenericExtruder implements Extruder
 	protected boolean pauseBetweenSegments = true;
 	
 	/**
+     * This decides how many layers to fine-infill for areas that are upward- 
+     * or downward-facing surfaces of the object. 
+     * @return
+     */
+	
+	protected int surfaceLayers = 2;
+	
+	/**
 	* Are we currently extruding?
 	*/
 	//protected boolean isExtruding = false;
@@ -473,6 +481,7 @@ public abstract class GenericExtruder implements Extruder
 					(float)Preferences.loadGlobalDouble(prefName + "ColourB(0..1)"));
 			materialColour = new Appearance();
 			materialColour.setMaterial(new Material(col, black, col, black, 101f));
+			surfaceLayers = Preferences.loadGlobalInt(prefName + "SurfaceLayers(0..N)");
 		} catch (Exception ex)
 		{
 			Debug.e("Refresh extruder preferences: " + ex.toString());
@@ -1399,6 +1408,16 @@ public abstract class GenericExtruder implements Extruder
     public double getLift()
     {
     	return lift;
+    }
+    
+	 /**
+     * This decides how many layers to fine-infill for areas that are upward- 
+     * or downward-facing surfaces of the object. 
+     * @return
+     */
+    public int getSurfaceLayers()
+    {
+    	return surfaceLayers;
     }
     
 }
