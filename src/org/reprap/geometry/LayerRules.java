@@ -281,7 +281,10 @@ public class LayerRules
 		Extruder[] es = printer.getExtruders();
 		double myHeight = es[e].getExtrusionHeight();
 		double eFraction = machineZ/myHeight;
-		double delta = myHeight*(eFraction - Math.floor(eFraction));
+		double delta = eFraction - Math.floor(eFraction);
+		if(delta > 0.5)
+			delta = Math.ceil(eFraction) - eFraction;
+		delta = myHeight*delta;
 		return (delta < zStep*0.5);
 	}
 	
@@ -419,7 +422,11 @@ public class LayerRules
 	 * @return
 	 */
 	public HalfPlane getHatchDirection(Extruder e) 
-	{
+	{	
+		double myHeight = e.getExtrusionHeight();
+		double eFraction = machineZ/myHeight;
+		int mylayer = (int)Math.round(eFraction);
+
 		double angle;
 		
 		if(getMachineLayer() < getFoundationLayers())
@@ -430,7 +437,7 @@ public class LayerRules
 				angle = e.getOddHatchDirection();
 		} else
 		{
-			if(getModelLayer()%2 == 0)
+			if(mylayer%2 == 0)
 				angle = e.getEvenHatchDirection();
 			else
 				angle = e.getOddHatchDirection();

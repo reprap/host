@@ -311,7 +311,7 @@ public class Preferences extends JFrame {
 		            	String configPath = org.reprap.Preferences.getProbsFolderPath() + configName;
 		            	if((new File(configPath)).exists())
 		            	{
-		            		Debug.a("loading config " + configName);
+		            		Debug.d("loading config " + configName);
 		            		org.reprap.Preferences.loadConfig(configName);		
 		            		updatePreferencesValues();
 		            		
