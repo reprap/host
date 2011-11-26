@@ -221,7 +221,7 @@ public class GCodeRepRap extends GenericRepRap {
 		}
 		if(z > Preferences.loadGlobalDouble("WorkingZ(mm)") || z < 0)
 		{
-			Debug.e("Attempt to move z to " + z + " which is outside [0, " + Preferences.loadGlobalDouble("WorkingZ(mm)") + "]");
+			Debug.d("Attempt to move z to " + z + " which is outside [0, " + Preferences.loadGlobalDouble("WorkingZ(mm)") + "]");
 			z = Math.max(0, Math.min(z, Preferences.loadGlobalDouble("WorkingZ(mm)")));
 		}
 		} catch (Exception e)

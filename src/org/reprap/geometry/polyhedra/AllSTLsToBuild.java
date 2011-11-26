@@ -1085,20 +1085,6 @@ public class AllSTLsToBuild
 		
 		BooleanGridList slice = slice(stl, layer);
 		
-		// Get the bottom and top out of the way - no fancy calculations needed.
-		
-//		if(layer < 2 || layer > layerRules.getModelLayerMax() - 3)
-//		{
-//			slice = slice.offset(layerRules, false, -1);
-//			infill.hatchedPolygons = slice.hatch(layerRules, true, null);
-//			return infill.hatchedPolygons;
-//		}
-		
-		// If we are solid but the slices above or below us weren't, we need some fine infill as
-		// we are (at least partly) surface.
-		
-		// The intersection of the slices above does not need surface infill...
-		// How many do we need to consider?
 		
 		int surfaceLayers = 1;
 		for(int i = 0; i < slice.size(); i++)
@@ -1107,6 +1093,22 @@ public class AllSTLsToBuild
 			if(e.getSurfaceLayers() > surfaceLayers)
 				surfaceLayers = e.getSurfaceLayers();
 		}
+		
+		// Get the bottom out of the way - no fancy calculations needed.
+		
+		if(layer < surfaceLayers)
+		{
+			slice = slice.offset(layerRules, false, -1);
+			infill.hatchedPolygons = slice.hatch(layerRules, true, null);
+			return infill.hatchedPolygons;
+		}
+		
+		// If we are solid but the slices above or below us weren't, we need some fine infill as
+		// we are (at least partly) surface.
+		
+		// The intersection of the slices above does not need surface infill...
+		// How many do we need to consider?
+		
 				
 		BooleanGridList above = slice(stl, layer+1);
 		for(int i = 2; i <= surfaceLayers; i++)
