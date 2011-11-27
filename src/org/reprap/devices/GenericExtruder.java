@@ -1383,10 +1383,10 @@ public abstract class GenericExtruder implements Extruder
 			if(homeZ)
 				getPrinter().homeToZeroZ();
 			heatOn(true);
-			if(purgeTime > 0)
+			if(getPurgeTime() > 0)
 			{
 				setExtrusion(getFastXYFeedrate(), false);
-				getPrinter().machineWait(purgeTime, false, true);
+				getPrinter().machineWait(getPurgeTime(), false, true);
 				setExtrusion(0, false);
 				getPrinter().printEndReverse();
 				zeroExtrudedLength(true);

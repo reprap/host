@@ -208,7 +208,8 @@ public class BotConsoleFrame extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("XYZ", xYZTabPanel);
         for (int i = 0; i < extruderCount; i++) {
-            jTabbedPane1.addTab("Extruder " + i, extruderPanels[i]);
+            //jTabbedPane1.addTab("Extruder " + i, extruderPanels[i]);
+        	jTabbedPane1.addTab(extruderPanels[i].getExtruder().getMaterial(), extruderPanels[i]);
         }
         pack();
     }

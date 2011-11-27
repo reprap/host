@@ -113,7 +113,7 @@ abstract public class Panel3D extends JPanel {
 		// All this needs to go into Preferences.java
 		try
 		{
-		wv_location = "reprap-wv.stl"; //Preferences.loadGlobalString("WorkingLocation");
+		wv_location = Preferences.loadGlobalString("BuildBaseSTL(name)");
 
 		// Translate and zoom scaling factors
 		
@@ -132,9 +132,9 @@ abstract public class Panel3D extends JPanel {
 		// Factors for front and back clipping planes and so on
 		
 		worldName = "RepRap-World"; //Preferences.loadGlobalString("WorldName");
-		wv_offset = new Vector3d(-17.3, //Preferences.loadGlobalDouble("WorkingOffsetX(mm)"),
-				-24.85, //Preferences.loadGlobalDouble("WorkingOffsetY(mm)"),
-				-2); //Preferences.loadGlobalDouble("WorkingOffsetZ(mm)"));
+		wv_offset = new Vector3d(0, //Preferences.loadGlobalDouble("WorkingOffsetX(mm)"),
+				0, //Preferences.loadGlobalDouble("WorkingOffsetY(mm)"),
+				0); //Preferences.loadGlobalDouble("WorkingOffsetZ(mm)"));
 
 		// The background, and other colours
 

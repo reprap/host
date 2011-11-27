@@ -87,11 +87,16 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
     }
     
+    public Extruder getExtruder()
+    {
+    	return extruder;
+    }
 
     public void initialiseExtruders(int id) throws Exception {
            	
         extruderID = id;
-        prefix = "Extruder" + id + "_";        
+        prefix = "Extruder" + id + "_";
+        
 
         Printer p = org.reprap.Main.gui.getPrinter();
         Extruder extruders[] = p.getExtruders();

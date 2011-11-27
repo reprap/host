@@ -454,8 +454,8 @@ public class Preferences extends JFrame {
 				else
 					rows = keys.length/2 + 1;
 				jPanelExtruder.setLayout(new GridLayout(rows, 4, 5, 5));
-				jTabbedPane1.addTab("Extruder " + j, null, jScrollPaneExtruder, null);
-				
+				//jTabbedPane1.addTab("Extruder " + j, null, jScrollPaneExtruder, null);
+				jTabbedPane1.addTab(loadString("Extruder" + j +"_MaterialType(name)"), null, jScrollPaneExtruder, null);
 				// Do it in two chunks, so they're vertically ordered, not horizontally
 				
 				half = keys.length/2;

@@ -1099,6 +1099,7 @@ public class AllSTLsToBuild
 		if(layer < surfaceLayers)
 		{
 			slice = slice.offset(layerRules, false, -1);
+			slice = neededThisLayer(slice, false, false);
 			infill.hatchedPolygons = slice.hatch(layerRules, true, null);
 			return infill.hatchedPolygons;
 		}
@@ -1259,7 +1260,8 @@ public class AllSTLsToBuild
 			borderPolygons.middleStarts(hatchedPolygons, layerRules, slice);
 			try
 			{
-				if(shield && Preferences.loadGlobalBool("Shield"))
+				if(shield && Preferences.loadGlobalBool("Shield") || 
+						(borderPolygons.polygon(0).getAttributes().getExtruder().getPurgeTime() <= 0 && layerRules.getMachineLayer() == 0))
 					borderPolygons.add(0, shieldPolygon(borderPolygons.polygon(0).getAttributes()));
 			} catch (Exception ex)
 			{}
