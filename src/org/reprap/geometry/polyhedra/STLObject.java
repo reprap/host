@@ -121,14 +121,16 @@ public class STLObject
 	    private BranchGroup stl = null;     // The actual STL geometry
 	    private CSG3D csg = null;           // CSG if available
 	    private Attributes att = null;		// The attributes associated with it
+	    private double volume;				// Useful to know
 	    private int unique = 0;
 	    
-	    Contents(String s, BranchGroup st, CSG3D c, Attributes a)
+	    Contents(String s, BranchGroup st, CSG3D c, Attributes a, double v)
 	    {
 	    	sourceFile = s;
 	    	stl = st;
 	    	csg = c;
 	    	att = a;
+	    	volume = v;
 	    }
 	    
 	    void setUnique(int i)
@@ -245,6 +247,7 @@ public class STLObject
     	CSG3D csgResult = null;
         STLLoader loader = new STLLoader();
         Scene scene;
+        double volume = 0;
         try 
         {
             scene = loader.load(location);
@@ -270,6 +273,7 @@ public class STLObject
                     while(enumValues.hasMoreElements( )) 
                     {
                     	Shape3D value = (Shape3D)enumValues.nextElement();
+                    	volume += s3dVolume(value);
                         bbox = (BoundingBox)value.getBounds();
                         
                         value.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE );
@@ -310,7 +314,8 @@ public class STLObject
                     + location);
             e.printStackTrace();
         }
-        return new Contents(location, bgResult, csgResult, att);
+        
+        return new Contents(location, bgResult, csgResult, att, volume);
     }
     
     private void updateBox(BoundingBox bb)
@@ -993,7 +998,79 @@ public class STLObject
             return;
         
         rScale(Preferences.inchesToMillimetres());
-    } 
+    }
+    
+    /**
+     * Return the volume of the last-added item
+     * @return
+     */
+    public double volume()
+    {
+    	if(contents == null)
+    		return 0;
+    	if(contents.size() <= 0)
+    		return 0;
+    	return contents.get(contents.size()-1).volume;
+    }
+    
+   /**
+    * Compute the volume of a Shape3D
+    * @param shape
+    * @return
+    */
+    
+    private double s3dVolume(Shape3D shape)
+    {
+    	double total = 0;
+        GeometryArray g = (GeometryArray)shape.getGeometry();
+        Point3d a = new Point3d();
+        Point3d b = new Point3d();
+        Point3d c = new Point3d();
+        if(g != null)
+        {
+            for(int i = 0; i < g.getVertexCount(); i += 3) 
+            {
+                g.getCoordinate(i, a);
+                g.getCoordinate(i+1, b);
+                g.getCoordinate(i+2, c);
+                total += prismVolume(a, b, c);
+            }
+        }
+        return Math.abs(total);
+    }
+    
+    /**
+     * Compute the signed volume of a tetrahedron
+     * @param a
+     * @param b
+     * @param c
+     * @param d
+     * @return
+     */
+    private double tetVolume(Point3d a, Point3d b, Point3d c, Point3d d)
+    {
+    	Matrix3d m = new Matrix3d(b.x - a.x, c.x - a.x, d.x - a.x, b.y - a.y, c.y - a.y, d.y - a.y, b.z - a.z, c.z - a.z, d.z - a.z);
+    	return m.determinant()/6.0;
+    }
+    
+    /**
+     * Compute the signed volume of the prism between the XY plane and the 
+     * space triangle {a, b, c}
+     * 
+     * @param a
+     * @param b
+     * @param c
+     * @return
+     */
+    private double prismVolume(Point3d a, Point3d b, Point3d c)
+    {
+    	Point3d d = new Point3d(a.x, a.y, 0); 
+    	Point3d e = new Point3d(b.x, b.y, 0);  
+    	Point3d f = new Point3d(c.x, c.y, 0);
+    	return tetVolume(a, b, c, e) +
+    		tetVolume(a, e, c, d) +
+    		tetVolume(e, f, c, d);
+    }
 }
 
 //********************************************************************************

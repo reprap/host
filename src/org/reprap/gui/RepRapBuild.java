@@ -146,7 +146,7 @@ class MaterialRadioButtons extends JPanel {
 	private static RepRapBuild rrb;
 	private static int stlIndex; 
 	
-	private MaterialRadioButtons()
+	private MaterialRadioButtons(double volume)
 	{
 		super(new BorderLayout());
 		JPanel radioPanel;
@@ -154,6 +154,11 @@ class MaterialRadioButtons extends JPanel {
 		String[] names;
 		radioPanel = new JPanel(new GridLayout(0, 1));
 		radioPanel.setSize(300,200);
+		
+		JLabel jLabel0 = new JLabel();
+	    radioPanel.add(jLabel0);
+	    jLabel0.setText("Volume of object: " + Math.round(volume) + " mm^3");
+		jLabel0.setHorizontalAlignment(SwingConstants.CENTER);
 		
 	    JLabel jLabel2 = new JLabel();
 	    radioPanel.add(jLabel2);
@@ -227,7 +232,7 @@ class MaterialRadioButtons extends JPanel {
 		dialog.dispose();
 	}
     
-    public static void createAndShowGUI(Attributes a, RepRapBuild r, int index) 
+    public static void createAndShowGUI(Attributes a, RepRapBuild r, int index, double volume) 
     {
     	att = a;
     	rrb = r;
@@ -239,7 +244,7 @@ class MaterialRadioButtons extends JPanel {
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         //Create and set up the content pane.
-        JComponent newContentPane = new MaterialRadioButtons();
+        JComponent newContentPane = new MaterialRadioButtons(volume);
         newContentPane.setOpaque(true); //content panes must be opaque
         dialog.setContentPane(newContentPane);
 
@@ -263,7 +268,7 @@ class MaterialRadioButtons extends JPanel {
 			}
 		}
 		if (index >= 0) 
-			createAndShowGUI(a, r, index);
+			createAndShowGUI(a, r, index, r.getSTLs().get(index).volume());
     }
 	
 }
@@ -474,7 +479,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 				wv_and_stls.addChild(stl.top());
 				stls.add(stl);
 			}
-			MaterialRadioButtons.createAndShowGUI(att, this, stls.size() - 1);
+			MaterialRadioButtons.createAndShowGUI(att, this, stls.size() - 1, stl.volume());
 		}
 	}
 	

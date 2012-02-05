@@ -10,7 +10,7 @@ RELEASE=${1:-`date -u +%Y%m%d`}
 
 RELEASENAME="reprap-$MACHINE-$RELEASE"
 
-FILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
+FILELIST="jar/reprap.jar lib/*.jar lib/mendel-base.stl lib/huxley-base.stl lib/rr-logo-green-url.png\
     lib/reprap-icon.png lib/reprap.properties.dist lib/system-dependent/linux-i386/*\
     lib/system-dependent/windows-i586/* lib/system-dependent/macosx/RepRap-Mac-Drivers.mpkg.zip LICENSE"
 
@@ -125,7 +125,7 @@ echo "Zip file created."
 
 rm -rf "$RELEASENAME"
 
-cd host
+cd ../host
 # Remove any old jar directory
 [ -d jar ] && rm -rf jar
 

@@ -10,7 +10,11 @@
 </target>
 
 <target name="backgroundstl" depends="build">
-    <copy file="lib/reprap-wv.stl" tofile="bin/reprap-wv.stl"/>
+    <copy file="lib/mendel-base.stl" tofile="bin/mendel-base.stl"/>
+</target>
+
+<target name="backgroundhuxleystl" depends="build">
+    <copy file="lib/huxley-base.stl" tofile="bin/huxley-base.stl"/>
 </target>
 
 <target name="jar" depends="init,properties,backgroundstl">
