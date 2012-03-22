@@ -978,13 +978,13 @@ public class STLObject
     
     // Do Zs by 45 deg
     
-    public void zClick()
+    public void zClick(double angle)
     {
         if(mouse == null)
             return;
         
         Transform3D x45 = new Transform3D();
-        x45.set(new AxisAngle4d(0, 0, 1, 0.25*Math.PI));
+        x45.set(new AxisAngle4d(0, 0, 1, angle*Math.PI/180.0));
         
         rClick(x45);
     } 
@@ -1012,6 +1012,12 @@ public class STLObject
     		return 0;
     	return contents.get(contents.size()-1).volume;
     }
+    
+    
+ /*
+    Project each triangle onto the XY plane and sum all the resulting prisms.  Downward-facing triangles will
+    give negative volumes, upward positive.  So the result is the volume of the triangulated object.
+ */
     
    /**
     * Compute the volume of a Shape3D

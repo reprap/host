@@ -128,7 +128,7 @@ public class Main {
         manipMenu.setMnemonic(KeyEvent.VK_M);
         menubar.add(manipMenu);
 
-        JMenuItem manipX = new JMenuItem("Rotate X", KeyEvent.VK_X);
+        JMenuItem manipX = new JMenuItem("Rotate X 90", KeyEvent.VK_X);
         manipX.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
         manipX.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -136,7 +136,7 @@ public class Main {
 			}});
         manipMenu.add(manipX);
 
-        JMenuItem manipY = new JMenuItem("Rotate Y", KeyEvent.VK_Y);
+        JMenuItem manipY = new JMenuItem("Rotate Y 90", KeyEvent.VK_Y);
         manipY.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
         manipY.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -144,13 +144,21 @@ public class Main {
 			}});
         manipMenu.add(manipY);
 
-        JMenuItem manipZ = new JMenuItem("Rotate Z", KeyEvent.VK_Z);
-        manipZ.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
-        manipZ.addActionListener(new ActionListener() {
+        JMenuItem manipZ45 = new JMenuItem("Rotate Z 45", KeyEvent.VK_Z);
+        manipZ45.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
+        manipZ45.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				onRotateZ();
+				onRotateZ(45);
 			}});
-        manipMenu.add(manipZ);
+        manipMenu.add(manipZ45);
+        
+        JMenuItem manipZ25 = new JMenuItem("Rotate Z 2.5", KeyEvent.VK_Z);
+        manipZ25.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+        manipZ25.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				onRotateZ(2.5);
+			}});
+        manipMenu.add(manipZ25);
         
         JMenuItem inToMM = new JMenuItem("Scale by 25.4 (in -> mm)", KeyEvent.VK_I);
         inToMM.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
@@ -444,8 +452,8 @@ public class Main {
   	  builder.yRotate();
     }
 
-    private void onRotateZ() {
-  	  builder.zRotate();
+    private void onRotateZ(double angle) {
+  	  builder.zRotate(angle);
     }
     
     private void oninToMM() {

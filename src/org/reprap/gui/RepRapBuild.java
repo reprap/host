@@ -579,9 +579,9 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 			lastPicked.yClick();
 	}
 
-	public void zRotate() {
+	public void zRotate(double angle) {
 		if (lastPicked != null)
-			lastPicked.zClick();
+			lastPicked.zClick(angle);
 	}
 	
 	// Callback for a request to convert units
