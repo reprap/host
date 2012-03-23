@@ -152,13 +152,21 @@ public class Main {
 			}});
         manipMenu.add(manipZ45);
         
-        JMenuItem manipZ25 = new JMenuItem("Rotate Z 2.5", KeyEvent.VK_Z);
-        manipZ25.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
-        manipZ25.addActionListener(new ActionListener() {
+        JMenuItem manipZp25 = new JMenuItem("Z Anticlockwise 2.5", KeyEvent.VK_A);
+        manipZp25.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
+        manipZp25.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				onRotateZ(2.5);
 			}});
-        manipMenu.add(manipZ25);
+        manipMenu.add(manipZp25);
+        
+        JMenuItem manipZm25 = new JMenuItem("Z Clockwise 2.5", KeyEvent.VK_C);
+        manipZm25.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
+        manipZm25.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				onRotateZ(-2.5);
+			}});
+        manipMenu.add(manipZm25);
         
         JMenuItem inToMM = new JMenuItem("Scale by 25.4 (in -> mm)", KeyEvent.VK_I);
         inToMM.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
