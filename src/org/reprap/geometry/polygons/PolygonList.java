@@ -1134,7 +1134,7 @@ public class PolygonList
 			Extruder ex = outline.getAttributes().getExtruder();
 			if(ex.getMiddleStart())
 			{
-				Line l = lc.getHatchDirection(ex).pLine();
+				Line l = lc.getHatchDirection(ex, false).pLine();
 				if(i%2 != 0 ^ lc.getMachineLayer()%4 > 1)
 					l = l.neg();
 				outline = outline.newStart(outline.maximalVertex(l));

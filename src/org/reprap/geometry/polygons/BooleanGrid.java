@@ -2514,8 +2514,14 @@ public class BooleanGrid
 			break;
 		}
 		
-		HalfPlane hatcher = new 
-			HalfPlane(org, Point2D.add(org, hp.pLine().direction()));
+		double dist = Point2D.mul(org, orth)/gap;
+		dist = (1 + (long)dist)*gap;
+		HalfPlane hatcher = new HalfPlane(hp);
+		hatcher = hatcher.offset(dist);
+		
+		//HalfPlane hatcher = new 
+		//	HalfPlane(org, Point2D.add(org, hp.pLine().direction()));
+		
 
 		List<HalfPlane> hatches = new ArrayList<HalfPlane>();
 		iPolygonList iHatches = new iPolygonList();

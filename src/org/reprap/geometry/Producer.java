@@ -156,7 +156,7 @@ public class Producer {
 //			shield.add(allSTLs.shieldPolygon(fa));
 		CSG2D rect = CSG2D.RrCSGFromBox(gp);
 		BooleanGrid bg = new BooleanGrid(rect, gp.scale(1.1), fa);
-		PolygonList h[] = {shield, bg.hatch(layerRules.getHatchDirection(e), layerRules.getHatchWidth(e), bg.attribute())};
+		PolygonList h[] = {shield, bg.hatch(layerRules.getHatchDirection(e, false), layerRules.getHatchWidth(e), bg.attribute())};
 		LayerProducer lp = new LayerProducer(h, layerRules, simulationPlot);
 		lp.plot();
 		reprap.getExtruder().stopExtruding();

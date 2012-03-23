@@ -428,7 +428,7 @@ public class LayerRules
 	 *   
 	 * @return
 	 */
-	public HalfPlane getHatchDirection(Extruder e) 
+	public HalfPlane getHatchDirection(Extruder e, boolean support) 
 	{	
 		double myHeight = e.getExtrusionHeight();
 		double eFraction = machineZ/myHeight;
@@ -450,7 +450,14 @@ public class LayerRules
 				angle = e.getOddHatchDirection();
 		}
 		angle = angle*Math.PI/180;
-		return new HalfPlane(new Point2D(0.0, 0.0), new Point2D(Math.sin(angle), Math.cos(angle)));
+		HalfPlane result = new HalfPlane(new Point2D(0.0, 0.0), new Point2D(Math.sin(angle), Math.cos(angle)));
+		
+		if(((mylayer/2)%2 == 0) && !support)
+		{
+			result = result.offset(0.5*getHatchWidth(e));
+		}
+		
+		return result;
 	}
 	
 	/**

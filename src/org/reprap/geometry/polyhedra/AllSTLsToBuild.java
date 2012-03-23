@@ -844,7 +844,7 @@ public class AllSTLsToBuild
 		
 		// Finally compute the support hatch.
 		
-		PolygonList result = support.hatch(layerRules, false, null);
+		PolygonList result = support.hatch(layerRules, false, null, true);
 		
 		return result;
 	}
@@ -958,7 +958,7 @@ public class AllSTLsToBuild
 					
 					// No second land implies a ring of support - just infill it.
 					
-					result.hatchedPolygons.add(bridge.hatch(layerConditions.getHatchDirection(bridge.attribute().getExtruder()), 
+					result.hatchedPolygons.add(bridge.hatch(layerConditions.getHatchDirection(bridge.attribute().getExtruder(), false), 
 							bridge.attribute().getExtruder().getExtrusionInfillWidth(), 
 							bridge.attribute()));
 					
@@ -1100,7 +1100,7 @@ public class AllSTLsToBuild
 		{
 			slice = slice.offset(layerRules, false, -1);
 			slice = neededThisLayer(slice, false, false);
-			infill.hatchedPolygons = slice.hatch(layerRules, true, null);
+			infill.hatchedPolygons = slice.hatch(layerRules, true, null, false);
 			return infill.hatchedPolygons;
 		}
 		
@@ -1185,9 +1185,9 @@ public class AllSTLsToBuild
 		
 		infill = bridgeHatch(infill, lands, layerRules);
 		infill.insides = neededThisLayer(infill.insides, true, false);
-		infill.hatchedPolygons.add(infill.insides.hatch(layerRules, false, null));
+		infill.hatchedPolygons.add(infill.insides.hatch(layerRules, false, null, false));
 		infill.surfaces = neededThisLayer(infill.surfaces, false, false);
-		infill.hatchedPolygons.add(infill.surfaces.hatch(layerRules, true, null));
+		infill.hatchedPolygons.add(infill.surfaces.hatch(layerRules, true, null, false));
 		
 	
 		return infill.hatchedPolygons;
