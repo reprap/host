@@ -362,6 +362,8 @@ public abstract class GenericExtruder implements Extruder
 	
 	protected boolean middleStart;
 	
+	protected boolean singleLine = false;
+	
 	/**
 	* Our printer object.
 	*/
@@ -482,6 +484,7 @@ public abstract class GenericExtruder implements Extruder
 			materialColour = new Appearance();
 			materialColour.setMaterial(new Material(col, black, col, black, 101f));
 			surfaceLayers = Preferences.loadGlobalInt(prefName + "SurfaceLayers(0..N)");
+			singleLine = Preferences.loadGlobalBool(prefName + "SingleLine");
 		} catch (Exception ex)
 		{
 			Debug.e("Refresh extruder preferences: " + ex.toString());
@@ -1420,4 +1423,12 @@ public abstract class GenericExtruder implements Extruder
     	return surfaceLayers;
     }
     
+    /**
+     * Are the extruder's models ones that (may) include single-width vectors to be plotted?
+     * @return
+     */
+    public boolean getSingleLine()
+    {
+    	return singleLine;
+    }
 }

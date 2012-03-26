@@ -607,6 +607,12 @@ public interface Extruder
      * @return
      */
     public int getSurfaceLayers();
+    
+    /**
+     * Are the extruder's models ones that (may) include single-width vectors to be plotted?
+     * @return
+     */
+    public boolean getSingleLine();
 	
 	
 }
