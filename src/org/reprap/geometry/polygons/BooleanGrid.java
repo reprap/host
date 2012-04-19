@@ -819,6 +819,8 @@ public class BooleanGrid
 	 */
 	private Attributes att;
 	
+	private Boolean isThin = false;
+	
 
 	
 	//**************************************************************************************************
@@ -868,6 +870,7 @@ public class BooleanGrid
 	public BooleanGrid(CSG2D csgExp, Rectangle rectangle, Attributes a)
 	{
 		att = a;
+		isThin = false;
 		Rectangle ri = rectangle.offset(rSwell);
 		rec = new iRectangle(new iPoint(0, 0), new iPoint(1, 1));  // Set the origin to (0, 0)...
 		rec.swCorner = new iPoint(ri.sw());                        // That then gets subtracted by the iPoint constructor to give the true origin
@@ -892,6 +895,7 @@ public class BooleanGrid
 	{
 		att = bg.att;
 		visited = null;
+		isThin = bg.isThin;
 		rec= new iRectangle(bg.rec);
 		bits = (BitSet)bg.bits.clone();
 	}
@@ -905,6 +909,7 @@ public class BooleanGrid
 	{
 		att = bg.att;
 		visited = null;
+		isThin = bg.isThin;
 		rec= new iRectangle(newRec);
 		bits = new BitSet(rec.size.x*rec.size.y);
 		iRectangle recScan = rec.intersection(bg.rec);
@@ -925,6 +930,7 @@ public class BooleanGrid
 		att = new Attributes(null, null, null, null);
 		rec = new iRectangle();
 		bits = new BitSet(1);
+		isThin = false;
 		visited = null;		
 	}
 	
@@ -985,6 +991,20 @@ public class BooleanGrid
 	public Attributes attribute()
 	{
 		return att;
+	}
+	
+	/**
+	 * Bitmap of thin lines?
+	 * @return
+	 */
+	public Boolean isThin()
+	{
+		return isThin;
+	}
+	
+	public void setThin(Boolean t)
+	{
+		isThin = t;
 	}
 	
 	/**
@@ -2098,6 +2118,8 @@ public class BooleanGrid
 	 */
 	private iPolygonList marchAll()
 	{
+		//if(isThin)
+		//	return marchLines();
 		iPolygonList result = new iPolygonList();
 		if(isEmpty())
 			return result;
@@ -2576,6 +2598,25 @@ public class BooleanGrid
 		
 		//pop();
 		return result;
+	}
+	
+	/**
+	 * This assumes that shrunk is this bitmap offset by dist from a previous calculation.
+	 * It grows shrunk by -dist, then subtracts that from itself.  The result is a bitmap of all the
+	 * thin lines in this pattern that were discarded by the original offset (plus some noise at places
+	 * square convex corners that have grown back rounded).
+	 * @param shrunk
+	 * @param dist
+	 * @return
+	 */
+	public BooleanGrid lines(BooleanGrid shrunk, double dist)
+	{
+		if(dist >=0)
+		{
+			Debug.e("BooleanGrid.lines() called with non-negative offset: " + dist);
+			return new BooleanGrid();
+		}
+		return difference(this, shrunk.offset(-dist));
 	}
 	
 	

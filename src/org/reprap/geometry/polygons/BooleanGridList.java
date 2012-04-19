@@ -165,11 +165,20 @@ public class BooleanGridList
 						boolean carryOn = true;
 						while(carryOn && shell < shells)
 						{
-							BooleanGrid thisOne = get(i).offset(multiplier*((double)shell + 0.5)*e.getExtrusionSize());
+							double d = multiplier*((double)shell + 0.5)*e.getExtrusionSize();
+							BooleanGrid thisOne = get(i).offset(d);
 							if(thisOne.isEmpty())
 								carryOn = false;
 							else
+							{
+								if(shell == 0 && e.getSingleLine())
+								{
+									BooleanGrid lines = get(i).lines(thisOne, d);
+									lines.setThin(true);
+									result.add(lines);
+								}
 								result.add(thisOne);
+							}
 							shell++;
 						}
 						result = result.reverse();  // Best to plot from the inside out
