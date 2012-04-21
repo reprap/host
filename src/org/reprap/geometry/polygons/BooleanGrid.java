@@ -2119,7 +2119,7 @@ public class BooleanGrid
 	private iPolygonList marchAll()
 	{
 		//if(isThin)
-		//	return marchLines();
+		//	return marchLines(); // XXXXXXXXXXXXXXXXXXXXXXX
 		iPolygonList result = new iPolygonList();
 		if(isEmpty())
 			return result;

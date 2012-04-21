@@ -469,7 +469,7 @@ public class AllSTLsToBuild
 	public boolean reorderAdd(STLObject st)
 	{
 		if(frozen)
-			Debug.d("AllSTLsToBuild.remove(): attempting to reorder a frozen list.");
+			Debug.d("AllSTLsToBuild.reorderAdd(): attempting to reorder a frozen list.");
 		
 		if(newstls == null)
 			newstls = new ArrayList<STLObject>();
