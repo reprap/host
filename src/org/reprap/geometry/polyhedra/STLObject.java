@@ -61,7 +61,7 @@ import java.math.BigDecimal;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.ArrayList;
-import java.util.List;
+//import java.util.List;
 
 import javax.media.j3d.Appearance;
 import javax.media.j3d.BoundingBox;
@@ -84,6 +84,7 @@ import com.sun.j3d.loaders.Scene;
 import com.sun.j3d.utils.picking.PickTool;
 
 import org.j3d.renderer.java3d.loaders.STLLoader;
+//import org.reprap.utilities.StlFile;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.gui.MouseObject;
