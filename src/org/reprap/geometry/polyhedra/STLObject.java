@@ -84,7 +84,7 @@ import com.sun.j3d.loaders.Scene;
 import com.sun.j3d.utils.picking.PickTool;
 
 import org.j3d.renderer.java3d.loaders.STLLoader;
-//import org.reprap.utilities.StlFile;
+import org.reprap.utilities.StlFile;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.gui.MouseObject;
@@ -247,10 +247,14 @@ public class STLObject
     	BranchGroup bgResult = null;
     	CSG3D csgResult = null;
         STLLoader loader = new STLLoader();
+    	//StlFile loader = new StlFile();
         Scene scene;
         double volume = 0;
         try 
         {
+        	
+        	//location=location.substring(5);
+        	//System.out.println(location);
             scene = loader.load(location);
         	CSGReader csgr = new CSGReader(location);
         	if(csgr.csgAvailable())

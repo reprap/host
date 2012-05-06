@@ -60,8 +60,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reprap.Extruder;
+import org.reprap.Attributes;
 import org.reprap.geometry.LayerRules;
 import org.reprap.utilities.Debug;
+
+// Stuff for kabeja DXF import
+
+import java.io.InputStream;
+import java.util.Iterator;
+
+/*
+import org.kabeja.dxf.DXFCircle;
+import org.kabeja.dxf.DXFConstants;
+import org.kabeja.dxf.DXFDocument;
+import org.kabeja.dxf.DXFLayer;
+import org.kabeja.dxf.DXFLine;
+import org.kabeja.dxf.DXFPolyline;
+import org.kabeja.dxf.DXFVertex;
+import org.kabeja.dxf.DXFConstants;
+import org.kabeja.dxf.helpers.Point;
+import org.kabeja.parser.ParseException;
+import org.kabeja.parser.Parser;
+import org.kabeja.parser.DXFParser;
+import org.kabeja.parser.ParserBuilder;
+*/
 
 /**
  * Small class to hold a polygon index and the index of a point within it
@@ -711,7 +733,75 @@ public class PolygonList
 		
 		return r;
 	}
+
 	
+	
+
+//	private void addDXFPolyLines(List plines, Attributes a)
+//	{
+//		for(int pg = 0; pg < plines.size(); pg++)
+//		{
+//			DXFPolyline dxfp = (DXFPolyline) plines.get(pg);
+//			Polygon p = new Polygon(a, true);
+//			for (int i = 0; i < dxfp.getVertexCount(); i++) 
+//			{
+//				DXFVertex vertex = dxfp.getVertex(i);
+//				Point2D pt = new Point2D(vertex.getX(), vertex.getY());
+//				p.add(pt);
+//			}
+//			add(p);
+//		}
+//	}
+//	
+//	public static Polygon ArcToPolygon(double xCen, double yCen, double r, double a0, double a1, Attributes a)
+//	{
+//		return null;
+//	}
+//	
+//	private void addDXFCircles(List pcircs, Attributes a)
+//	{
+//		for(int pg = 0; pg < pcircs.size(); pg++)
+//		{
+//			DXFCircle dxfc = (DXFCircle) pcircs.get(pg);
+//			Polygon p = ArcToPolygon(dxfc.getCenterPoint().getX(), dxfc.getCenterPoint().getY(), dxfc.getRadius(), 0, 2*Math.PI, a);
+//			add(p);
+//		}
+//	}
+//	
+//	/**
+//	 * Read a DXF file layer and return it as a polygon list.
+//	 * @return
+//	 */
+//	public PolygonList readDXF(InputStream in, String layerid, Attributes a)
+//	{
+//		Parser parser = ParserBuilder.createDefaultParser();
+//		PolygonList result = new PolygonList();
+//
+//		try 
+//		{
+//			//parse
+//			parser.parse(in, DXFParser.DEFAULT_ENCODING);
+//			//get the documnet and the layer
+//			DXFDocument doc = parser.getDocument();
+//			DXFLayer layer = doc.getDXFLayer(layerid);
+//			//get all polylines from the layer
+//			List plist = layer.getDXFEntities(DXFConstants.ENTITY_TYPE_POLYLINE);
+//			//work with the first polyline
+//			result.addDXFPolyLines(plist, a);
+//			plist = layer.getDXFEntities(DXFConstants.ENTITY_TYPE_CIRCLE);
+//			result.addDXFCircles(plist, a);
+//		} catch (ParseException e) 
+//		{
+//			Debug.e("PolygonList.readDXF() error: " + e);
+//			result = new PolygonList();
+//		}
+//		
+//		
+//		
+//		return result;
+//	}
+	
+
 	
 	/**
 	 * Re-order and (if need be) reverse the order of the polygons
