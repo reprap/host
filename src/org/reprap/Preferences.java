@@ -25,6 +25,9 @@ public class Preferences {
 	private static String propsFile = "reprap.properties";
 	private static final String propsFolder = ".reprap";
 	private static final String propsFileDist = "reprap.properties.dist";
+	private static final String cannedDefault = "Canned_G_Codes";
+	private static final String prologueFile = "prologue.gcode";
+	private static final String epilogueFile = "epilogue.gcode";
 	
 	private static Preferences globalPrefs = null; 
 	
@@ -35,6 +38,10 @@ public class Preferences {
 	 * This section deals with internal (i.e. not RepRap machine, but this code or
 	 * physics) precisions and accuracies
 	 */
+	
+	// standard file names for the top and tail for G Code files
+	public static final String prologue = "prologue.gcode";
+	public static final String epilogue = "epilogue.gcode";
 	
 	private static final int grid = 100;             // Click outline polygons to a...
 	public static int grid() { return grid; }
@@ -94,6 +101,11 @@ public class Preferences {
 		return unselectedApp;
 	}
 	
+	public static String getPropsFolderPath()
+	{
+		return System.getProperty("user.home") + File.separatorChar + propsFolder + File.separatorChar;
+	}
+	
 	// Main preferences constructor
 	
 	public Preferences() throws IOException {
@@ -103,8 +115,7 @@ public class Preferences {
 		//Debug.a("++++ " + fallbackUrl.toString());
 
 		// Construct URL of user properties file
-		String path = new String(System.getProperty("user.home") + File.separatorChar + 
-			propsFolder + File.separatorChar + propsFile);
+		String path = getPropsFolderPath() + propsFile;
 		File mainFile = new File(path);
 		URL mainUrl = mainFile.toURI().toURL();
 		
@@ -193,20 +204,29 @@ public class Preferences {
 	}
 
 	public void save(boolean startUp) throws FileNotFoundException, IOException {
-		String savePath = new String(System.getProperty("user.home") + File.separatorChar + 
-			propsFolder + File.separatorChar);
-		File f = new File(savePath + File.separatorChar + propsFile);
+		String savePath = getPropsFolderPath() + propsFile;
+		//File f = new File(savePath + File.separatorChar + propsFile);
+		File f = new File(savePath);
 		if (!f.exists()) {
 			// No properties file exists, so we will create one and try again
 			// We'll put the properties file in the .reprap folder,
 			// under the user's home folder.
-			File p = new File(savePath);
-			if (!p.isDirectory())		// Create .reprap folder if necessary
+			String canned = getPropsFolderPath() + loadString(cannedDefault) + File.separatorChar;
+			File p = new File(canned);
+			if (!p.isDirectory())		// Create .reprap folder and those under it if necessary
 				   p.mkdirs();
+			URL sourceUrl = ClassLoader.getSystemResource(prologueFile);
+			File source = new File(sourceUrl.getFile());
+			File dest = new File(canned + prologueFile);
+			org.reprap.utilities.RepRapUtils.copyFile(source, dest);
+			sourceUrl = ClassLoader.getSystemResource(epilogueFile);
+			source = new File(sourceUrl.getFile());
+			dest = new File(canned + epilogueFile);
+			org.reprap.utilities.RepRapUtils.copyFile(source, dest);
 		}
 		
 		OutputStream output = new FileOutputStream(f);
-		mainPreferences.store(output, "RepRap machine parameters. See http://objects.reprap.org/wiki/Java_Software_Preferences_File");
+		mainPreferences.store(output, "RepRap machine parameters. See http://reprap.org/wiki/Java_Software_Preferences_File");
 
 		if(!startUp)
 			org.reprap.Main.gui.getPrinter().refreshPreferences();
@@ -289,14 +309,7 @@ public class Preferences {
 		return globalPrefs;
 	}
 	
-	public static String getProbsFolderPath()
-	{
-		String path;
-		path = System.getProperty("user.home") + File.separatorChar + 	propsFolder + File.separatorChar;
-		return path;
-	}
-	
-	public static String getPropsFile()
+	public static String getDefaultPropsFile()
 	{
 		return propsFile;
 	}

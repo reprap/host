@@ -19,6 +19,7 @@ import org.reprap.gui.StatusMessage;
 import org.reprap.Extruder;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.Timer;
+import org.reprap.geometry.polygons.Rectangle;
 import org.reprap.geometry.polyhedra.AllSTLsToBuild;
 
 public abstract class GenericRepRap implements CartesianPrinter
@@ -29,7 +30,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/**
 	 * Force an extruder to be selected on startup
 	 */
-	Boolean forceSelection;
+	protected boolean forceSelection;
+	
+	// If true this starts by drawing a rectangle round everything
+	// If false the extruder purges at the purge point
+	//protected boolean startRectangle = true;
 	
 	//protected boolean accelerating;
 	
@@ -311,6 +316,41 @@ public abstract class GenericRepRap implements CartesianPrinter
 		
 		Debug.refreshPreferences();
 	}
+	
+	/**
+	 * Plot a rectangle round the build on layer 0
+	 * @param lc
+	 */
+	private void plotOutline(LayerRules lc)
+	{
+		Rectangle r = lc.getBox();
+		r = r.offset(2);
+		try 
+		{
+			singleMove(r.x().low(), r.y().low(), currentZ, getExtruder().getFastXYFeedrate(), true);
+			//getExtruder().zeroExtrudedLength(true);
+			getExtruder().setExtrusion(getExtruder().getExtruderSpeed(), false);
+			singleMove(r.x().high(), r.y().low(), currentZ, getExtruder().getFastXYFeedrate(), true);
+			singleMove(r.x().high(), r.y().high(), currentZ, getExtruder().getFastXYFeedrate(), true);
+			singleMove(r.x().low(), r.y().high(), currentZ, getExtruder().getFastXYFeedrate(), true);
+			singleMove(r.x().low(), r.y().low(), currentZ, getExtruder().getFastXYFeedrate(), true);
+			currentX = r.x().low();
+			currentY = r.y().low();
+			printEndReverse();
+			getExtruder().stopExtruding();
+			getExtruder().setValve(false);
+			//getExtruder().zeroExtrudedLength(true);
+		} catch (ReprapException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	
 	/* (non-Javadoc)
@@ -321,19 +361,24 @@ public abstract class GenericRepRap implements CartesianPrinter
 		//if (previewer != null)
 			//previewer.reset();
 
-		Debug.d("Selecting material 0");
-		selectExtruder(0, true);
-		getExtruder().zeroExtrudedLength(true);
+		//Debug.d("Selecting material 0");
+		//selectExtruder(0, true);
+		//getExtruder().zeroExtrudedLength(true);
 		
-		Debug.d("Homing machine in X and Y");
-		homeToZeroX();
-		homeToZeroY();
+		//Debug.d("Homing machine in X and Y");
+		//homeToZeroX();
+		//homeToZeroY();
 
 		//Debug.d("Setting temperature");
 		//getExtruder().heatOn(true);
 		
-		// Move to the purge point, home Z and purge the extruder
-		getExtruder().purge(true);
+		// plot the outline, or move to the purge point, home Z and purge the extruder
+		if(Preferences.loadGlobalBool("StartRectangle"))
+			plotOutline(lc);
+		else
+			getExtruder().purge(0);
+		
+		//System.out.println(getExtruder().)
 	}
 	
 	/**
@@ -347,7 +392,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 
 		startCooling = -1;
 
-		if(coolTime > 0 && !lc.notStartedYet()) {
+		if(coolTime > 0 && !lc.notStartedYet()) 
+		{
 			getExtruder().setCooler(true, lc.getReversing()); //***
 			Debug.d("Start of cooling period");
 			//setFeedrate(getFastXYFeedrate());
@@ -398,13 +444,14 @@ public abstract class GenericRepRap implements CartesianPrinter
 				singleMove(getX(), getY(), currentZ, getFastFeedrateZ(), lc.getReversing()); //***				
 		} else
 		{
-			int extruderNow = extruder;
-			for(int i = 0; i < extruders.length; i++)
-			{
-				selectExtruder(i, lc.getReversing());
-				extruders[i].zeroExtrudedLength(lc.getReversing()); //***
-			}
-			selectExtruder(extruderNow, lc.getReversing()); //***
+			getExtruder().zeroExtrudedLength(lc.getReversing());
+//			int extruderNow = extruder;
+//			for(int i = 0; i < extruders.length; i++)
+//			{
+//				selectExtruder(i, lc.getReversing());
+//				extruders[i].zeroExtrudedLength(lc.getReversing()); //***
+//			}
+//			selectExtruder(extruderNow, lc.getReversing()); //***
 		}
 
 		//		double datumX = getExtruder().getNozzleWipeDatumX();
@@ -493,10 +540,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/**
 	 * Go to the purge point
 	 */
-	public void moveToPurge(boolean raiseZ)
+	public void moveToPurge(double liftZ)
 	{
-		if(raiseZ)
-			singleMove(currentX, currentY, currentZ + 1, getFastFeedrateZ(), true);
+		if(liftZ > 0)
+			singleMove(currentX, currentY, currentZ + liftZ, getFastFeedrateZ(), true);
 		singleMove(dumpX, dumpY, currentZ, getExtruder().getFastXYFeedrate(), true);
 	}
 	

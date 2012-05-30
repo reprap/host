@@ -17,6 +17,8 @@ import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
 import org.reprap.geometry.LayerRules;
 import org.reprap.geometry.polygons.Point2D;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
@@ -294,7 +296,7 @@ public class GCodeRepRap extends GenericRepRap {
 
 	
 	/**
-	 * make a single, non building move (between plots, or zeroing an axis etc.)
+	 * make a single, usually non-building move (between plots, or zeroing an axis etc.)
 	 */
 	public void singleMove(double x, double y, double z, double feedrate, boolean really)
 	{
@@ -483,7 +485,12 @@ public class GCodeRepRap extends GenericRepRap {
 		String myDateString = sdf.format(myDate);
 		gcode.queue("; Created: " + myDateString);
 		gcode.queue(";#!RECTANGLE: " + lc.getBox());
-		
+		if(Debug.d())
+			gcode.queue("; Prologue:");
+		gcode.copyFile(Preferences.getPropsFolderPath() + Preferences.loadGlobalString("Canned_G_Codes") + File.separatorChar + Preferences.prologue);
+		if(Debug.d())
+			gcode.queue("; ------");
+		/*
 		String s = "M110";
 		if(Debug.d())
 			s += " ; Reset the line numbers";
@@ -500,23 +507,23 @@ public class GCodeRepRap extends GenericRepRap {
 			s += " ; absolute positioning";		
 		gcode.queue(s);
 		
+		// Set the bed temperature
+		
+		setBedTemperature(bedTemperatureTarget);
+		*/
 		currentX = 0;
 		currentY = 0;
 		currentZ = 0;
 		currentFeedrate = -100; // Force it to set the feedrate at the start
 		
 		forceSelection = true;  // Force it to set the extruder to use at the start
-		
-		// Set the bed temperature
-		
-		setBedTemperature(bedTemperatureTarget);
 				
 		try	{
 			super.startRun(lc);
 		} catch (Exception E) {
 			Debug.d("Initialization error: " + E.toString());
 		}
-
+		//gcode.queue(";HERE!");
 	}
 	
 	public void startingLayer(LayerRules lc) throws Exception
@@ -553,6 +560,13 @@ public class GCodeRepRap extends GenericRepRap {
 			currentZ = round(lc.getLayerZ(topLayer),1);
 			//gcode.queue("; Moving to finish:");
 			moveToFinish(lc);
+			
+			if(Debug.d())
+				gcode.queue("; Epilogue:");
+			gcode.copyFile(Preferences.getPropsFolderPath() + Preferences.loadGlobalString("Canned_G_Codes") + File.separatorChar + Preferences.epilogue);
+			if(Debug.d())
+				gcode.queue("; ------");
+			/*
 			// Extruder off
 			//getExtruder().setExtrusion(0, false);
 			String s = "M0";
@@ -561,6 +575,7 @@ public class GCodeRepRap extends GenericRepRap {
 			gcode.queue(s);
 			// heater off
 			//getExtruder().heatOff();
+			*/
 		} catch(Exception e){
 			//oops
 		}
@@ -1006,10 +1021,10 @@ public class GCodeRepRap extends GenericRepRap {
 					gcode.queue(s);
 				}else
 				{
-					s = "M113";
-					if(Debug.d())
-						s += " ; set extruder to use pot for PWM";
-					gcode.queue(s);
+//					s = "M113";
+//					if(Debug.d())
+//						s += " ; set extruder to use pot for PWM";
+//					gcode.queue(s);
 				}
 			}
 			forceSelection = false;

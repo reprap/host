@@ -216,7 +216,7 @@ public interface Extruder
      * Purge the extruder
      *
      */
-    public void purge(boolean homeZ) throws Exception;
+    public void purge(double liftZ) throws Exception;
     
     /**
      * Set the flag to show we're creating a separation

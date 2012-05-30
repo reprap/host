@@ -64,11 +64,17 @@ import java.util.ArrayList;
 //import java.util.List;
 
 import javax.media.j3d.Appearance;
+import javax.media.j3d.Behavior;
 import javax.media.j3d.BoundingBox;
 import javax.media.j3d.BranchGroup;
+import javax.media.j3d.ColoringAttributes;
 import javax.media.j3d.GeometryArray;
 import javax.media.j3d.Group;
+import javax.media.j3d.Light;
+import javax.media.j3d.Material;
 import javax.media.j3d.Node;
+import javax.media.j3d.PolygonAttributes;
+import javax.media.j3d.RenderingAttributes;
 import javax.media.j3d.SceneGraphObject;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
@@ -229,6 +235,7 @@ public class STLObject
     		lastPicked.contents.add(child);
     	return att;
     }
+ 
 
     /**
      * Actually load the stl file and set its attributes.  Offset decides where to put it relative to 
@@ -266,8 +273,6 @@ public class STLObject
                 bgResult.setCapability(Group.ALLOW_CHILDREN_READ);
                 bgResult.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE);
                 
-
-                
                 // Recursively add its attribute
                 
                 Hashtable<?,?> namedObjects = scene.getNamedObjects( );
@@ -277,15 +282,19 @@ public class STLObject
                 {
                     while(enumValues.hasMoreElements( )) 
                     {
-                    	Shape3D value = (Shape3D)enumValues.nextElement();
-                    	volume += s3dVolume(value);
-                        bbox = (BoundingBox)value.getBounds();
-                        
-                        value.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE );
-                        GeometryArray g = (GeometryArray)value.getGeometry();
-                        g.setCapability(GeometryArray.ALLOW_COORDINATE_WRITE);
-                        
-                        recursiveSetUserData(value, att);
+                    	Object tt = enumValues.nextElement();
+                    	if(tt instanceof Shape3D)
+                    	{
+                    		Shape3D value = (Shape3D)tt;
+                    		volume += s3dVolume(value);
+                    		bbox = (BoundingBox)value.getBounds();
+
+                    		value.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE );
+                    		GeometryArray g = (GeometryArray)value.getGeometry();
+                    		g.setCapability(GeometryArray.ALLOW_COORDINATE_WRITE);
+
+                    		recursiveSetUserData(value, att);
+                    	}
                     }
                 }
                 
@@ -728,6 +737,7 @@ public class STLObject
     {
         mouse = m;
     }
+    
     
     // Change colour etc. - recursive private call to walk the tree
     

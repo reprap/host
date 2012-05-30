@@ -1378,14 +1378,14 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * Purge the extruder
 	 */
-	public void purge(boolean homeZ) throws Exception
+	public void purge(double liftZ) throws Exception
 	{
-		getPrinter().moveToPurge(!homeZ);
+		getPrinter().moveToPurge(liftZ);
 		try
 		{
-			if(homeZ)
-				getPrinter().homeToZeroZ();
-			heatOn(true);
+			//if(homeZ)
+			//	getPrinter().homeToZeroZ();
+			//heatOn(true);
 			if(getPurgeTime() > 0)
 			{
 				setExtrusion(getFastXYFeedrate(), false);

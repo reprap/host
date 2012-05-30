@@ -8,6 +8,8 @@ import com.sun.j3d.loaders.SceneBase;
 import com.sun.j3d.loaders.IncorrectFormatException;
 import com.sun.j3d.loaders.ParsingErrorException;
 import com.sun.j3d.utils.geometry.GeometryInfo;
+import com.sun.j3d.utils.geometry.NormalGenerator;
+import com.sun.j3d.utils.geometry.Stripifier;
 
 import java.net.URL;
 import java.net.MalformedURLException;
@@ -26,7 +28,10 @@ import java.util.ArrayList;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
+import javax.media.j3d.BoundingSphere;
 import javax.media.j3d.BranchGroup;
+import javax.media.j3d.DirectionalLight;
+import javax.media.j3d.GeometryArray;
 import javax.media.j3d.Shape3D;
 
 // New from JDK 1.4 for endian related problems
@@ -126,6 +131,12 @@ public class StlFile implements Loader
    */
   private void readSolid(StlFileParser parser)
   {
+	if(parser.sval == null)
+	{
+		// Added by AB
+		this.setAscii(false);
+		return;
+	}
     if( !parser.sval.equals("solid"))
     {
       //System.out.println("Expecting solid on line " + parser.lineno());
@@ -747,18 +758,23 @@ public class StlFile implements Loader
       coordArray = objectToPoint3Array(coordList);
       normArray = objectToVectorArray(normList);
     }
+    
+    //for(int i = 0; i < normArray.length; i++)
+    //	normArray[i].negate();
 
     gi.setCoordinates(coordArray);
     gi.setNormals(normArray);
-    gi.setStripCounts(stripCounts);
+    gi.setStripCounts(stripCounts);  
 
     // Put geometry into Shape3d
     Shape3D shape = new Shape3D();
     shape.setGeometry(gi.getGeometryArray());
-
+    
     group.addChild(shape);
+    
+    
     scene.addNamedObject(objectName, shape);
-
+    
     return scene;
   } // end of makeScene
 

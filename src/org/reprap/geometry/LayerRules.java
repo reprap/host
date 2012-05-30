@@ -611,7 +611,7 @@ public class LayerRules
 
 		try
 		{
-			getPrinter().startRun(this);
+			getPrinter().startRun(this); // Sets current X, Y, Z to 0
 			int top = realTopLayer();
 			for(machineLayer = 0; machineLayer <= top; machineLayer++)
 			{
