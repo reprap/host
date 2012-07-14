@@ -281,7 +281,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
             }
         });
 
-        layerPauseCheck.setText("Pause at end of layer"); // NOI18N
+        layerPauseCheck.setText("Layer pause when slicing"); // NOI18N
         layerPauseCheck.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 layerPauseCheckActionPerformed(evt);
@@ -416,7 +416,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {//AB99
         
         
         
-        displayPathsCheck.setText("Display paths");
+        displayPathsCheck.setText("Show paths when slicing");
         displayPathsCheck.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 displayPathsCheckMouseClicked(evt);
