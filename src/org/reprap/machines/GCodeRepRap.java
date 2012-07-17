@@ -98,11 +98,28 @@ public class GCodeRepRap extends GenericRepRap {
 		double dx = x - currentX;
 		double dy = y - currentY;
 		
+		double extrudeLength = extruders[extruder].getDistance(Math.sqrt(dx*dx + dy*dy));
+		String se = "";
+
+		if(extrudeLength > 0)
+		{
+			if(extruders[extruder].getReversing())
+				extrudeLength = -extrudeLength;
+			extruders[extruder].getExtruderState().add(extrudeLength);
+			if(extruders[extruder].get5D())
+			{
+				if(Preferences.loadGlobalBool("ExtrusionRelative"))
+					se = " E" + round(extrudeLength, 2);
+				else
+					se = " E" + round(extruders[extruder].getExtruderState().length(), 2);
+			}
+		}
+		
 		double xyFeedrate = round(extruders[extruder].getFastXYFeedrate(), 1);
 		
-		if(xyFeedrate < feedrate)
+		if(xyFeedrate < feedrate && Math.abs(extrudeLength) > Preferences.tiny())
 		{
-			Debug.d("GCodeRepRap().qXYMove: feedrate (" + feedrate + ") exceeds maximum (" + xyFeedrate + ").");
+			Debug.d("GCodeRepRap().qXYMove: extruding feedrate (" + feedrate + ") exceeds maximum (" + xyFeedrate + ").");
 			feedrate = xyFeedrate;
 		}
 		
@@ -117,7 +134,7 @@ public class GCodeRepRap extends GenericRepRap {
 			return;
 		}
 		
-		double extrudeLength;
+		
 		String s = "G1 ";
 
 		if (dx != 0)
@@ -125,17 +142,7 @@ public class GCodeRepRap extends GenericRepRap {
 		if (dy != 0)
 			s += " Y" + y;
 
-		extrudeLength = extruders[extruder].getDistance(Math.sqrt(dx*dx + dy*dy));
-
-		if(extrudeLength > 0)
-		{
-			if(extruders[extruder].getReversing())
-				extruders[extruder].getExtruderState().add(-extrudeLength);
-			else
-				extruders[extruder].getExtruderState().add(extrudeLength);
-			if(extruders[extruder].get5D())
-				s += " E" + round(extruders[extruder].getExtruderState().length(), 1);
-		}
+		s += se;
 		
 		if (currentFeedrate != feedrate)
 		{
@@ -180,11 +187,15 @@ public class GCodeRepRap extends GenericRepRap {
 		if(extrudeLength > 0)
 		{
 			if(extruders[extruder].getReversing())
-				extruders[extruder].getExtruderState().add(-extrudeLength);
-			else
-				extruders[extruder].getExtruderState().add(extrudeLength);
+				extrudeLength = -extrudeLength;
+			extruders[extruder].getExtruderState().add(extrudeLength);
 			if(extruders[extruder].get5D())
-				s += " E" + round(extruders[extruder].getExtruderState().length(), 1);
+			{
+				if(Preferences.loadGlobalBool("ExtrusionRelative"))
+					s += " E" + round(extrudeLength, 2);
+				else
+					s += " E" + round(extruders[extruder].getExtruderState().length(), 2);
+			}
 		}
 		
 		if (currentFeedrate != feedrate)
@@ -325,6 +336,19 @@ public class GCodeRepRap extends GenericRepRap {
 			return;
 		}
 		
+		try 
+		{
+			if(!Preferences.loadGlobalBool("RepRapAccelerations"))
+			{
+				moveTo(x, y, z, feedrate, false, false);
+				return;
+			} 
+		}catch (Exception e1) 
+		{
+			// TODO Auto-generated catch block
+				e1.printStackTrace();
+		}
+		
 		try
 		{
 			if(xyMove && getExtruder().getMaxAcceleration() <= 0)
@@ -462,9 +486,9 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public void moveToFinish(LayerRules lc)
 	{
-		currentFeedrate = -100; // Force it to set the feedrate
-		singleMove(getX(), getY(), getZ() + 1, getFastFeedrateZ(), lc.getReversing());
-		singleMove(getFinishX(), getFinishY(), getZ(), getExtruder().getFastXYFeedrate(), lc.getReversing());
+		//currentFeedrate = -100; // Force it to set the feedrate
+		//singleMove(getX(), getY(), getZ() + 1, getFastFeedrateZ(), lc.getReversing());
+		//singleMove(getFinishX(), getFinishY(), getZ(), getExtruder().getFastXYFeedrate(), lc.getReversing());
 	}
 
 
@@ -531,7 +555,7 @@ public class GCodeRepRap extends GenericRepRap {
 		currentFeedrate = -1;  // Force it to set the feedrate
 		gcode.startingLayer(lc);
 		if(lc.getReversing())
-			gcode.queue(";#!LAYER: " + (lc.getMachineLayer() + 1) + "/" + lc.getMachineLayerMax());
+			gcode.queue(";#!LAYER: " + (lc.getMachineLayer()) + "/" + (lc.getMachineLayerMax() - 1));
 		super.startingLayer(lc);
 	}
 	
@@ -630,23 +654,38 @@ public class GCodeRepRap extends GenericRepRap {
 					fr = getExtruder().getFastEFeedrate();
 				else
 					fr = getExtruder().getFastXYFeedrate();
-				if(really)
-					qFeedrate(fr);
-				else
-					currentFeedrate = fr;
+
+				currentFeedrate = fr;
 				// Fix the value for possible feedrate change
-				extrudeLength = getExtruder().getDistanceFromTime(millis); 
+				extrudeLength = getExtruder().getDistanceFromTime(millis);
+				
+				if(getExtruder().getFeedDiameter() > 0)
+				{
+					fr = fr*getExtruder().getExtrusionHeight()*getExtruder().getExtrusionSize()/
+						(getExtruder().getFeedDiameter()*getExtruder().getFeedDiameter()*Math.PI/4);
+				}
+				
+				fr = round(fr, 1);
+				
+				if(really)
+				{
+					currentFeedrate = 0; // force it to output feedrate
+					qFeedrate(fr);
+				}
 			}
 
 			if(extruders[extruder].getReversing())
-				extruders[extruder].getExtruderState().add(-extrudeLength);
-			else
-				extruders[extruder].getExtruderState().add(extrudeLength);
+				extrudeLength = -extrudeLength;
+				
+			extruders[extruder].getExtruderState().add(extrudeLength);
 			
 			
 			if(extruders[extruder].get5D())
 			{
-				s = "G1 E" + round(extruders[extruder].getExtruderState().length(), 1);
+				if(Preferences.loadGlobalBool("ExtrusionRelative"))
+					s = "G1 E" + round(extrudeLength, 2);
+				else
+					s = "G1 E" + round(extruders[extruder].getExtruderState().length(), 2);
 				if(Debug.d())
 				{
 					if(extruders[extruder].getReversing())
@@ -654,12 +693,17 @@ public class GCodeRepRap extends GenericRepRap {
 					else
 						s += " ; extruder dwell";
 				}
+				double fr;
+				if(Preferences.loadGlobalBool("RepRapAccelerations"))
+					fr = getExtruder().getSlowXYFeedrate();
+				else
+					fr = getExtruder().getFastXYFeedrate();
 				if(really)
 				{
 					gcode.queue(s);
-					qFeedrate(getExtruder().getSlowXYFeedrate());
+					qFeedrate(fr);
 				} else
-					currentFeedrate = getExtruder().getSlowXYFeedrate();
+					currentFeedrate = fr;
 				return;
 			}
 		}

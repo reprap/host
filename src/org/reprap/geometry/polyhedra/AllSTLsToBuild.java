@@ -1096,7 +1096,7 @@ public class AllSTLsToBuild
 		
 		// Get the bottom out of the way - no fancy calculations needed.
 		
-		if(layer < surfaceLayers)
+		if(layer <= surfaceLayers)
 		{
 			slice = slice.offset(layerRules, false, -1);
 			slice = neededThisLayer(slice, false, false);

@@ -74,7 +74,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/**
 	 * The location of the place to go at the end
 	 */
-	protected double finishX, finishY;
+	//protected double finishX, finishY;
 	
 	/**
 	 * Rezero X and y every...
@@ -301,8 +301,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 			dumpX = Preferences.loadGlobalDouble("DumpX(mm)");
 			dumpY = Preferences.loadGlobalDouble("DumpY(mm)");
 			
-			finishX = Preferences.loadGlobalDouble("FinishX(mm)");
-			finishY = Preferences.loadGlobalDouble("FinishY(mm)");
+			//finishX = Preferences.loadGlobalDouble("FinishX(mm)");
+			//finishY = Preferences.loadGlobalDouble("FinishY(mm)");
 			
 			bedTemperatureTarget = Preferences.loadGlobalDouble("BedTemperature(C)");
 		}
@@ -1364,15 +1364,15 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * The XY location to go to at the end of a build
 	 * @return
 	 */
-	public double getFinishX()
-	{
-		return finishX;
-	}
-	
-	public double getFinishY()
-	{
-		return finishY;
-	}
+//	public double getFinishX()
+//	{
+//		return finishX;
+//	}
+//	
+//	public double getFinishY()
+//	{
+//		return finishY;
+//	}
 	
 	
 	/**

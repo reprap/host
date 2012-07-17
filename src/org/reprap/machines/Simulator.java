@@ -49,7 +49,7 @@ public class Simulator extends GenericRepRap {
 	public void terminate(LayerRules lr) throws Exception
 	{
 		//Debug.e("Generic terminate: " + getFinishX() + " " + getFinishY());
-		moveTo(getFinishX(), getFinishY(), getZ(), getExtruder().getFastXYFeedrate(), true, true);
+		//moveTo(getFinishX(), getFinishY(), getZ(), getExtruder().getFastXYFeedrate(), true, true);
 		getExtruder().setMotor(false);
 		getExtruder().setValve(false);
 		getExtruder().setTemperature(0, false);

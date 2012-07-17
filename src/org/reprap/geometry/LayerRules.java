@@ -228,7 +228,7 @@ public class LayerRules
 		}
 		
 		int foundationLayers = Math.max(0, printer.getFoundationLayers());
-		modelLayerMax = (int)(modelZMax/zStep);
+		modelLayerMax = (int)(modelZMax/zStep) + 1;
 		machineLayerMax = modelLayerMax + foundationLayers;
 		machineZMax = modelZMax + foundationLayers*zStep;
 		if(topDown)
@@ -613,7 +613,7 @@ public class LayerRules
 		{
 			getPrinter().startRun(this); // Sets current X, Y, Z to 0
 			int top = realTopLayer();
-			for(machineLayer = 0; machineLayer <= top; machineLayer++)
+			for(machineLayer = 1; machineLayer <= top; machineLayer++)
 			{
 				machineZ = layerZ[machineLayer];
 				getPrinter().startingLayer(this);
@@ -622,7 +622,10 @@ public class LayerRules
 				//System.out.println("Layer: " + machineLayer + " z: " + machineZ +
 				//		" first point: " + getFirstPoint(machineLayer) + " last point: " + getLastPoint(machineLayer)
 				//		+ " " + getLayerFileName(machineLayer));
-				getPrinter().singleMove(getLastPoint(machineLayer).x(), getLastPoint(machineLayer).y(), machineZ, getPrinter().getSlowXYFeedrate(), false);
+				if(Preferences.loadGlobalBool("RepRapAccelerations"))
+					getPrinter().singleMove(getLastPoint(machineLayer).x(), getLastPoint(machineLayer).y(), machineZ, getPrinter().getSlowXYFeedrate(), false);
+				else
+					getPrinter().singleMove(getLastPoint(machineLayer).x(), getLastPoint(machineLayer).y(), machineZ, getPrinter().getFastXYFeedrate(), false);
 				getPrinter().finishedLayer(this);
 				getPrinter().betweenLayers(this);
 			}

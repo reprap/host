@@ -259,7 +259,7 @@ public class Producer {
 		boolean firstTimeRound = true;
 		
 		
-		while(layerRules.getModelLayer() >= 0 ) 
+		while(layerRules.getModelLayer() > 0 ) 
 		{
 			if(layerRules.getModelLayer() == 0)
 				reprap.setSeparating(true);

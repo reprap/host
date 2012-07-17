@@ -386,7 +386,10 @@ public class LayerProducer {
 		{
 			// The next line tells the printer that it is already at the first point.  It is not, but code will be added just before this
 			// to put it there by the LayerRules function that reverses the top-down order of the layers.
-			printer.singleMove(p.point(0).x(), p.point(0).y(), currentZ, printer.getSlowXYFeedrate(), false);
+			if(Preferences.loadGlobalBool("RepRapAccelerations"))
+				printer.singleMove(p.point(0).x(), p.point(0).y(), currentZ, printer.getSlowXYFeedrate(), false);
+			else
+				printer.singleMove(p.point(0).x(), p.point(0).y(), currentZ, printer.getFastXYFeedrate(), false);
 			printer.forceNextExtruder();
 		}
 		printer.selectExtruder(att);
@@ -400,8 +403,14 @@ public class LayerProducer {
 		Boolean lift = att.getExtruder().getMinLiftedZ() >= 0 || liftZ > 0;
 		
 		if(acc)
-			p.setSpeeds(att.getExtruder().getSlowXYFeedrate(), p.isClosed()?outlineFeedrate:infillFeedrate, 
+		{
+			if(Preferences.loadGlobalBool("RepRapAccelerations"))
+				p.setSpeeds(printer.getFastXYFeedrate(), att.getExtruder().getSlowXYFeedrate(), p.isClosed()?outlineFeedrate:infillFeedrate, 
 					att.getExtruder().getMaxAcceleration());
+			else
+				p.setSpeeds(printer.getFastXYFeedrate(), att.getExtruder().getFastXYFeedrate(), p.isClosed()?outlineFeedrate:infillFeedrate, 
+						att.getExtruder().getMaxAcceleration());
+		}
 		
 		double extrudeBackLength = att.getExtruder().getExtrusionOverRun();
 		double valveBackLength = att.getExtruder().getValveOverRun();
@@ -421,7 +430,7 @@ public class LayerProducer {
 		if(liftZ > 0)
 			printer.singleMove(printer.getX(), printer.getY(), currentZ, printer.getFastFeedrateZ(), true);
 		
-		if(acc)
+		if(acc | (!Preferences.loadGlobalBool("RepRapAccelerations")))
 			currentFeedrate = p.speed(0);
 		else
 		{

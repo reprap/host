@@ -68,6 +68,7 @@
 
 package org.reprap.geometry.polygons;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -1249,7 +1250,7 @@ public class Polygon
 	 * @param maxSpeed
 	 * @param maxAcceleration
 	 */
-	public void setSpeeds(double minSpeed, double maxSpeed, double acceleration)
+	public void setSpeeds(double airSpeed, double minSpeed, double maxSpeed, double acceleration)
 	{
 		//if(isClosed())System.out.println(toString());
 		//RrPolygon pg = simplify(Preferences.gridRes());
@@ -1257,6 +1258,30 @@ public class Polygon
 		//points = pg.points;
 		//box = pg.box;
 		//if(isClosed())System.out.println(toString());
+		
+
+		// If not doing RepRap style accelerations, just move in air to the
+		// first point and then go round as fast as possible.
+		try 
+		{
+			if(!Preferences.loadGlobalBool("RepRapAccelerations"))
+			{
+				setSpeed(0, airSpeed);
+				for(int i = 1; i < size(); i++)
+				{
+					setSpeed(i, maxSpeed);
+				}
+				return;
+			}
+		} catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+
+
+		// RepRap-style accelerations
 		
 		boolean fixup[] = new boolean[size()];
 		setSpeed(0, minSpeed);

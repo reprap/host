@@ -186,7 +186,12 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * Where to put the nozzle
 	 */
-	protected double offsetX, offsetY, offsetZ; 
+	protected double offsetX, offsetY, offsetZ;
+	
+	/**
+	 * The diameter of the feedstock (if any)
+	 */
+	protected double feedDiameter = -1;
 	
 	/**
 	 * 
@@ -485,6 +490,7 @@ public abstract class GenericExtruder implements Extruder
 			materialColour.setMaterial(new Material(col, black, col, black, 101f));
 			surfaceLayers = Preferences.loadGlobalInt(prefName + "SurfaceLayers(0..N)");
 			singleLine = Preferences.loadGlobalBool(prefName + "SingleLine");
+			feedDiameter = Preferences.loadGlobalDouble(prefName + "FeedDiameter(mm)");
 		} catch (Exception ex)
 		{
 			Debug.e("Refresh extruder preferences: " + ex.toString());
@@ -1266,6 +1272,21 @@ public abstract class GenericExtruder implements Extruder
     }
     
     /**
+     * If we are working with feedstock lengths, compute that from the
+     * actual length we want to extrude from the nozzle, otherwise
+     * just return the extruded length.
+     * @param distance
+     * @return
+     */
+    private double filamentDistance(double distance)
+    {
+    	if(getFeedDiameter() < 0)
+    		return distance;
+    	
+    	return distance*getExtrusionHeight()*getExtrusionSize()/(getFeedDiameter()*getFeedDiameter()*Math.PI/4);
+    }
+    
+    /**
      * Get how much extrudate is deposited in a given time (in milliseconds)
      * currentSpeed is in mm per minute.  Valve extruders cannot know, so return 0.
      * @param time (ms)
@@ -1275,7 +1296,8 @@ public abstract class GenericExtruder implements Extruder
     {
     	if(!es.isExtruding() || valvePulseTime > 0)
     		return 0;
-    	return es.speed()*time/60000.0;
+    	
+    	return filamentDistance(extrudeRatio*es.speed()*time/60000.0);
     }
     
     /**
@@ -1289,7 +1311,7 @@ public abstract class GenericExtruder implements Extruder
     {
     	if(!es.isExtruding() || valvePulseTime > 0)
     		return 0;
-    	return extrudeRatio*distance;
+    	return filamentDistance(extrudeRatio*distance);
     }
     
     /**
@@ -1430,5 +1452,14 @@ public abstract class GenericExtruder implements Extruder
     public boolean getSingleLine()
     {
     	return singleLine;
+    }
+    
+    /**
+     * The diameter of the input filament
+     * @return
+     */
+    public double getFeedDiameter()
+    {
+    	return feedDiameter;
     }
 }

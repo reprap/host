@@ -211,8 +211,8 @@ public interface Printer {
 	 * The location to go to at the end
 	 * @return
 	 */
-	public double getFinishX();
-	public double getFinishY();
+//	public double getFinishX();
+//	public double getFinishY();
 	
 	/**
 	 * Move to the purge point

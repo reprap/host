@@ -614,5 +614,9 @@ public interface Extruder
      */
     public boolean getSingleLine();
 	
-	
+    /**
+     * Get the input filament diameter (if any)
+     * @return
+     */
+	public double getFeedDiameter();
 }
