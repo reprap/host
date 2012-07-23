@@ -291,20 +291,20 @@ public interface Extruder
 	 */
 	public void zeroExtrudedLength(boolean really) throws Exception;
     
-    /**
-     * @return the X offset in millimeters
-     */
-    public double getOffsetX();
- 
-    /**
-     * @return the Y offset in millimeters
-     */
-    public double getOffsetY();
- 
-    /**
-     * @return the Z offset in millimeters
-     */
-    public double getOffsetZ();
+//    /**
+//     * @return the X offset in millimeters
+//     */
+//    public double getOffsetX();
+// 
+//    /**
+//     * @return the Y offset in millimeters
+//     */
+//    public double getOffsetY();
+// 
+//    /**
+//     * @return the Z offset in millimeters
+//     */
+//    public double getOffsetZ();
     
     /**
      * @return the appearance (colour) to use in the simulation window for this material

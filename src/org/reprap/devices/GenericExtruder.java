@@ -186,7 +186,7 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * Where to put the nozzle
 	 */
-	protected double offsetX, offsetY, offsetZ;
+	//protected double offsetX, offsetY, offsetZ;
 	
 	/**
 	 * The diameter of the feedstock (if any)
@@ -444,9 +444,9 @@ public abstract class GenericExtruder implements Extruder
 			material = Preferences.loadGlobalString(prefName + "MaterialType(name)");
 			supportMaterial = Preferences.loadGlobalString(prefName + "SupportMaterialType(name)");
 			inFillMaterial = Preferences.loadGlobalString(prefName + "InFillMaterialType(name)");			
-			offsetX = Preferences.loadGlobalDouble(prefName + "OffsetX(mm)");
-			offsetY = Preferences.loadGlobalDouble(prefName + "OffsetY(mm)");
-			offsetZ = Preferences.loadGlobalDouble(prefName + "OffsetZ(mm)");
+//			offsetX = Preferences.loadGlobalDouble(prefName + "OffsetX(mm)");
+//			offsetY = Preferences.loadGlobalDouble(prefName + "OffsetY(mm)");
+//			offsetZ = Preferences.loadGlobalDouble(prefName + "OffsetZ(mm)");
 			nozzleWipeEnabled = false; //Preferences.loadGlobalBool(prefName + "NozzleWipeEnabled");
 			nozzleWipeDatumX = 22.4; //Preferences.loadGlobalDouble(prefName + "NozzleWipeDatumX(mm)");
 			nozzleWipeDatumY = 4; //Preferences.loadGlobalDouble(prefName + "NozzleWipeDatumY(mm)");
@@ -831,29 +831,29 @@ public abstract class GenericExtruder implements Extruder
     	return coolingPeriod;
     } 
     
-    /* (non-Javadoc)
-     * @see org.reprap.Extruder#getOffsetX()
-     */
-    public double getOffsetX()
-    {
-    	return offsetX;
-    }    
-    
-    /* (non-Javadoc)
-     * @see org.reprap.Extruder#getOffsetY()
-     */
-    public double getOffsetY()
-    {
-    	return offsetY;
-    }
-    
-    /* (non-Javadoc)
-     * @see org.reprap.Extruder#getOffsetZ()
-     */
-    public double getOffsetZ()
-    {
-    	return offsetZ;
-    }
+//    /* (non-Javadoc)
+//     * @see org.reprap.Extruder#getOffsetX()
+//     */
+//    public double getOffsetX()
+//    {
+//    	return offsetX;
+//    }    
+//    
+//    /* (non-Javadoc)
+//     * @see org.reprap.Extruder#getOffsetY()
+//     */
+//    public double getOffsetY()
+//    {
+//    	return offsetY;
+//    }
+//    
+//    /* (non-Javadoc)
+//     * @see org.reprap.Extruder#getOffsetZ()
+//     */
+//    public double getOffsetZ()
+//    {
+//    	return offsetZ;
+//    }
     
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getColour()
